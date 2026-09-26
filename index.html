@@ -2,13 +2,54 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Générateur d'images</title>
   <style>
-    body { margin: 0; background: #111; display: flex; justify-content: center; }
-    iframe { width: 100%; max-width: 900px; height: 100vh; border: none; }
+    body { font-family: system-ui, sans-serif; background: #111; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 2rem; }
+    .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+    textarea, button { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box; }
+    button { background: #6366f1; font-weight: bold; cursor: pointer; border: none; }
+    .result { margin-top: 1rem; text-align: center; }
+    img { max-width: 100%; border-radius: 8px; margin-top: 1rem; display: none; }
   </style>
 </head>
 <body>
-  <iframe src="https://black-forest-labs-flux-1-schnell.hf.space"></iframe>
+  <div class="container">
+    <h1>Générateur d'images</h1>
+    <textarea id="prompt" rows="3" placeholder="Entre ton prompt..."></textarea>
+    <button id="btn" onclick="generer()">Générer l'image</button>
+
+    <div class="result">
+      <p id="status"></p>
+      <img id="imageResult" alt="Résultat" />
+    </div>
+  </div>
+
+  <script>
+    function generer() {
+      const prompt = document.getElementById('prompt').value;
+      const status = document.getElementById('status');
+      const img = document.getElementById('imageResult');
+
+      if (!prompt) return alert('Entre un prompt.');
+
+      status.innerText = 'Génération en cours...';
+      img.style.display = 'none';
+
+      // Encodage du prompt pour l'URL
+      const promptEncode = encodeURIComponent(prompt);
+      // URL d'image directe de Pollinations (sans clé requise)
+      const imageUrl = `https://image.pollinations.ai/prompt/${promptEncode}?model=flux&nologo=true&seed=${Math.floor(Math.random() * 1000000)}`;
+
+      img.src = imageUrl;
+      img.onload = () => {
+        status.innerText = '';
+        img.style.display = 'block';
+      };
+      img.onerror = () => {
+        status.innerText = 'Erreur lors du chargement de l\'image.';
+      };
+    }
+  </script>
 </body>
 </html>
