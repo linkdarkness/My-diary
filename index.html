@@ -1,83 +1,1218 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Générateur AI (Sans Censure)</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; background: #0f172a; color: #fff; padding: 1.5rem; display: flex; justify-content: center; }
-    .container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
-    input, textarea, button { width: 100%; padding: 0.85rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 1rem; }
-    button { background: #6366f1; font-weight: bold; cursor: pointer; border: none; }
-    button:disabled { background: #475569; }
-    .result { text-align: center; margin-top: 1rem; }
-    img { max-width: 100%; border-radius: 8px; display: none; margin-top: 1rem; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Générateur AI (Sans Censure)</h2>
-    
-    <label for="apiUrl">1. Lien Colab (.gradio.live)</label>
-    <input type="text" id="apiUrl" placeholder="https://xxxxxx.gradio.live" />
-
-    <label for="prompt">2. Ton prompt</label>
-    <textarea id="prompt" rows="3" placeholder="Description de l'image..."></textarea>
-
-    <button id="btn" onclick="generer()">Générer l'image</button>
-
-    <div class="result">
-      <p id="status"></p>
-      <img id="imageResult" alt="Résultat" />
-    </div>
-  </div>
-
-  <script>
-    async function generer() {
-      let apiUrl = document.getElementById('apiUrl').value.trim();
-      const prompt = document.getElementById('prompt').value.trim();
-      const status = document.getElementById('status');
-      const img = document.getElementById('imageResult');
-      const btn = document.getElementById('btn');
-
-      if (!apiUrl || !prompt) {
-        alert('Entre le lien Gradio et un prompt.');
-        return;
-      }
-
-      apiUrl = apiUrl.replace(/\/$/, "");
-
-      btn.disabled = true;
-      status.innerText = 'Génération sur le GPU Colab (10-15s)...';
-      img.style.display = 'none';
-
-      try {
-        const response = await fetch(`${apiUrl}/sdapi/v1/txt2img`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            prompt: prompt,
-            steps: 20
-          })
-        });
-
-        const data = await response.json();
-        
-        if (data.images && data.images[0]) {
-          img.src = 'data:image/png;base64,' + data.images[0];
-          img.style.display = 'block';
-          status.innerText = '';
-        } else {
-          status.innerText = 'Erreur lors de la génération.';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Loop Dungeon - Roguelike Incremental RPG</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569'
+                        },
+                        accent: {
+                            gold: '#f59e0b',
+                            soul: '#a855f7',
+                            hp: '#ef4444',
+                            xp: '#3b82f6'
+                        }
+                    }
+                }
+            }
         }
-      } catch (err) {
-        console.error(err);
-        status.innerText = 'Impossible de contacter Colab. Vérifie l\'URL.';
-      } finally {
-        btn.disabled = false;
-      }
-    }
-  </script>
+    </script>
+    <style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        
+        .animate-pulse-subtle {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-30px); }
+        }
+        .damage-number {
+            position: absolute;
+            animation: float-up 0.8s ease-out forwards;
+            pointer-events: none;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-slate-100 font-sans min-h-screen flex flex-col md:flex-row overflow-x-hidden select-none">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-dark-800 border-r border-slate-700 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Game Title Header -->
+            <div class="p-4 border-b border-slate-700 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="skull" class="text-accent-soul w-7 h-7"></i>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-purple-400 to-amber-400 bg-clip-text text-transparent">Idle Loop Dungeon</h1>
+                        <span class="text-xs text-slate-400">Roguelike Incremental</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-2 space-y-1">
+                <button onclick="switchTab('dungeon')" id="nav-dungeon" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-purple-900/40 text-purple-200 border border-purple-500/30">
+                    <i data-lucide="swords" class="w-5 h-5 text-purple-400"></i>
+                    <span>Donjon & Combat</span>
+                </button>
+                <button onclick="switchTab('hero')" id="nav-hero" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-dark-700 hover:text-slate-200">
+                    <i data-lucide="user" class="w-5 h-5 text-blue-400"></i>
+                    <span>Héros & Stats</span>
+                </button>
+                <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-dark-700 hover:text-slate-200">
+                    <i data-lucide="shield" class="w-5 h-5 text-emerald-400"></i>
+                    <span>Inventaire (<span id="inv-count">0/20</span>)</span>
+                </button>
+                <button onclick="switchTab('meta')" id="nav-meta" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-dark-700 hover:text-slate-200">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
+                    <span>Arbre d'Âmes (Méta)</span>
+                </button>
+                <button onclick="switchTab('achievements')" id="nav-achievements" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-dark-700 hover:text-slate-200">
+                    <i data-lucide="trophy" class="w-5 h-5 text-yellow-500"></i>
+                    <span>Hauts faits</span>
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-dark-700 hover:text-slate-200">
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-400"></i>
+                    <span>Options / GitHub</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Meta Currency Summary in Sidebar -->
+        <div class="p-4 border-t border-slate-700 bg-dark-900/50 space-y-2">
+            <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400 flex items-center gap-1"><i data-lucide="coins" class="w-3.5 h-3.5 text-amber-400"></i> Or (Run):</span>
+                <span id="sidebar-gold" class="font-bold text-amber-400">0</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400 flex items-center gap-1"><i data-lucide="ghost" class="w-3.5 h-3.5 text-purple-400"></i> Âmes (Méta):</span>
+                <span id="sidebar-souls" class="font-bold text-purple-400">0</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400 flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-blue-400"></i> Étages max:</span>
+                <span id="sidebar-max-floor" class="font-bold text-slate-200">1</span>
+            </div>
+            <button onclick="triggerPrestige()" class="w-full mt-2 py-1.5 px-3 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded text-xs font-semibold flex items-center justify-center gap-1 transition-all shadow-lg shadow-purple-900/20">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Ménager / Réincarnation</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Display -->
+    <main class="flex-1 flex flex-col min-h-0 bg-dark-900 relative overflow-y-auto">
+
+        <!-- Top Bar Header with Quick Hero Overview -->
+        <header class="bg-dark-800/80 backdrop-blur border-b border-slate-700/80 p-3 sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4 flex-wrap">
+                <!-- HP Bar -->
+                <div class="w-44">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-300 font-semibold flex items-center gap-1"><i data-lucide="heart" class="w-3.5 h-3.5 text-red-500 fill-red-500"></i> PV</span>
+                        <span id="top-hp-text" class="text-slate-400 font-mono">100/100</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                        <div id="top-hp-bar" class="bg-red-500 h-full transition-all duration-200" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- XP Bar -->
+                <div class="w-36">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-300 font-semibold flex items-center gap-1"><i data-lucide="zap" class="w-3.5 h-3.5 text-blue-400 fill-blue-400"></i> Niv. <span id="top-level">1</span></span>
+                        <span id="top-xp-text" class="text-slate-400 font-mono">0/50</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
+                        <div id="top-xp-bar" class="bg-blue-500 h-full transition-all duration-200" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="px-3 py-1 bg-dark-900/80 border border-slate-700 rounded-lg flex items-center gap-2">
+                    <i data-lucide="compass" class="w-4 h-4 text-purple-400"></i>
+                    <span class="text-xs text-slate-400">Étage actuel :</span>
+                    <span id="top-current-floor" class="font-bold text-amber-400">1</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TAB 1: DUNGEON COMBAT -->
+        <div id="tab-dungeon" class="tab-content p-4 md:p-6 space-y-6">
+            
+            <!-- Combat Stage Viewport -->
+            <div class="bg-dark-800 border border-slate-700 rounded-xl p-6 relative overflow-hidden shadow-2xl">
+                <!-- Floating damage container -->
+                <div id="damage-container" class="absolute inset-0 pointer-events-none z-20"></div>
+
+                <!-- Dungeon Status Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span id="dungeon-zone-name" class="text-purple-400">Forêt des Ombrages</span>
+                            <span id="boss-badge" class="hidden px-2 py-0.5 bg-red-900/60 text-red-300 border border-red-500 text-xs rounded font-semibold uppercase">BOSS</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Combats automatiques continus • Boucle de Donjon</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="auto-advance-btn" onclick="toggleAutoAdvance()" class="px-3 py-1.5 bg-emerald-900/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-600/50 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                            <i data-lucide="fast-forward" class="w-4 h-4"></i>
+                            <span id="auto-advance-text">Progression Auto: ON</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Battle Arena (Hero vs Enemy) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center my-4 relative">
+                    <!-- HERO CARD -->
+                    <div id="hero-card" class="bg-dark-900/70 border border-blue-500/30 rounded-xl p-5 flex flex-col items-center text-center relative transition-transform">
+                        <div class="w-20 h-20 bg-blue-950/60 border-2 border-blue-500/50 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-blue-500/10">
+                            <i data-lucide="shield-user" class="w-10 h-10 text-blue-400"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-200" id="arena-hero-name">Le Vagabond</h3>
+                        <p class="text-xs text-blue-400 font-semibold mb-3">Niveau <span id="arena-hero-level">1</span></p>
+                        
+                        <!-- Hero HP Bar -->
+                        <div class="w-full space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">PV</span>
+                                <span id="arena-hero-hp-text" class="font-mono text-slate-300">100/100</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                                <div id="arena-hero-hp-bar" class="bg-red-500 h-full transition-all duration-150" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VS Divider / Combat Progress -->
+                    <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex-col items-center justify-center z-10 pointer-events-none">
+                        <span class="bg-dark-800 border border-slate-700 text-slate-400 rounded-full w-8 h-8 flex items-center justify-center text-xs font-black">VS</span>
+                    </div>
+
+                    <!-- ENEMY CARD -->
+                    <div id="enemy-card" class="bg-dark-900/70 border border-red-500/30 rounded-xl p-5 flex flex-col items-center text-center relative transition-transform">
+                        <div id="enemy-avatar-bg" class="w-20 h-20 bg-red-950/60 border-2 border-red-500/50 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-red-500/10">
+                            <i id="enemy-icon" data-lucide="bug" class="w-10 h-10 text-red-400"></i>
+                        </div>
+                        <h3 id="enemy-name" class="font-bold text-slate-200">Gargouille des Cavernes</h3>
+                        <p class="text-xs text-slate-400 mb-3">Niveau d'Étage <span id="enemy-level">1</span></p>
+
+                        <!-- Enemy HP Bar -->
+                        <div class="w-full space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">PV Monstre</span>
+                                <span id="arena-enemy-hp-text" class="font-mono text-slate-300">30/30</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                                <div id="arena-enemy-hp-bar" class="bg-red-600 h-full transition-all duration-150" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combat Timer Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-slate-400 mb-1">
+                        <span>Attaque imminente</span>
+                        <span id="turn-timer-text">--</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                        <div id="attack-progress-bar" class="bg-purple-500 h-full w-0 transition-all duration-75"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combat Activity Console Log -->
+            <div class="bg-dark-800 border border-slate-700 rounded-xl p-4 flex flex-col h-56">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-700 mb-2">
+                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="terminal" class="w-4 h-4 text-purple-400"></i> Journal d'Aventure
+                    </span>
+                    <button onclick="clearCombatLog()" class="text-xs text-slate-500 hover:text-slate-300">Effacer</button>
+                </div>
+                <div id="combat-log" class="flex-1 overflow-y-auto space-y-1 font-mono text-xs pr-2">
+                    <!-- Logs dynamically appended here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: HERO & STATS -->
+        <div id="tab-hero" class="tab-content hidden p-4 md:p-6 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Stats Overview -->
+                <div class="bg-dark-800 border border-slate-700 rounded-xl p-5 lg:col-span-1 space-y-4">
+                    <h3 class="text-lg font-bold border-b border-slate-700 pb-2 flex items-center gap-2">
+                        <i data-lucide="user-check" class="text-blue-400 w-5 h-5"></i> Attributes du Héros
+                    </h3>
+
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between py-1.5 border-b border-slate-700/50">
+                            <span class="text-slate-400">Attaque Physique:</span>
+                            <span id="stat-atk" class="font-bold text-slate-200">10</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-700/50">
+                            <span class="text-slate-400">Défense / Réduction:</span>
+                            <span id="stat-def" class="font-bold text-slate-200">0</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-700/50">
+                            <span class="text-slate-400">Chances de Critique:</span>
+                            <span id="stat-crit" class="font-bold text-amber-400">5%</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-700/50">
+                            <span class="text-slate-400">Régénération PV/sec:</span>
+                            <span id="stat-regen" class="font-bold text-emerald-400">1.0</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-slate-700/50">
+                            <span class="text-slate-400">Points de Stat Dispo:</span>
+                            <span id="stat-points" class="font-bold text-amber-400">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat Leveling Panel -->
+                <div class="bg-dark-800 border border-slate-700 rounded-xl p-5 lg:col-span-2 space-y-4">
+                    <h3 class="text-lg font-bold border-b border-slate-700 pb-2 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="text-amber-400 w-5 h-5"></i> Améliorations de Statistiques (Run)
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Stat Upgrade 1: Force -->
+                        <div class="bg-dark-900/60 p-4 rounded-lg border border-slate-700 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold text-slate-200">Force (Attaque)</h4>
+                                <p class="text-xs text-slate-400">+2 Attaque par niveau</p>
+                            </div>
+                            <button onclick="upgradeStat('atk')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors">
+                                +1 (<span id="stat-cost-atk">1</span> pt)
+                            </button>
+                        </div>
+
+                        <!-- Stat Upgrade 2: Vitalité -->
+                        <div class="bg-dark-900/60 p-4 rounded-lg border border-slate-700 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold text-slate-200">Vitalité (PV Max)</h4>
+                                <p class="text-xs text-slate-400">+15 PV Max par niveau</p>
+                            </div>
+                            <button onclick="upgradeStat('hp')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors">
+                                +1 (<span id="stat-cost-hp">1</span> pt)
+                            </button>
+                        </div>
+
+                        <!-- Stat Upgrade 3: Agilité -->
+                        <div class="bg-dark-900/60 p-4 rounded-lg border border-slate-700 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold text-slate-200">Agilité (Critique)</h4>
+                                <p class="text-xs text-slate-400">+1.5% Chance Critique</p>
+                            </div>
+                            <button onclick="upgradeStat('crit')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors">
+                                +1 (<span id="stat-cost-crit">1</span> pt)
+                            </button>
+                        </div>
+
+                        <!-- Stat Upgrade 4: Armure -->
+                        <div class="bg-dark-900/60 p-4 rounded-lg border border-slate-700 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold text-slate-200">Robustesse (Défense)</h4>
+                                <p class="text-xs text-slate-400">+1 Réduction de Dégâts</p>
+                            </div>
+                            <button onclick="upgradeStat('def')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition-colors">
+                                +1 (<span id="stat-cost-def">1</span> pt)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: INVENTORY & GEAR -->
+        <div id="tab-inventory" class="tab-content hidden p-4 md:p-6 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Equipped Gear Slots -->
+                <div class="bg-dark-800 border border-slate-700 rounded-xl p-5 lg:col-span-1 space-y-4">
+                    <h3 class="text-lg font-bold border-b border-slate-700 pb-2 flex items-center gap-2">
+                        <i data-lucide="shield" class="text-emerald-400 w-5 h-5"></i> Équipement Actif
+                    </h3>
+
+                    <div class="space-y-3">
+                        <!-- Weapon Slot -->
+                        <div id="slot-weapon" class="p-3 bg-dark-900/80 border border-slate-700 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-800 border border-slate-600 rounded flex items-center justify-center">
+                                    <i data-lucide="sword" class="w-5 h-5 text-amber-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Arme</p>
+                                    <p id="eq-weapon-name" class="text-sm font-semibold text-slate-200">Épée en Bois</p>
+                                </div>
+                            </div>
+                            <button onclick="unequipSlot('weapon')" class="text-xs text-red-400 hover:text-red-300">Retirer</button>
+                        </div>
+
+                        <!-- Armor Slot -->
+                        <div id="slot-armor" class="p-3 bg-dark-900/80 border border-slate-700 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-800 border border-slate-600 rounded flex items-center justify-center">
+                                    <i data-lucide="shirt" class="w-5 h-5 text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Armure</p>
+                                    <p id="eq-armor-name" class="text-sm font-semibold text-slate-200">Tunique usée</p>
+                                </div>
+                            </div>
+                            <button onclick="unequipSlot('armor')" class="text-xs text-red-400 hover:text-red-300">Retirer</button>
+                        </div>
+
+                        <!-- Accessory Slot -->
+                        <div id="slot-accessory" class="p-3 bg-dark-900/80 border border-slate-700 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-800 border border-slate-600 rounded flex items-center justify-center">
+                                    <i data-lucide="gem" class="w-5 h-5 text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Accessoire</p>
+                                    <p id="eq-accessory-name" class="text-sm font-semibold text-slate-200">Aucun</p>
+                                </div>
+                            </div>
+                            <button onclick="unequipSlot('accessory')" class="text-xs text-red-400 hover:text-red-300">Retirer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bag / Inventory Storage Grid -->
+                <div class="bg-dark-800 border border-slate-700 rounded-xl p-5 lg:col-span-2 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                        <h3 class="text-lg font-bold flex items-center gap-2">
+                            <i data-lucide="package" class="text-amber-400 w-5 h-5"></i> Sac à dos
+                        </h3>
+                        <button onclick="sellAllCommon()" class="px-2.5 py-1 bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-700/50 rounded text-xs transition-colors">
+                            Vendre Objets Communs
+                        </button>
+                    </div>
+
+                    <!-- Item Grid -->
+                    <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-1">
+                        <!-- Dynamic items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SOUL TREE (META-PROGRESSION) -->
+        <div id="tab-meta" class="tab-content hidden p-4 md:p-6 space-y-6">
+            <div class="bg-dark-800 border border-slate-700 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-700 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-purple-400 flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i> Arbre des Âmes Révélées
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Ces améliorations restent **permanentes** même après votre mort ou votre réincarnation !
+                        </p>
+                    </div>
+                    <div class="bg-dark-900 px-4 py-2 rounded-lg border border-purple-500/30 flex items-center gap-2">
+                        <i data-lucide="ghost" class="w-5 h-5 text-purple-400"></i>
+                        <span class="text-sm text-slate-400">Réserve d'Âmes :</span>
+                        <span id="meta-souls-display" class="text-lg font-bold text-purple-400">0</span>
+                    </div>
+                </div>
+
+                <!-- Meta Upgrades List -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Meta Upgrade 1 -->
+                    <div class="bg-dark-900/80 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-200">Force des Ancêtres</h4>
+                            <p class="text-xs text-slate-400">+10% Attaque permanente de base</p>
+                            <p class="text-xs text-purple-400 font-semibold">Niveau actuel: <span id="meta-lvl-atk">0</span></p>
+                        </div>
+                        <button onclick="buyMetaUpgrade('atk')" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all shadow">
+                            Améliorer (<span id="meta-cost-atk">10</span> Âmes)
+                        </button>
+                    </div>
+
+                    <!-- Meta Upgrade 2 -->
+                    <div class="bg-dark-900/80 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-200">Robustesse Éternelle</h4>
+                            <p class="text-xs text-slate-400">+25 PV Max permanents</p>
+                            <p class="text-xs text-purple-400 font-semibold">Niveau actuel: <span id="meta-lvl-hp">0</span></p>
+                        </div>
+                        <button onclick="buyMetaUpgrade('hp')" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all shadow">
+                            Améliorer (<span id="meta-cost-hp">10</span> Âmes)
+                        </button>
+                    </div>
+
+                    <!-- Meta Upgrade 3 -->
+                    <div class="bg-dark-900/80 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-200">Aura d'Avarice</h4>
+                            <p class="text-xs text-slate-400">+15% Gain d'Or global</p>
+                            <p class="text-xs text-purple-400 font-semibold">Niveau actuel: <span id="meta-lvl-gold">0</span></p>
+                        </div>
+                        <button onclick="buyMetaUpgrade('gold')" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all shadow">
+                            Améliorer (<span id="meta-cost-gold">15</span> Âmes)
+                        </button>
+                    </div>
+
+                    <!-- Meta Upgrade 4 -->
+                    <div class="bg-dark-900/80 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-200">Régénération Vitale</h4>
+                            <p class="text-xs text-slate-400">+0.5 Régénération PV/sec</p>
+                            <p class="text-xs text-purple-400 font-semibold">Niveau actuel: <span id="meta-lvl-regen">0</span></p>
+                        </div>
+                        <button onclick="buyMetaUpgrade('regen')" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all shadow">
+                            Améliorer (<span id="meta-cost-regen">20</span> Âmes)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ACHIEVEMENTS -->
+        <div id="tab-achievements" class="tab-content hidden p-4 md:p-6 space-y-6">
+            <div class="bg-dark-800 border border-slate-700 rounded-xl p-6">
+                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2 mb-4">
+                    <i data-lucide="trophy" class="w-6 h-6"></i> Hauts Faits & Exploits
+                </h2>
+                <div id="achievements-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Dynamic achievements list -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: SETTINGS & GITHUB PAGES -->
+        <div id="tab-settings" class="tab-content hidden p-4 md:p-6 space-y-6">
+            <!-- Save/Reset Section -->
+            <div class="bg-dark-800 border border-slate-700 rounded-xl p-6 space-y-4">
+                <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5 text-blue-400"></i> Sauvegarde & Données
+                </h3>
+                <p class="text-xs text-slate-400">Le jeu se sauvegarde automatiquement dans votre navigateur toutes les 10 secondes ainsi qu'en quittant.</p>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="manualSave()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors">
+                        Sauvegarder Maintenant
+                    </button>
+                    <button onclick="resetGamePrompt()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition-colors">
+                        Réinitialiser Totalement le Jeu
+                    </button>
+                </div>
+            </div>
+
+            <!-- GitHub Pages Hosting Tutorial -->
+            <div class="bg-dark-800 border border-slate-700 rounded-xl p-6 space-y-4">
+                <h3 class="text-lg font-bold text-purple-400 flex items-center gap-2">
+                    <i data-lucide="github" class="w-5 h-5"></i> Comment Héberger ce jeu sur GitHub Pages ?
+                </h3>
+                <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                    <p>Ce jeu est conçu comme un <strong>fichier HTML unique autonome</strong> sans aucune dépendance serveur requise.</p>
+                    <ol class="list-decimal list-inside space-y-1.5 text-slate-400">
+                        <li>Créez un dépôt GitHub public (ex: <code class="bg-dark-900 px-1 py-0.5 rounded text-amber-300">mon-rpg-idle</code>).</li>
+                        <li>Enregistrez ce code complet dans un fichier nommé <code class="bg-dark-900 px-1 py-0.5 rounded text-amber-300">index.html</code>.</li>
+                        <li>Uploadez ou pushez ce fichier <code class="bg-dark-900 px-1 py-0.5 rounded text-amber-300">index.html</code> à la racine de la branche <code class="bg-dark-900 px-1 py-0.5 rounded text-amber-300">main</code>.</li>
+                        <li>Dans GitHub, allez sur votre dépôt dans <strong>Settings &gt; Pages</strong>.</li>
+                        <li>Sous "Build and deployment / Source", choisissez <strong>Deploy from a branch</strong> et sélectionnez <code class="bg-dark-900 px-1 py-0.5 rounded text-amber-300">main</code>.</li>
+                        <li>Cliquez sur <strong>Save</strong>. En 1-2 minutes, votre jeu sera en ligne gratuitement !</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        /* GAME DATA AND STATE STRUCTURE */
+        const DEFAULT_STATE = {
+            version: 1.0,
+            lastSaveTime: Date.now(),
+            hero: {
+                level: 1,
+                xp: 0,
+                maxXp: 50,
+                hp: 100,
+                maxHp: 100,
+                statPoints: 0,
+                stats: {
+                    atk: 10,
+                    def: 0,
+                    crit: 5,
+                    regen: 1.0
+                },
+                equipment: {
+                    weapon: { name: "Épée de Bois", atk: 5, def: 0, crit: 0, rarity: "common" },
+                    armor: { name: "Tunique usée", atk: 0, def: 2, crit: 0, rarity: "common" },
+                    accessory: null
+                }
+            },
+            dungeon: {
+                currentFloor: 1,
+                highestFloor: 1,
+                autoAdvance: true,
+                currentMonster: null
+            },
+            inventory: [],
+            inventoryCapacity: 20,
+            meta: {
+                gold: 0,
+                souls: 0,
+                upgrades: {
+                    atk: 0,
+                    hp: 0,
+                    gold: 0,
+                    regen: 0
+                }
+            },
+            achievements: {
+                monstersKilled: 0,
+                bossesKilled: 0,
+                totalPrestages: 0
+            }
+        };
+
+        let gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+
+        /* Monster Database Generator */
+        const MONSTER_PREFIXES = ["Ombre", "Ferocité", "Enragé", "Spectral", "Venimeux", "Céleste"];
+        const MONSTER_TYPES = [
+            { name: "Gargouille", icon: "bug", hpMult: 1.0, atkMult: 1.0 },
+            { name: "Squelette guerrier", icon: "skull", hpMult: 0.9, atkMult: 1.2 },
+            { name: "Loup des ténébres", icon: "dog", hpMult: 0.8, atkMult: 1.3 },
+            { name: "Golem de roche", icon: "shield", hpMult: 1.6, atkMult: 0.8 }
+        ];
+
+        /* Achievements Definition */
+        const ACHIEVEMENTS_DEF = [
+            { id: "kill_10", title: "Chasseur débutant", desc: "Tuer 10 monstres", check: (s) => s.achievements.monstersKilled >= 10 },
+            { id: "floor_10", title: "Explorateur de Donjons", desc: "Atteindre l'étage 10", check: (s) => s.dungeon.highestFloor >= 10 },
+            { id: "boss_1", title: "Tueur de Géants", desc: "Vaincre votre premier Boss d'étage", check: (s) => s.achievements.bossesKilled >= 1 },
+            { id: "prestige_1", title: "Nouvelle Vie", desc: "Effectuer votre première réincarnation", check: (s) => s.achievements.totalPrestages >= 1 }
+        ];
+
+        /* Game Loop Timers */
+        let combatTimer = 0;
+        const COMBAT_INTERVAL = 1200; // ms per tick action
+        let lastLoopTime = Date.now();
+
+        /* Initialize Lucide Icons */
+        function initIcons() {
+            lucide.createIcons();
+        }
+
+        /* Navigation Tab Switching */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-purple-900/40', 'text-purple-200', 'border', 'border-purple-500/30');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-purple-900/40', 'text-purple-200', 'border', 'border-purple-500/30');
+                activeBtn.classList.remove('text-slate-400');
+            }
+        }
+
+        /* Spawn Monster Logic */
+        function spawnMonster() {
+            const floor = gameState.dungeon.currentFloor;
+            const isBoss = floor % 5 === 0;
+
+            const baseType = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
+            const prefix = MONSTER_PREFIXES[Math.floor(Math.random() * MONSTER_PREFIXES.length)];
+
+            const name = isBoss ? `BOSS : ${prefix} ${baseType.name}` : `${prefix} ${baseType.name}`;
+            const hpBase = (25 + (floor * 18)) * baseType.hpMult * (isBoss ? 2.5 : 1.0);
+            const atkBase = (5 + (floor * 3.5)) * baseType.atkMult * (isBoss ? 1.4 : 1.0);
+
+            gameState.dungeon.currentMonster = {
+                name: name,
+                icon: baseType.icon,
+                isBoss: isBoss,
+                maxHp: Math.floor(hpBase),
+                hp: Math.floor(hpBase),
+                atk: Math.floor(atkBase),
+                floor: floor
+            };
+
+            updateDungeonUI();
+        }
+
+        /* Calculate Total Hero Stats */
+        function getEffectiveHeroStats() {
+            let totalAtk = gameState.hero.stats.atk;
+            let totalDef = gameState.hero.stats.def;
+            let totalCrit = gameState.hero.stats.crit;
+            let totalRegen = gameState.hero.stats.regen;
+            let totalMaxHp = gameState.hero.maxHp;
+
+            // Apply Equipment Stats
+            Object.values(gameState.hero.equipment).forEach(item => {
+                if (item) {
+                    totalAtk += item.atk || 0;
+                    totalDef += item.def || 0;
+                    totalCrit += item.crit || 0;
+                }
+            });
+
+            // Apply Permanent Meta Multipliers
+            const metaAtkMult = 1 + (gameState.meta.upgrades.atk * 0.10);
+            totalAtk = Math.floor(totalAtk * metaAtkMult);
+
+            const metaHpBonus = gameState.meta.upgrades.hp * 25;
+            totalMaxHp += metaHpBonus;
+
+            totalRegen += (gameState.meta.upgrades.regen * 0.5);
+
+            return {
+                atk: totalAtk,
+                def: totalDef,
+                crit: Math.min(75, totalCrit),
+                regen: totalRegen,
+                maxHp: totalMaxHp
+            };
+        }
+
+        /* Combat Tick Loop */
+        function processCombatTick(deltaTime) {
+            if (!gameState.dungeon.currentMonster) {
+                spawnMonster();
+                return;
+            }
+
+            const stats = getEffectiveHeroStats();
+
+            // Passive Regeneration
+            if (gameState.hero.hp < stats.maxHp) {
+                gameState.hero.hp = Math.min(stats.maxHp, gameState.hero.hp + (stats.regen * (deltaTime / 1000)));
+            }
+
+            combatTimer += deltaTime;
+            const progress = Math.min(100, (combatTimer / COMBAT_INTERVAL) * 100);
+            document.getElementById('attack-progress-bar').style.width = `${progress}%`;
+
+            if (combatTimer >= COMBAT_INTERVAL) {
+                combatTimer = 0;
+                executeCombatRound(stats);
+            }
+
+            updateTopBarUI();
+        }
+
+        /* Execute Round */
+        function executeCombatRound(heroStats) {
+            const monster = gameState.dungeon.currentMonster;
+            if (!monster) return;
+
+            // 1. Hero attacks Monster
+            const isCrit = Math.random() * 100 < heroStats.crit;
+            let heroDamage = heroStats.atk;
+            if (isCrit) heroDamage = Math.floor(heroDamage * 1.8);
+
+            monster.hp -= heroDamage;
+            spawnDamageNumber(heroDamage, isCrit, 'enemy-card');
+            logCombatMessage(`Vous frappez ${monster.name} pour <span class="text-amber-400 font-bold">${heroDamage}</span> dégâts !${isCrit ? ' (Coup Critique!)' : ''}`);
+
+            // Check Monster Death
+            if (monster.hp <= 0) {
+                handleMonsterDefeated(monster);
+                return;
+            }
+
+            // 2. Monster attacks Hero
+            let monsterDamage = Math.max(1, monster.atk - heroStats.def);
+            gameState.hero.hp -= monsterDamage;
+            spawnDamageNumber(monsterDamage, false, 'hero-card');
+            logCombatMessage(`${monster.name} vous inflige <span class="text-red-400">${monsterDamage}</span> dégâts.`, 'red');
+
+            // Check Hero Death
+            if (gameState.hero.hp <= 0) {
+                handleHeroDeath();
+            }
+
+            updateDungeonUI();
+        }
+
+        /* Monster Defeated Handler */
+        function handleMonsterDefeated(monster) {
+            gameState.achievements.monstersKilled++;
+            if (monster.isBoss) gameState.achievements.bossesKilled++;
+
+            // Calculate Gold Reward
+            const metaGoldMult = 1 + (gameState.meta.upgrades.gold * 0.15);
+            const goldEarned = Math.floor((12 + (monster.floor * 6)) * metaGoldMult);
+            gameState.meta.gold += goldEarned;
+
+            // Calculate XP Reward
+            const xpEarned = Math.floor(15 + (monster.floor * 8));
+            addHeroXp(xpEarned);
+
+            logCombatMessage(`Victoire ! ${monster.name} vaincu. +${goldEarned} Or, +${xpEarned} XP.`, 'emerald');
+
+            // Loot Drop Chance
+            if (Math.random() < 0.45 || monster.isBoss) {
+                generateLootItem(monster.floor, monster.isBoss);
+            }
+
+            // Dungeon Progression
+            if (gameState.dungeon.autoAdvance) {
+                gameState.dungeon.currentFloor++;
+                if (gameState.dungeon.currentFloor > gameState.dungeon.highestFloor) {
+                    gameState.dungeon.highestFloor = gameState.dungeon.currentFloor;
+                }
+            }
+
+            spawnMonster();
+        }
+
+        /* Hero Death Handler */
+        function handleHeroDeath() {
+            logCombatMessage(`VOUS ÊTES MORT au niveau ${gameState.dungeon.currentFloor} ! Réincarnation forcée...`, 'purple');
+            triggerPrestige(true);
+        }
+
+        /* Loot Item Generator */
+        function generateLootItem(floor, isBoss = false) {
+            if (gameState.inventory.length >= gameState.inventoryCapacity) {
+                logCombatMessage(`Inventaire plein ! Objet abandonné au sol.`, 'slate');
+                return;
+            }
+
+            const itemTypes = ['weapon', 'armor', 'accessory'];
+            const type = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+
+            const rarities = [
+                { name: 'Common', color: 'slate-300', chance: 0.6 },
+                { name: 'Rare', color: 'blue-400', chance: 0.3 },
+                { name: 'Epic', color: 'purple-400', chance: 0.1 }
+            ];
+
+            let rarityObj = rarities[0];
+            const rand = Math.random();
+            if (rand < 0.1 || isBoss) rarityObj = rarities[2];
+            else if (rand < 0.4) rarityObj = rarities[1];
+
+            let item = {
+                id: Date.now() + Math.random(),
+                type: type,
+                rarity: rarityObj.name,
+                atk: 0,
+                def: 0,
+                crit: 0
+            };
+
+            const statScale = floor * (rarityObj.name === 'Epic' ? 2.5 : rarityObj.name === 'Rare' ? 1.5 : 1.0);
+
+            if (type === 'weapon') {
+                item.name = `${rarityObj.name === 'Epic' ? 'Dague Légendaire' : 'Épée Raze'} +${floor}`;
+                item.atk = Math.max(2, Math.floor(3 + statScale));
+                item.crit = rarityObj.name === 'Epic' ? 5 : 2;
+            } else if (type === 'armor') {
+                item.name = `${rarityObj.name === 'Epic' ? 'Cotte de Mailles' : 'Cuirassé'} +${floor}`;
+                item.def = Math.max(1, Math.floor(1 + (statScale * 0.7)));
+            } else {
+                item.name = `Amulette d'Âme +${floor}`;
+                item.atk = Math.floor(1 + (statScale * 0.5));
+                item.crit = Math.floor(2 + (statScale * 0.4));
+            }
+
+            gameState.inventory.push(item);
+            logCombatMessage(`Objet trouvé: <span class="text-amber-300">${item.name}</span>!`, 'amber');
+            updateInventoryUI();
+        }
+
+        /* Equip Item */
+        function equipItem(itemId) {
+            const index = gameState.inventory.findIndex(i => i.id === itemId);
+            if (index === -1) return;
+
+            const item = gameState.inventory[index];
+            const oldItem = gameState.hero.equipment[item.type];
+
+            gameState.hero.equipment[item.type] = item;
+            gameState.inventory.splice(index, 1);
+
+            if (oldItem) {
+                gameState.inventory.push(oldItem);
+            }
+
+            updateInventoryUI();
+            updateHeroUI();
+        }
+
+        /* Unequip Slot */
+        function unequipSlot(slotType) {
+            const current = gameState.hero.equipment[slotType];
+            if (!current) return;
+
+            if (gameState.inventory.length >= gameState.inventoryCapacity) {
+                logCombatMessage(`Inventaire plein ! Impossible de retirer.`, 'slate');
+                return;
+            }
+
+            gameState.inventory.push(current);
+            gameState.hero.equipment[slotType] = null;
+
+            updateInventoryUI();
+            updateHeroUI();
+        }
+
+        /* Sell Item */
+        function sellItem(itemId) {
+            const index = gameState.inventory.findIndex(i => i.id === itemId);
+            if (index === -1) return;
+
+            const item = gameState.inventory[index];
+            const value = Math.floor(10 + (item.atk + item.def + item.crit) * 5);
+            gameState.meta.gold += value;
+
+            gameState.inventory.splice(index, 1);
+            updateInventoryUI();
+            updateTopBarUI();
+        }
+
+        function sellAllCommon() {
+            gameState.inventory = gameState.inventory.filter(item => {
+                if (item.rarity === 'Common') {
+                    const value = Math.floor(10 + (item.atk + item.def + item.crit) * 5);
+                    gameState.meta.gold += value;
+                    return false;
+                }
+                return true;
+            });
+            updateInventoryUI();
+            updateTopBarUI();
+        }
+
+        /* Hero XP and Level Up */
+        function addHeroXp(amount) {
+            gameState.hero.xp += amount;
+            while (gameState.hero.xp >= gameState.hero.maxXp) {
+                gameState.hero.xp -= gameState.hero.maxXp;
+                gameState.hero.level++;
+                gameState.hero.statPoints += 2;
+                gameState.hero.maxXp = Math.floor(gameState.hero.maxXp * 1.35);
+
+                const stats = getEffectiveHeroStats();
+                gameState.hero.hp = stats.maxHp; // Full heal on level up
+                logCombatMessage(` NIVEAU SUPÉRIEUR ! Vous êtes niveau ${gameState.hero.level}. (+2 Points de Stat)`, 'blue');
+            }
+        }
+
+        /* Upgrade Hero Stat Point */
+        function upgradeStat(statName) {
+            if (gameState.hero.statPoints < 1) return;
+
+            gameState.hero.statPoints--;
+            if (statName === 'atk') gameState.hero.stats.atk += 2;
+            if (statName === 'hp') {
+                gameState.hero.maxHp += 15;
+                gameState.hero.hp += 15;
+            }
+            if (statName === 'crit') gameState.hero.stats.crit += 1.5;
+            if (statName === 'def') gameState.hero.stats.def += 1;
+
+            updateHeroUI();
+        }
+
+        /* Buy Permanent Soul Upgrade */
+        function buyMetaUpgrade(type) {
+            const currentLvl = gameState.meta.upgrades[type];
+            const costs = { atk: 10, hp: 10, gold: 15, regen: 20 };
+            const cost = Math.floor(costs[type] * Math.pow(1.5, currentLvl));
+
+            if (gameState.meta.souls >= cost) {
+                gameState.meta.souls -= cost;
+                gameState.meta.upgrades[type]++;
+                updateMetaUI();
+                updateTopBarUI();
+            }
+        }
+
+        /* Prestige / Reset Run for Souls */
+        function triggerPrestige(isDeath = false) {
+            const soulsEarned = Math.floor(Math.pow(gameState.dungeon.highestFloor, 1.2));
+
+            if (!isDeath && !confirm(`Voulez-vous vous réincarner maintenant ? Vous gagnerez ${soulsEarned} Âmes mais réinitialiserez votre niveau et étage.`)) {
+                return;
+            }
+
+            gameState.meta.souls += soulsEarned;
+            gameState.achievements.totalPrestages++;
+
+            // Reset Hero & Floor
+            gameState.hero.level = 1;
+            gameState.hero.xp = 0;
+            gameState.hero.maxXp = 50;
+            gameState.hero.statPoints = 0;
+            gameState.hero.stats = { atk: 10, def: 0, crit: 5, regen: 1.0 };
+            gameState.hero.maxHp = 100;
+            gameState.hero.hp = 100;
+
+            gameState.dungeon.currentFloor = 1;
+            gameState.dungeon.currentMonster = null;
+
+            logCombatMessage(`Réincarnation accomplie ! +${soulsEarned} Âmes acquises.`, 'purple');
+            
+            spawnMonster();
+            updateAllUI();
+        }
+
+        /* Offline Calculation */
+        function calculateOfflineProgress() {
+            const now = Date.now();
+            const elapsedSeconds = Math.floor((now - gameState.lastSaveTime) / 1000);
+            
+            if (elapsedSeconds > 10) {
+                const simulatedTicks = Math.min(500, Math.floor(elapsedSeconds / 2));
+                const goldPerTick = Math.max(1, Math.floor(gameState.dungeon.currentFloor * 0.8));
+                const totalOfflineGold = simulatedTicks * goldPerTick;
+
+                gameState.meta.gold += totalOfflineGold;
+                logCombatMessage(`Bon retour ! Gain Hors-ligne : +${totalOfflineGold} Or (${elapsedSeconds}s d'absence)`, 'amber');
+            }
+            gameState.lastSaveTime = now;
+        }
+
+        /* LocalStorage Helpers */
+        function saveGame() {
+            gameState.lastSaveTime = Date.now();
+            localStorage.setItem('idle_loop_dungeon_save', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('idle_loop_dungeon_save');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    gameState = { ...DEFAULT_STATE, ...parsed };
+                } catch (e) {
+                    console.error("Save state corrupted, using default.", e);
+                }
+            }
+        }
+
+        function manualSave() {
+            saveGame();
+            alert("Partie sauvegardée avec succès !");
+        }
+
+        function resetGamePrompt() {
+            if (confirm("ÊTES-VOUS SÛR ? Cela supprimera toute votre progression !")) {
+                localStorage.removeItem('idle_loop_dungeon_save');
+                location.reload();
+            }
+        }
+
+        /* UI Rendering Core */
+        function updateAllUI() {
+            updateTopBarUI();
+            updateDungeonUI();
+            updateHeroUI();
+            updateInventoryUI();
+            updateMetaUI();
+            updateAchievementsUI();
+        }
+
+        function updateTopBarUI() {
+            const stats = getEffectiveHeroStats();
+            document.getElementById('top-hp-text').innerText = `${Math.ceil(gameState.hero.hp)}/${stats.maxHp}`;
+            document.getElementById('top-hp-bar').style.width = `${Math.max(0, (gameState.hero.hp / stats.maxHp) * 100)}%`;
+
+            document.getElementById('top-level').innerText = gameState.hero.level;
+            document.getElementById('top-xp-text').innerText = `${gameState.hero.xp}/${gameState.hero.maxXp}`;
+            document.getElementById('top-xp-bar').style.width = `${(gameState.hero.xp / gameState.hero.maxXp) * 100}%`;
+
+            document.getElementById('top-current-floor').innerText = gameState.dungeon.currentFloor;
+            document.getElementById('sidebar-gold').innerText = gameState.meta.gold.toLocaleString();
+            document.getElementById('sidebar-souls').innerText = gameState.meta.souls.toLocaleString();
+            document.getElementById('sidebar-max-floor').innerText = gameState.dungeon.highestFloor;
+        }
+
+        function updateDungeonUI() {
+            const monster = gameState.dungeon.currentMonster;
+            if (!monster) return;
+
+            document.getElementById('enemy-name').innerText = monster.name;
+            document.getElementById('enemy-level').innerText = monster.floor;
+            document.getElementById('arena-enemy-hp-text').innerText = `${Math.max(0, monster.hp)}/${monster.maxHp}`;
+            document.getElementById('arena-enemy-hp-bar').style.width = `${Math.max(0, (monster.hp / monster.maxHp) * 100)}%`;
+
+            const bossBadge = document.getElementById('boss-badge');
+            if (monster.isBoss) bossBadge.classList.remove('hidden');
+            else bossBadge.classList.add('hidden');
+
+            const stats = getEffectiveHeroStats();
+            document.getElementById('arena-hero-hp-text').innerText = `${Math.ceil(gameState.hero.hp)}/${stats.maxHp}`;
+            document.getElementById('arena-hero-hp-bar').style.width = `${Math.max(0, (gameState.hero.hp / stats.maxHp) * 100)}%`;
+            document.getElementById('arena-hero-level').innerText = gameState.hero.level;
+        }
+
+        function updateHeroUI() {
+            const stats = getEffectiveHeroStats();
+            document.getElementById('stat-atk').innerText = stats.atk;
+            document.getElementById('stat-def').innerText = stats.def;
+            document.getElementById('stat-crit').innerText = `${stats.crit}%`;
+            document.getElementById('stat-regen').innerText = stats.regen.toFixed(1);
+            document.getElementById('stat-points').innerText = gameState.hero.statPoints;
+        }
+
+        function updateInventoryUI() {
+            document.getElementById('inv-count').innerText = `${gameState.inventory.length}/${gameState.inventoryCapacity}`;
+
+            // Update Equipped UI
+            const eq = gameState.hero.equipment;
+            document.getElementById('eq-weapon-name').innerText = eq.weapon ? eq.weapon.name : "Aucune";
+            document.getElementById('eq-armor-name').innerText = eq.armor ? eq.armor.name : "Aucune";
+            document.getElementById('eq-accessory-name').innerText = eq.accessory ? eq.accessory.name : "Aucune";
+
+            // Render Inventory Grid
+            const grid = document.getElementById('inventory-grid');
+            grid.innerHTML = '';
+
+            gameState.inventory.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = `p-3 bg-dark-900/80 border rounded-lg flex items-center justify-between ${item.rarity === 'Epic' ? 'border-purple-500/50' : item.rarity === 'Rare' ? 'border-blue-500/50' : 'border-slate-700'}`;
+                
+                let statsText = [];
+                if (item.atk) statsText.push(`+${item.atk} Atk`);
+                if (item.def) statsText.push(`+${item.def} Def`);
+                if (item.crit) statsText.push(`+${item.crit}% Crit`);
+
+                itemEl.innerHTML = `
+                    <div>
+                        <p class="text-xs font-bold text-slate-200">${item.name}</p>
+                        <p class="text-xs text-amber-400 font-mono">${statsText.join(' ')}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="equipItem(${item.id})" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs">Équiper</button>
+                        <button onclick="sellItem(${item.id})" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs">Vendre</button>
+                    </div>
+                `;
+                grid.appendChild(itemEl);
+            });
+        }
+
+        function updateMetaUI() {
+            document.getElementById('meta-souls-display').innerText = gameState.meta.souls.toLocaleString();
+            
+            const upg = gameState.meta.upgrades;
+            const costs = { atk: 10, hp: 10, gold: 15, regen: 20 };
+
+            ['atk', 'hp', 'gold', 'regen'].forEach(type => {
+                document.getElementById(`meta-lvl-${type}`).innerText = upg[type];
+                document.getElementById(`meta-cost-${type}`).innerText = Math.floor(costs[type] * Math.pow(1.5, upg[type]));
+            });
+        }
+
+        function updateAchievementsUI() {
+            const list = document.getElementById('achievements-list');
+            list.innerHTML = '';
+
+            ACHIEVEMENTS_DEF.forEach(ach => {
+                const unlocked = ach.check(gameState);
+                const el = document.createElement('div');
+                el.className = `p-3 rounded-lg border flex items-center gap-3 ${unlocked ? 'bg-amber-950/20 border-amber-500/40' : 'bg-dark-900/40 border-slate-800 opacity-60'}`;
+                el.innerHTML = `
+                    <i data-lucide="${unlocked ? 'check-circle-2' : 'lock'}" class="w-5 h-5 ${unlocked ? 'text-amber-400' : 'text-slate-600'}"></i>
+                    <div>
+                        <h4 class="text-xs font-bold ${unlocked ? 'text-amber-300' : 'text-slate-400'}">${ach.title}</h4>
+                        <p class="text-xs text-slate-500">${ach.desc}</p>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+            initIcons();
+        }
+
+        function toggleAutoAdvance() {
+            gameState.dungeon.autoAdvance = !gameState.dungeon.autoAdvance;
+            const btnText = document.getElementById('auto-advance-text');
+            btnText.innerText = `Progression Auto: ${gameState.dungeon.autoAdvance ? 'ON' : 'OFF'}`;
+        }
+
+        function logCombatMessage(msg, type = 'slate') {
+            const logContainer = document.getElementById('combat-log');
+            const entry = document.createElement('div');
+            entry.className = `text-${type}-300 py-0.5 border-b border-slate-800/50`;
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logContainer.prepend(entry);
+        }
+
+        function clearCombatLog() {
+            document.getElementById('combat-log').innerHTML = '';
+        }
+
+        function spawnDamageNumber(amount, isCrit, targetCardId) {
+            const card = document.getElementById(targetCardId);
+            if (!card) return;
+
+            const el = document.createElement('div');
+            el.className = `damage-number ${isCrit ? 'text-amber-400 text-lg' : 'text-red-400 text-sm'}`;
+            el.innerText = `-${amount}`;
+            el.style.left = `${40 + Math.random() * 20}%`;
+            el.style.top = `30%`;
+
+            card.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        /* Main Initialization on Load */
+        window.onload = function () {
+            loadGame();
+            calculateOfflineProgress();
+            spawnMonster();
+            initIcons();
+            updateAllUI();
+
+            // Main Game Engine Loop
+            setInterval(() => {
+                const now = Date.now();
+                const deltaTime = now - lastLoopTime;
+                lastLoopTime = now;
+
+                processCombatTick(deltaTime);
+            }, 100);
+
+            // Auto-save interval (every 10 seconds)
+            setInterval(() => {
+                saveGame();
+            }, 10000);
+        };
+    </script>
 </body>
 </html>
