@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générateur AI (Sans Censure)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #fff; padding: 1.5rem; display: flex; justify-content: center; }
+    .container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+    input, textarea, button { width: 100%; padding: 0.85rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 1rem; }
+    button { background: #6366f1; font-weight: bold; cursor: pointer; border: none; }
+    button:disabled { background: #475569; }
+    .result { text-align: center; margin-top: 1rem; }
+    img { max-width: 100%; border-radius: 8px; display: none; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Générateur AI (Sans Censure)</h2>
+    
+    <label for="apiUrl">1. Lien Colab (.gradio.live)</label>
+    <input type="text" id="apiUrl" placeholder="https://xxxxxx.gradio.live" />
+
+    <label for="prompt">2. Ton prompt</label>
+    <textarea id="prompt" rows="3" placeholder="Description de l'image..."></textarea>
+
+    <button id="btn" onclick="generer()">Générer l'image</button>
+
+    <div class="result">
+      <p id="status"></p>
+      <img id="imageResult" alt="Résultat" />
+    </div>
+  </div>
+
+  <script>
+    async function generer() {
+      let apiUrl = document.getElementById('apiUrl').value.trim();
+      const prompt = document.getElementById('prompt').value.trim();
+      const status = document.getElementById('status');
+      const img = document.getElementById('imageResult');
+      const btn = document.getElementById('btn');
+
+      if (!apiUrl || !prompt) {
+        alert('Entre le lien Gradio et un prompt.');
+        return;
+      }
+
+      apiUrl = apiUrl.replace(/\/$/, "");
+
+      btn.disabled = true;
+      status.innerText = 'Génération sur le GPU Colab (10-15s)...';
+      img.style.display = 'none';
+
+      try {
+        const response = await fetch(`${apiUrl}/sdapi/v1/txt2img`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            prompt: prompt,
+            steps: 20
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.images && data.images[0]) {
+          img.src = 'data:image/png;base64,' + data.images[0];
+          img.style.display = 'block';
+          status.innerText = '';
+        } else {
+          status.innerText = 'Erreur lors de la génération.';
+        }
+      } catch (err) {
+        console.error(err);
+        status.innerText = 'Impossible de contacter Colab. Vérifie l\'URL.';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
