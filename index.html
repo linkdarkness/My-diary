@@ -3,31 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Générateur d'images AI</title>
+  <title>Générateur d'images WebGPU (Sans API)</title>
   <style>
     body { font-family: system-ui, sans-serif; background: #111; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 2rem; }
     .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
-    textarea, input, button { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box; }
+    textarea, button { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box; }
     button { background: #6366f1; font-weight: bold; cursor: pointer; border: none; }
-    button:disabled { background: #444; }
+    button:disabled { background: #444; cursor: not-allowed; }
     .result { margin-top: 1rem; text-align: center; }
     img { max-width: 100%; border-radius: 8px; margin-top: 1rem; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Générateur d'images</h1>
+    <h1>Générateur WebGPU (100% Client)</h1>
+    <p style="font-size: 0.85rem; color: #aaa;">
+      Aucune clé API requise. Le modèle se télécharge et s'exécute directement sur votre carte graphique via le navigateur.
+    </p>
     
-    <input type="password" id="apiKey" placeholder="Clé API (ex: Replicate ou Fal.ai)" />
-    <textarea id="prompt" rows="4" placeholder="Entre ton prompt ici..."></textarea>
-    <button id="btn" onclick="genererImage()">Générer l'image</button>
+    <textarea id="prompt" rows="3" placeholder="Un chat astronaute sur la lune, style cyberpunk..."></textarea>
+    <button id="btn" onclick="generateImage()">Générer l'image</button>
 
     <div class="result">
       <p id="status"></p>
-      <img id="imageResult" style="display:none;" alt="Résultat" />
+      <div id="output"></div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0';
+
+    let generator = null;
+
+    window.generateImage = async function() {
+      const prompt = document.getElementById('prompt').value;
+      const status = document.getElementById('status');
+      const btn = document.getElementById('btn');
+      const output = document.getElementById('output');
+
+      if (!prompt) {
+        alert('Entre un prompt.');
+        return;
+      }
+
+      // Vérification du support WebGPU
+      if (!navigator.gpu) {
+        status.innerText = "Erreur : Votre navigateur ne supporte pas WebGPU (utilisez Chrome/Edge récents).";
+        return;
+      }
+
+      btn.disabled = true;
+      output.innerHTML = '';
+
+      try {
+        if (!generator) {
+          status.innerText = 'Chargement du modèle dans le navigateur (peut prendre quelques minutes)...';
+          // Utilisation d'un pipeline Text-to-Image optimisé WebGPU
+          generator = await pipeline('text-to-image', 'Xenova/text-to-image-sd-turbo', {
+            device: 'webgpu',
+          });
+        }
+
+        status.innerText = 'Génération sur votre GPU en cours...';
+        
+        // Génération de l'image
+        const result = await generator(prompt, {
+          num_inference_steps: 1, // Très rapide pour SD-Turbo
+        });
+
+        // Affichage de l’image générée
+        const canvas = document.createElement('canvas');
+        canvas.width = result.width;
+        canvas.height = result.height;
+        const ctx = canvas.getContext('2d');
+        ctx.putImageData(result.toImageData(), 0, 0);
+
+        output.appendChild(canvas);
+        status.innerText = '';
+
+      } catch (err) {
+        console.error(err);
+        status.innerText = 'Erreur de génération : ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  </script>
 </body>
 </html>
