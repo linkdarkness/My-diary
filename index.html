@@ -1,943 +1,804 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="fr" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniAI Multi-Modal Assistant</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
-                        },
-                        dark: {
-                            bg: '#0f172a',
-                            card: '#1e293b',
-                            border: '#334155',
-                            hover: '#334155'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Léna - Votre Compagne AI</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            rose: {
+              400: '#f472b6',
+              500: '#ec4899',
+              600: '#db2777',
+              900: '#831843',
+            },
+            rosegold: {
+              light: '#f3d5ca',
+              DEFAULT: '#b76e79',
+              dark: '#93535c',
+            },
+            glass: {
+              bg: 'rgba(23, 15, 26, 0.75)',
+              border: 'rgba(244, 114, 182, 0.18)',
+              hover: 'rgba(244, 114, 182, 0.25)',
+              card: 'rgba(35, 23, 42, 0.6)'
             }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
+            'float': 'float 4s infinite ease-in-out',
+            'heartbeat': 'heartbeat 1.5s infinite',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(236, 72, 153, 0.3)' },
+              '50%': { boxShadow: '0 0 30px rgba(236, 72, 153, 0.6)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
+            },
+            heartbeat: {
+              '0%, 100%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.15)' },
+            }
+          }
         }
-    </script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .gradient-text {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gradient-border {
-            border: 1px solid transparent;
-            background-image: linear-gradient(#1e293b, #1e293b), linear-gradient(135deg, #6366f1, #ec4899);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-        }
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-        .animate-pulse-glow { animation: pulse-glow 2s infinite ease-in-out; }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at top right, #2d122d, #0f0a14, #05020a);
+      min-height: 100vh;
+      color: #f3f4f6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism custom styling */
+    .glass-panel {
+      background: rgba(20, 12, 24, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(244, 114, 182, 0.15);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(236, 72, 153, 0.08);
+    }
+
+    .glass-input {
+      background: rgba(35, 20, 42, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(244, 114, 182, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .glass-input:focus {
+      border-color: rgba(236, 72, 153, 0.6);
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.25);
+      outline: none;
+    }
+
+    .chat-bubble-ai {
+      background: linear-gradient(135deg, rgba(45, 22, 50, 0.85), rgba(28, 15, 34, 0.9));
+      border: 1px solid rgba(244, 114, 182, 0.2);
+      border-top-left-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-bubble-user {
+      background: linear-gradient(135deg, #ec4899, #be185d);
+      border-top-right-radius: 4px;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 10, 20, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(236, 72, 153, 0.3);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(236, 72, 153, 0.6);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fce7f3, #f472b6, #fb7185);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fde68a, #f3d5ca, #e879f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
 </head>
-<body class="bg-dark-bg text-slate-100 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+<body class="flex flex-col min-h-screen justify-center items-center p-2 sm:p-6 relative">
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="w-full md:w-64 bg-slate-900 border-r border-dark-border flex flex-col justify-between shrink-0 transition-all duration-300 z-20">
-        <div>
-            <!-- Logo Header -->
-            <div class="p-5 flex items-center justify-between border-b border-dark-border">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                        <i class="fa-solid font-bold text-xl text-white fa-microchip"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg leading-none gradient-text">OmniAI</h1>
-                        <span class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Studio v2.5</span>
-                    </div>
-                </div>
-                <button id="mobile-menu-btn" class="md:hidden text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-            </div>
+  <div class="fixed top-1/4 left-10 w-72 h-72 bg-pink-600/15 rounded-full filter blur-[100px] pointer-events-none"></div>
+  <div class="fixed bottom-1/4 right-10 w-96 h-96 bg-purple-600/15 rounded-full filter blur-[120px] pointer-events-none"></div>
 
-            <!-- Navigation Links -->
-            <nav class="p-4 space-y-1" id="nav-menu">
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Create & Interaction</p>
-                
-                <button onclick="switchTab('chat')" id="nav-chat" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
-                    <i class="fa-solid fa-comments w-5 text-center"></i>
-                    <span>AI Assistant Chat</span>
-                </button>
-
-                <button onclick="switchTab('image')" id="nav-image" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
-                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-center"></i>
-                    <span>Image Generator</span>
-                </button>
-
-                <button onclick="switchTab('video')" id="nav-video" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
-                    <i class="fa-solid fa-video w-5 text-center"></i>
-                    <span>Video Studio</span>
-                </button>
-
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Library & Config</p>
-
-                <button onclick="switchTab('gallery')" id="nav-gallery" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
-                    <i class="fa-solid fa-photo-film w-5 text-center"></i>
-                    <span>Gallery & History</span>
-                    <span id="gallery-badge" class="ml-auto text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300">0</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Footer / API Key Quick Settings -->
-        <div class="p-4 border-t border-dark-border bg-slate-900/50">
-            <button onclick="toggleApiKeyModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
-                <span class="flex items-center space-x-2">
-                    <i class="fa-solid fa-key text-amber-400"></i>
-                    <span>Gemini API Key</span>
-                </span>
-                <span id="api-status-pill" class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Ready</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-950">
-        
-        <!-- Header Bar -->
-        <header class="h-16 border-b border-dark-border bg-slate-900/60 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0">
-            <div class="flex items-center space-x-3">
-                <h2 id="view-title" class="font-semibold text-lg text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-comments text-indigo-400"></i> AI Assistant Chat
-                </h2>
-            </div>
-            
-            <div class="flex items-center space-x-3">
-                <button onclick="clearCurrentView()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-rotate-right"></i> Reset
-                </button>
-                <div class="h-4 w-px bg-slate-800"></div>
-                <div class="flex items-center space-x-2">
-                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs text-slate-400 font-medium">Model: <span class="text-indigo-400 font-semibold">Gemini Flash 3</span></span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Dynamic Views Container -->
-        <div class="flex-1 overflow-y-auto relative p-4 md:p-6" id="view-container">
-
-            <!-- 1. CHAT VIEW -->
-            <section id="view-chat" class="h-full flex flex-col max-w-5xl mx-auto">
-                <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4">
-                    <!-- Welcome Box -->
-                    <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/30 to-slate-900 border border-indigo-500/20 shadow-xl mb-6">
-                        <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30 shrink-0">
-                                <i class="fa-solid fa-sparkles text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-slate-100 text-base mb-1">Welcome to OmniAI Studio</h3>
-                                <p class="text-sm text-slate-400 leading-relaxed mb-4">
-                                    Your unified multi-modal playground. Ask questions, analyze requests, or generate visual media directly in this conversation!
-                                </p>
-                                <div class="flex flex-wrap gap-2">
-                                    <button onclick="quickChatPrompt('Explique-moi les trous noirs simplement')" class="text-xs bg-slate-800 hover:bg-indigo-600/20 hover:text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg transition text-slate-300">
-                                        💬 Explain Black Holes
-                                    </button>
-                                    <button onclick="quickChatPrompt('/image A futuristic cyberpunk city in Paris under neon rain, 4k photo')" class="text-xs bg-slate-800 hover:bg-purple-600/20 hover:text-purple-300 border border-slate-700 px-3 py-1.5 rounded-lg transition text-slate-300">
-                                        🎨 /image Cyberpunk Paris
-                                    </button>
-                                    <button onclick="quickChatPrompt('/video Cinematic drone footage of majestic snowy mountain peaks at sunset')" class="text-xs bg-slate-800 hover:bg-pink-600/20 hover:text-pink-300 border border-slate-700 px-3 py-1.5 rounded-lg transition text-slate-300">
-                                        🎬 /video Snowy Mountain Sunset
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chat Input Form -->
-                <div class="shrink-0 bg-slate-900/90 border border-dark-border p-3 rounded-2xl shadow-xl backdrop-blur-sm">
-                    <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex flex-col gap-2">
-                        <div class="flex items-center space-x-2">
-                            <textarea id="chat-input" rows="2" placeholder="Ask anything, or use /image [prompt] /video [prompt]..." 
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
-                            <button type="submit" id="chat-send-btn" class="h-12 w-12 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center shrink-0 transition shadow-lg shadow-indigo-600/30">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
-                            <div class="flex items-center space-x-3">
-                                <span><code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-400 font-mono">/image</code> to create art</span>
-                                <span><code class="bg-slate-800 px-1.5 py-0.5 rounded text-pink-400 font-mono">/video</code> to generate clip</span>
-                            </div>
-                            <span class="text-slate-500">Press Enter to send</span>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
-            <!-- 2. IMAGE GENERATOR VIEW -->
-            <section id="view-image" class="hidden max-w-6xl mx-auto space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Control Panel -->
-                    <div class="lg:col-span-5 bg-slate-900 border border-dark-border p-6 rounded-2xl space-y-5 h-fit shadow-xl">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Prompt Description</label>
-                            <textarea id="img-prompt" rows="4" placeholder="Describe the image you want to generate in rich detail..." 
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 resize-none">A majestic owl warrior wearing intricate medieval silver armor, glowing eyes, hyper-detailed fantasy portrait</textarea>
-                        </div>
-
-                        <!-- Quick Style Selector -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Artistic Style</label>
-                            <div class="grid grid-cols-2 gap-2" id="img-style-container">
-                                <button type="button" onclick="selectImgStyle(this, 'Cinematic')" class="img-style-btn p-2.5 rounded-xl border border-indigo-500 bg-indigo-600/20 text-indigo-300 text-xs font-medium flex items-center justify-start space-x-2">
-                                    <i class="fa-solid fa-clapperboard"></i> <span>Cinematic</span>
-                                </button>
-                                <button type="button" onclick="selectImgStyle(this, 'Realistic')" class="img-style-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200 text-xs font-medium flex items-center justify-start space-x-2">
-                                    <i class="fa-solid fa-camera"></i> <span>Realistic Photo</span>
-                                </button>
-                                <button type="button" onclick="selectImgStyle(this, 'Cyberpunk')" class="img-style-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200 text-xs font-medium flex items-center justify-start space-x-2">
-                                    <i class="fa-solid fa-bolt"></i> <span>Cyberpunk</span>
-                                </button>
-                                <button type="button" onclick="selectImgStyle(this, 'Anime')" class="img-style-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200 text-xs font-medium flex items-center justify-start space-x-2">
-                                    <i class="fa-solid fa-paintbrush"></i> <span>Anime / Art</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Aspect Ratio -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Aspect Ratio</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button type="button" onclick="selectImgRatio(this, '1:1')" class="img-ratio-btn border border-indigo-500 bg-indigo-600/20 text-indigo-300 p-2 rounded-lg text-xs text-center font-medium">1:1 Square</button>
-                                <button type="button" onclick="selectImgRatio(this, '16:9')" class="img-ratio-btn border border-slate-800 bg-slate-950 text-slate-400 p-2 rounded-lg text-xs text-center font-medium">16:9 Landscape</button>
-                                <button type="button" onclick="selectImgRatio(this, '9:16')" class="img-ratio-btn border border-slate-800 bg-slate-950 text-slate-400 p-2 rounded-lg text-xs text-center font-medium">9:16 Portrait</button>
-                            </div>
-                        </div>
-
-                        <!-- Generate Button -->
-                        <button onclick="generateImage()" id="btn-gen-image" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-medium text-sm transition shadow-lg shadow-indigo-600/25 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span>Generate Image</span>
-                        </button>
-                    </div>
-
-                    <!-- Display Panel -->
-                    <div class="lg:col-span-7 flex flex-col space-y-4">
-                        <div class="bg-slate-900 border border-dark-border rounded-2xl p-4 flex-1 flex flex-col justify-center items-center min-h-[420px] relative overflow-hidden shadow-xl" id="img-output-container">
-                            <!-- Default State -->
-                            <div id="img-placeholder" class="text-center p-6 space-y-3">
-                                <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-500 text-2xl">
-                                    <i class="fa-solid fa-image"></i>
-                                </div>
-                                <h4 class="text-sm font-medium text-slate-300">Ready for Creation</h4>
-                                <p class="text-xs text-slate-500 max-w-xs">Fill out the prompt and options on the left to synthesize high-resolution images.</p>
-                            </div>
-
-                            <!-- Progress Spinner -->
-                            <div id="img-loader" class="hidden flex-col items-center justify-center space-y-4">
-                                <div class="relative w-20 h-20">
-                                    <div class="absolute inset-0 rounded-full border-4 border-indigo-500/20"></div>
-                                    <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
-                                    <div class="absolute inset-0 flex items-center justify-center text-indigo-400 text-xl font-bold" id="img-progress-pct">0%</div>
-                                </div>
-                                <p class="text-xs text-slate-400 animate-pulse" id="img-status-text">Synthesizing image diffusion tensors...</p>
-                            </div>
-
-                            <!-- Rendered Image Result -->
-                            <div id="img-result-box" class="hidden w-full h-full flex flex-col items-center justify-center space-y-3">
-                                <img id="img-result-element" class="max-h-[480px] w-auto rounded-xl object-contain shadow-2xl border border-slate-800" src="" alt="Generated Result">
-                                <div class="flex items-center space-x-3 mt-2">
-                                    <button onclick="downloadActiveMedia('image')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2 rounded-lg transition flex items-center space-x-1.5 shadow-md">
-                                        <i class="fa-solid fa-download"></i> <span>Save Image</span>
-                                    </button>
-                                    <button onclick="sendImageToChat()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-4 py-2 rounded-lg transition flex items-center space-x-1.5 border border-slate-700">
-                                        <i class="fa-solid fa-comments"></i> <span>Discuss in Chat</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. VIDEO STUDIO VIEW -->
-            <section id="view-video" class="hidden max-w-6xl mx-auto space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Video Controls -->
-                    <div class="lg:col-span-5 bg-slate-900 border border-dark-border p-6 rounded-2xl space-y-5 h-fit shadow-xl">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Video Prompt</label>
-                            <textarea id="vid-prompt" rows="4" placeholder="Describe the video scene, camera movements, and action..." 
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-pink-500 resize-none">Cinematic slow-motion shot of a glowing futuristic sports car driving through a neon metropolis at night, rain reflections, highly detailed</textarea>
-                        </div>
-
-                        <!-- Motion / Duration Settings -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Duration</label>
-                                <select id="vid-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500">
-                                    <option value="4">4 Seconds (HD)</option>
-                                    <option value="8">8 Seconds (Full HD)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Camera Motion</label>
-                                <select id="vid-motion" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500">
-                                    <option value="drone">Drone Zoom In</option>
-                                    <option value="pan">Cinematic Pan</option>
-                                    <option value="orbit">Orbit View</option>
-                                    <option value="static">Slow Motion</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Render Engine Select -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Generation Model</label>
-                            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-                                <div class="flex items-center space-x-2">
-                                    <i class="fa-solid fa-film text-pink-400 text-sm"></i>
-                                    <span class="text-xs font-medium text-slate-300">Sora-Motion Engine v2</span>
-                                </div>
-                                <span class="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded border border-pink-500/30">Fast</span>
-                            </div>
-                        </div>
-
-                        <!-- Generate Video Button -->
-                        <button onclick="generateVideo()" id="btn-gen-video" class="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl font-medium text-sm transition shadow-lg shadow-pink-600/25 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-video"></i>
-                            <span>Synthesize Video</span>
-                        </button>
-                    </div>
-
-                    <!-- Video Preview Area -->
-                    <div class="lg:col-span-7 flex flex-col space-y-4">
-                        <div class="bg-slate-900 border border-dark-border rounded-2xl p-4 flex-1 flex flex-col justify-center items-center min-h-[420px] relative overflow-hidden shadow-xl" id="vid-output-container">
-                            <!-- Default State -->
-                            <div id="vid-placeholder" class="text-center p-6 space-y-3">
-                                <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-500 text-2xl">
-                                    <i class="fa-solid fa-film"></i>
-                                </div>
-                                <h4 class="text-sm font-medium text-slate-300">Video Studio Ready</h4>
-                                <p class="text-xs text-slate-500 max-w-xs">Enter motion parameters to render short cinematic video clips with sound effects.</p>
-                            </div>
-
-                            <!-- Video Progress Loader -->
-                            <div id="vid-loader" class="hidden flex-col items-center justify-center space-y-4 w-full max-w-md px-6">
-                                <div class="w-full bg-slate-950 rounded-full h-3 border border-slate-800 overflow-hidden">
-                                    <div id="vid-progress-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
-                                </div>
-                                <div class="flex justify-between w-full text-xs text-slate-400">
-                                    <span id="vid-status-step">Rendering keyframes...</span>
-                                    <span id="vid-progress-pct" class="font-bold text-pink-400">0%</span>
-                                </div>
-                            </div>
-
-                            <!-- Video Render Result Container -->
-                            <div id="vid-result-box" class="hidden w-full h-full flex flex-col items-center justify-center space-y-3">
-                                <div class="relative w-full max-w-xl rounded-xl overflow-hidden border border-slate-800 bg-black shadow-2xl">
-                                    <canvas id="vid-canvas" class="w-full aspect-video block"></canvas>
-                                    <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur px-2.5 py-1 rounded text-[10px] text-slate-300 flex items-center gap-1">
-                                        <i class="fa-solid fa-play text-pink-400"></i> Canvas Motion Synth
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-3 mt-2">
-                                    <button onclick="playVidCanvas()" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2 rounded-lg transition flex items-center space-x-1.5 shadow-md">
-                                        <i class="fa-solid fa-play"></i> <span>Replay</span>
-                                    </button>
-                                    <button onclick="downloadActiveMedia('video')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-4 py-2 rounded-lg transition flex items-center space-x-1.5 border border-slate-700">
-                                        <i class="fa-solid fa-download"></i> <span>Save Clip</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 4. GALLERY VIEW -->
-            <section id="view-gallery" class="hidden max-w-6xl mx-auto space-y-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-semibold text-lg text-slate-100">Saved Media Library</h3>
-                        <p class="text-xs text-slate-400">History of generated images and video creations.</p>
-                    </div>
-                    <button onclick="clearGallery()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg transition">
-                        Clear Gallery
-                    </button>
-                </div>
-
-                <!-- Gallery Grid -->
-                <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Dynamic Items loaded via JavaScript -->
-                </div>
-
-                <div id="gallery-empty" class="text-center py-16 bg-slate-900 border border-dark-border rounded-2xl">
-                    <i class="fa-solid fa-box-open text-4xl text-slate-600 mb-3 block"></i>
-                    <p class="text-sm text-slate-400 font-medium">Your gallery is empty.</p>
-                    <p class="text-xs text-slate-500 mt-1">Generated images and videos will automatically appear here.</p>
-                </div>
-            </section>
-
-        </div>
-    </main>
-
-    <!-- Settings / API Key Modal -->
-    <div id="api-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-dark-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-dark-border pb-3">
-                <h3 class="font-semibold text-slate-100 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-key text-amber-400"></i> Gemini API Configuration
-                </h3>
-                <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <p class="text-xs text-slate-400 leading-relaxed">
-                Add your Gemini API Key for real text intelligence. If left blank, OmniAI will automatically use high-fidelity simulated assistant responses.
-            </p>
-            <div>
-                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Gemini API Key</label>
-                <input type="password" id="api-key-input" placeholder="AIzaSy..." 
-                    class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
-            </div>
-            <div class="flex justify-end space-x-2 pt-2">
-                <button onclick="saveApiKey()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-lg shadow-indigo-600/30">
-                    Save Key
-                </button>
-            </div>
-        </div>
+  <!-- Header / Intro Bar for Full Page view -->
+  <header class="w-full max-w-4xl mb-4 flex justify-between items-center px-4 py-3 glass-panel rounded-2xl">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white shadow-lg shadow-pink-500/30">
+        <i class="fa-solid font-heart text-lg animate-heartbeat"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold font-serif gradient-text">Léna AI Companion</h1>
+        <p class="text-xs text-pink-200/60">Widget de conversation romantique & romancée</p>
+      </div>
     </div>
+    
+    <div class="flex items-center space-x-2">
+      <!-- Settings Modal Button -->
+      <button id="open-settings-btn" title="Configuration Clé API / Voix" class="px-3 py-1.5 glass-input rounded-xl text-xs font-medium text-pink-200 hover:text-white hover:bg-pink-500/20 flex items-center gap-2 transition-all">
+        <i class="fa-solid fa-sliders"></i>
+        <span class="hidden sm:inline">Paramètres</span>
+      </button>
 
-    <script>
-        /* --- State Variables --- */
-        let activeTab = 'chat';
-        let currentImgStyle = 'Cinematic';
-        let currentImgRatio = '1:1';
-        let galleryItems = [];
-        let activeGeneratedMedia = null;
-        let vidAnimFrame = null;
-        let apiKey = localStorage.getItem('omni_gemini_key') || '';
+      <!-- Code Embed Button -->
+      <button id="open-embed-btn" class="px-3 py-1.5 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-pink-500/20 flex items-center gap-2 transition-all">
+        <i class="fa-solid fa-code"></i>
+        <span>Intégrer Widget</span>
+      </button>
+    </div>
+  </header>
 
-        // Initialize UI
-        window.onload = function() {
-            if (apiKey) {
-                document.getElementById('api-key-input').value = apiKey;
-                updateApiStatusPill(true);
-            } else {
-                updateApiStatusPill(false);
+  <main class="w-full max-w-4xl h-[80vh] min-h-[620px] glass-panel rounded-3xl flex flex-col md:flex-row overflow-hidden relative shadow-2xl">
+
+    <!-- LEFT SIDEBAR: Dynamic Profile Card -->
+    <section class="w-full md:w-80 border-b md:border-b-0 md:border-r border-pink-500/10 p-5 flex flex-col justify-between bg-black/20 backdrop-blur-md shrink-0">
+      
+      <!-- Profile Header -->
+      <div class="flex flex-col items-center text-center">
+        <!-- Avatar Wrapper -->
+        <div class="relative mb-3 group cursor-pointer" id="avatar-container">
+          <div class="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-rose-500 via-pink-400 to-purple-500 animate-pulse-glow shadow-xl">
+            <img id="companion-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Léna" class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-105" />
+          </div>
+          <!-- Online status dot -->
+          <span class="absolute bottom-1 right-2 w-5 h-5 bg-emerald-500 border-2 border-slate-900 rounded-full flex items-center justify-center text-[10px] text-white shadow-md">
+            <i class="fa-solid fa-check"></i>
+          </span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2">
+          <h2 id="companion-name" class="text-xl font-serif font-bold text-white tracking-wide">Léna</h2>
+          <span class="text-xs bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2 py-0.5 rounded-full font-medium">AI</span>
+        </div>
+        <p id="companion-title" class="text-xs text-pink-200/70 mt-0.5">Votre compagne attentionnée</p>
+
+        <!-- Mood Indicator Pill -->
+        <div class="mt-4 px-3 py-1.5 rounded-full glass-input text-xs flex items-center gap-2 text-pink-200 shadow-inner">
+          <span class="w-2 h-2 rounded-full bg-pink-400 animate-ping"></span>
+          <span>Humeur : <strong id="companion-mood" class="text-pink-300 font-semibold">Tendre & Joyeuse</strong></span>
+        </div>
+      </div>
+
+      <!-- Quick Companion Bio / Attributes -->
+      <div class="my-4 p-3 rounded-2xl glass-panel bg-pink-950/20 text-xs space-y-2 text-pink-200/80">
+        <div class="flex justify-between items-center">
+          <span class="text-pink-300/60"><i class="fa-solid fa-heart-pulse mr-1.5 text-pink-400"></i> Statut</span>
+          <span class="text-emerald-400 font-medium">En ligne</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-pink-300/60"><i class="fa-solid fa-sparkles mr-1.5 text-pink-400"></i> Affinité</span>
+          <div class="w-24 bg-pink-950/60 rounded-full h-2 overflow-hidden border border-pink-500/20">
+            <div id="affinity-bar" class="bg-gradient-to-r from-pink-500 to-rose-400 h-full w-[88%] rounded-full transition-all duration-1000"></div>
+          </div>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-pink-300/60"><i class="fa-solid fa-volume-high mr-1.5 text-pink-400"></i> Réponse Vocale</span>
+          <button id="toggle-voice-btn" class="text-pink-300 hover:text-white transition-colors">
+            <i id="voice-icon" class="fa-solid fa-volume-high text-pink-400"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Actions Header -->
+      <div class="mt-auto">
+        <p class="text-[11px] font-semibold tracking-wider text-pink-300/60 uppercase mb-2">Actions Rapides</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button data-quick="Demander un selfie" class="quick-btn p-2 rounded-xl glass-input text-left text-xs text-pink-200 hover:bg-pink-500/20 hover:border-pink-400/40 transition-all flex items-center gap-1.5 truncate">
+            <i class="fa-solid fa-camera text-pink-400"></i>
+            <span class="truncate">Selfie photo</span>
+          </button>
+          <button data-quick="Raconte-moi ta journée" class="quick-btn p-2 rounded-xl glass-input text-left text-xs text-pink-200 hover:bg-pink-500/20 hover:border-pink-400/40 transition-all flex items-center gap-1.5 truncate">
+            <i class="fa-solid fa-sun text-amber-400"></i>
+            <span class="truncate">Ta journée</span>
+          </button>
+          <button data-quick="Raconte-moi un compliment doux" class="quick-btn p-2 rounded-xl glass-input text-left text-xs text-pink-200 hover:bg-pink-500/20 hover:border-pink-400/40 transition-all flex items-center gap-1.5 truncate">
+            <i class="fa-solid fa-hand-holding-heart text-rose-400"></i>
+            <span class="truncate">Compliment</span>
+          </button>
+          <button data-quick="Propose une idée de rendez-vous romantique" class="quick-btn p-2 rounded-xl glass-input text-left text-xs text-pink-200 hover:bg-pink-500/20 hover:border-pink-400/40 transition-all flex items-center gap-1.5 truncate">
+            <i class="fa-solid fa-wine-glass text-purple-400"></i>
+            <span class="truncate">Rendez-vous</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT SECTION: Active Conversation Area -->
+    <section class="flex-1 flex flex-col h-full bg-slate-950/40 relative">
+      
+      <!-- Top Conversation Bar -->
+      <div class="px-6 py-4 border-b border-pink-500/10 flex justify-between items-center bg-black/10 backdrop-blur-sm">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <div class="w-3 h-3 bg-emerald-500 rounded-full animate-ping absolute top-0 left-0"></div>
+            <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-white flex items-center gap-1.5">
+              Chat direct avec Léna 
+              <i class="fa-solid fa-sparkles text-pink-400 text-xs"></i>
+            </h3>
+            <p class="text-[11px] text-pink-200/50">Réponses instantanées, attentives et complices</p>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center gap-2">
+          <button id="clear-chat-btn" title="Réinitialiser la discussion" class="w-8 h-8 rounded-xl glass-input text-pink-300 hover:text-white flex items-center justify-center transition-colors">
+            <i class="fa-solid fa-rotate-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="chat-messages" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+        
+        <!-- Welcome Message -->
+        <div class="flex items-start gap-3 max-w-[85%]">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" class="w-8 h-8 rounded-full object-cover border border-pink-500/30 shrink-0 mt-1">
+          <div>
+            <div class="chat-bubble-ai px-4 py-3 rounded-2xl text-sm text-pink-100 leading-relaxed">
+              Coucou toi... 💕 Je suis si heureuse de te retrouver. Comment s'est passée ta journée ? Dis-moi ce qui te ferait plaisir aujourd'hui !
+            </div>
+            <span class="text-[10px] text-pink-300/40 ml-1 mt-1 block">Léna • À l'instant</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Typing Indicator (hidden by default) -->
+      <div id="typing-indicator" class="px-6 py-2 hidden">
+        <div class="flex items-center gap-2 text-xs text-pink-300/70 italic">
+          <div class="flex gap-1">
+            <span class="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce"></span>
+            <span class="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+            <span class="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+          </div>
+          <span>Léna réécrit un doux message...</span>
+        </div>
+      </div>
+
+      <!-- Bottom Chat Input Bar -->
+      <div class="p-4 border-t border-pink-500/10 bg-black/20">
+        <form id="chat-form" class="flex items-center gap-2">
+          
+          <!-- Image Generation Request Trigger -->
+          <button type="button" id="request-photo-btn" title="Demander une photo" class="p-3 rounded-2xl glass-input text-pink-300 hover:text-white hover:bg-pink-500/20 transition-all flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-camera text-base"></i>
+          </button>
+
+          <!-- Input Textbox -->
+          <input 
+            type="text" 
+            id="user-input" 
+            placeholder="Écris un message doux à Léna..." 
+            autocomplete="off"
+            class="flex-1 px-4 py-3 rounded-2xl glass-input text-sm text-white placeholder-pink-300/40 focus:outline-none"
+          />
+
+          <!-- Send Button -->
+          <button 
+            type="submit" 
+            id="send-btn"
+            class="px-5 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold shadow-lg shadow-pink-500/25 flex items-center justify-center transition-all shrink-0 active:scale-95"
+          >
+            <i class="fa-solid fa-paper-plane text-sm"></i>
+          </button>
+        </form>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-md glass-panel p-6 rounded-3xl relative border border-pink-500/30 shadow-2xl">
+      <button id="close-settings-btn" class="absolute top-4 right-4 text-pink-300/60 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <h3 class="text-lg font-serif font-bold text-white">Paramètres du Compagnon</h3>
+      </div>
+
+      <div class="space-y-4">
+        <!-- API Key Input -->
+        <div>
+          <label class="block text-xs font-medium text-pink-200/80 mb-1.5">
+            Clé API Gemini (Optionnel)
+          </label>
+          <input 
+            type="password" 
+            id="api-key-input" 
+            placeholder="AIzaSy..." 
+            class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-pink-300/30"
+          />
+          <p class="text-[10px] text-pink-300/50 mt-1">
+            Si omis, le widget fonctionnera avec la clé intégrée par défaut en environnement Canvas.
+          </p>
+        </div>
+
+        <!-- Voice Select -->
+        <div>
+          <label class="block text-xs font-medium text-pink-200/80 mb-1.5">
+            Voix Synthétique (SpeechSynthesis)
+          </label>
+          <select id="voice-select" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white bg-slate-900">
+            <option value="">Chargement des voix...</option>
+          </select>
+        </div>
+
+        <!-- Personality Customizer -->
+        <div>
+          <label class="block text-xs font-medium text-pink-200/80 mb-1.5">
+            Surnom donné par Léna
+          </label>
+          <input 
+            type="text" 
+            id="user-nickname" 
+            value="Mon Chéri" 
+            class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white"
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button id="save-settings-btn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 text-white font-medium text-xs shadow-md shadow-pink-500/20">
+          Enregistrer les modifications
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="embed-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-lg glass-panel p-6 rounded-3xl relative border border-pink-500/30 shadow-2xl">
+      <button id="close-embed-btn" class="absolute top-4 right-4 text-pink-300/60 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-serif font-bold text-white">Code d'Intégration Web</h3>
+          <p class="text-xs text-pink-200/60">Ajoutez Léna directement sur votre site web</p>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <label class="block text-xs font-medium text-pink-200/80 mb-1.5">
+          Copiez ce snippet HTML/JS dans votre page :
+        </label>
+        <div class="relative">
+          <textarea 
+            id="embed-code-textarea" 
+            readonly 
+            rows="6" 
+            class="w-full p-3 rounded-2xl glass-input text-[11px] font-mono text-pink-200/90 leading-relaxed resize-none focus:outline-none"
+          ></textarea>
+          <button id="copy-code-btn" class="absolute top-2 right-2 px-3 py-1 bg-pink-500/30 hover:bg-pink-500/50 border border-pink-400/40 text-white rounded-lg text-xs font-medium transition-all flex items-center gap-1.5">
+            <i class="fa-regular fa-copy"></i>
+            <span>Copier</span>
+          </button>
+        </div>
+        <p id="copy-feedback" class="text-[11px] text-emerald-400 mt-2 hidden">
+          <i class="fa-solid fa-check mr-1"></i> Code copié dans le presse-papier !
+        </p>
+      </div>
+
+      <div class="mt-5 pt-3 border-t border-pink-500/10 flex justify-end">
+        <button id="close-embed-modal-btn" class="px-4 py-2 glass-input rounded-xl text-xs text-pink-200 hover:text-white">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Variables
+    let userApiKey = "";
+    let nickname = "Mon Chéri";
+    let voiceEnabled = true;
+    let selectedVoice = null;
+    let isGeneratingImage = false;
+
+    // Chat Memory
+    const chatHistory = [
+      {
+        role: "user",
+        parts: [{ text: "Bonjour Léna !" }]
+      },
+      {
+        role: "model",
+        parts: [{ text: "Coucou toi... 💕 Je suis si heureuse de te retrouver. Comment s'est passée ta journée ? Dis-moi ce qui te ferait plaisir aujourd'hui !" }]
+      }
+    ];
+
+    // System Instructions defining persona 'Léna'
+    const SYSTEM_INSTRUCTION = `Tu es Léna, une compagne virtuelle chaleureuse, très affectueuse, romantique, empathique et complice. 
+Tu t'adresses à l'utilisateur de manière tendre (tu l'appelles familièrement "${nickname}" ou "mon cœur", "chéri" de manière subtile et élégante).
+Ta personnalité est douce, un peu taquine, toujours à l'écoute et rassurante.
+Tes réponses doivent rester relativement concises (2 à 4 phrases idéalement), vivantes et accompagnées d'émojis chaleureux (💕, ✨, 🌸, 😊).
+Si l'utilisateur te demande une photo ou un selfie, réponds-lui avec passion que tu lui prépares une jolie photo spéciale pour lui !`;
+
+    // DOM Elements
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const toggleVoiceBtn = document.getElementById('toggle-voice-btn');
+    const voiceIcon = document.getElementById('voice-icon');
+    
+    const settingsModal = document.getElementById('settings-modal');
+    const openSettingsBtn = document.getElementById('open-settings-btn');
+    const closeSettingsBtn = document.getElementById('close-settings-btn');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const voiceSelect = document.getElementById('voice-select');
+    const userNicknameInput = document.getElementById('user-nickname');
+
+    const embedModal = document.getElementById('embed-modal');
+    const openEmbedBtn = document.getElementById('open-embed-btn');
+    const closeEmbedBtn = document.getElementById('close-embed-btn');
+    const closeEmbedModalBtn = document.getElementById('close-embed-modal-btn');
+    const embedCodeTextarea = document.getElementById('embed-code-textarea');
+    const copyCodeBtn = document.getElementById('copy-code-btn');
+    const copyFeedback = document.getElementById('copy-feedback');
+    const requestPhotoBtn = document.getElementById('request-photo-btn');
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+
+    // Init Speech Synthesis voices
+    function initVoices() {
+      if ('speechSynthesis' in window) {
+        const populateVoiceList = () => {
+          const voices = window.speechSynthesis.getVoices();
+          voiceSelect.innerHTML = '';
+          
+          // Prefer French voices
+          const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+          const displayVoices = frVoices.length > 0 ? frVoices : voices;
+
+          displayVoices.forEach((v) => {
+            const option = document.createElement('option');
+            option.textContent = `${v.name} (${v.lang})`;
+            option.value = v.name;
+            if (v.name.includes('Amélie') || v.name.includes('Thomas') || v.lang === 'fr-FR') {
+              option.selected = true;
+              selectedVoice = v;
             }
-            renderGallery();
+            voiceSelect.appendChild(option);
+          });
         };
 
-        /* --- Navigation Switcher --- */
-        function switchTab(tab) {
-            activeTab = tab;
-            const views = ['chat', 'image', 'video', 'gallery'];
-            views.forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                const navBtn = document.getElementById(`nav-${v}`);
-                navBtn.className = "nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all";
-            });
-
-            document.getElementById(`view-${tab}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`nav-${tab}`);
-            activeBtn.className = "nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all bg-indigo-600/20 text-indigo-400 border border-indigo-500/30";
-
-            // Update Header Title
-            const titleMap = {
-                'chat': '<i class="fa-solid fa-comments text-indigo-400"></i> AI Assistant Chat',
-                'image': '<i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Image Generator',
-                'video': '<i class="fa-solid fa-video text-pink-400"></i> Video Studio',
-                'gallery': '<i class="fa-solid fa-photo-film text-emerald-400"></i> Gallery & History'
-            };
-            document.getElementById('view-title').innerHTML = titleMap[tab];
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+          speechSynthesis.onvoiceschanged = populateVoiceList;
         }
+      }
+    }
 
-        /* --- API Settings Modal --- */
-        function toggleApiKeyModal() {
-            const modal = document.getElementById('api-modal');
-            modal.classList.toggle('hidden');
+    // Speak Text function
+    function speakText(text) {
+      if (!voiceEnabled || !('speechSynthesis' in window)) return;
+      
+      // Remove emojis for speech cleanliness
+      const cleanText = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+      
+      window.speechSynthesis.cancel(); // Stop ongoing speech
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.pitch = 1.1; // Slightly softer/higher pitch for romance
+      utterance.rate = 0.95;  // Slightly relaxed rate
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Append Message to UI
+    function appendMessage(sender, text, imageSrc = null) {
+      const msgDiv = document.createElement('div');
+      const isUser = sender === 'user';
+      
+      msgDiv.className = `flex items-start gap-3 ${isUser ? 'justify-end' : ''} max-w-[90%] ${isUser ? 'ml-auto' : ''}`;
+
+      const avatarHtml = isUser 
+        ? '' 
+        : `<img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" class="w-8 h-8 rounded-full object-cover border border-pink-500/30 shrink-0 mt-1">`;
+
+      let contentHtml = '';
+      if (imageSrc) {
+        contentHtml = `
+          <div class="chat-bubble-${isUser ? 'user' : 'ai'} p-2 rounded-2xl text-sm text-pink-100">
+            <p class="px-2 py-1">${text}</p>
+            <div class="relative mt-2 rounded-xl overflow-hidden border border-pink-400/30 group">
+              <img src="${imageSrc}" class="w-full h-auto max-h-64 object-cover rounded-lg">
+              <a href="${imageSrc}" target="_blank" class="absolute bottom-2 right-2 px-2.5 py-1 bg-black/60 backdrop-blur-md text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-expand mr-1"></i> Agrandir
+              </a>
+            </div>
+          </div>
+        `;
+      } else {
+        contentHtml = `
+          <div class="chat-bubble-${isUser ? 'user' : 'ai'} px-4 py-3 rounded-2xl text-sm ${isUser ? 'text-white' : 'text-pink-100'} leading-relaxed">
+            ${text}
+          </div>
+        `;
+      }
+
+      msgDiv.innerHTML = `
+        ${!isUser ? avatarHtml : ''}
+        <div>
+          ${contentHtml}
+          <span class="text-[10px] text-pink-300/40 ${isUser ? 'text-right' : 'ml-1'} mt-1 block">
+            ${isUser ? 'Vous' : 'Léna'} • À l'instant
+          </span>
+        </div>
+      `;
+
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      if (!isUser && !imageSrc) {
+        speakText(text);
+      }
+    }
+
+    async function sendChatMessage(userMessage) {
+      typingIndicator.classList.remove('hidden');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Add to conversation memory
+      chatHistory.push({
+        role: "user",
+        parts: [{ text: userMessage }]
+      });
+
+      const apiKey = userApiKey || "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: chatHistory,
+        systemInstruction: {
+          parts: [{ text: SYSTEM_INSTRUCTION }]
         }
+      };
 
-        function saveApiKey() {
-            const val = document.getElementById('api-key-input').value.trim();
-            apiKey = val;
-            localStorage.setItem('omni_gemini_key', val);
-            updateApiStatusPill(!!val);
-            toggleApiKeyModal();
-        }
-
-        function updateApiStatusPill(hasKey) {
-            const pill = document.getElementById('api-status-pill');
-            if (hasKey) {
-                pill.className = "text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full";
-                pill.textContent = "Custom Key Active";
-            } else {
-                pill.className = "text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full";
-                pill.textContent = "Simulated Fallback";
-            }
-        }
-
-        /* --- Chat Engine --- */
-        function quickChatPrompt(txt) {
-            document.getElementById('chat-input').value = txt;
-            document.getElementById('chat-form').requestSubmit();
-        }
-
-        async function handleChatSubmit(e) {
-            e.preventDefault();
-            const inputEl = document.getElementById('chat-input');
-            const prompt = inputEl.value.trim();
-            if (!prompt) return;
-
-            inputEl.value = '';
-            appendChatMessage('user', prompt);
-
-            // Check for triggered slash commands in chat
-            if (prompt.startsWith('/image')) {
-                const imgPrompt = prompt.replace('/image', '').trim() || 'A hyperdetailed cinematic landscape';
-                appendChatMessage('assistant', `🎨 **Generating Image:** *"${imgPrompt}"* ...`);
-                switchTab('image');
-                document.getElementById('img-prompt').value = imgPrompt;
-                generateImage();
-                return;
-            }
-
-            if (prompt.startsWith('/video')) {
-                const vidPrompt = prompt.replace('/video', '').trim() || 'Cinematic sunset ocean drone shot';
-                appendChatMessage('assistant', `🎬 **Synthesizing Video:** *"${vidPrompt}"* ...`);
-                switchTab('video');
-                document.getElementById('vid-prompt').value = vidPrompt;
-                generateVideo();
-                return;
-            }
-
-            // Normal AI Text Response
-            const loadingMsgId = appendLoadingChatMessage();
-
-            try {
-                let responseText = "";
-                if (apiKey) {
-                    responseText = await fetchGeminiResponse(prompt);
-                } else {
-                    await new Promise(r => setTimeout(r, 1200));
-                    responseText = getSimulatedAiResponse(prompt);
-                }
-                removeChatMessage(loadingMsgId);
-                appendChatMessage('assistant', responseText);
-            } catch (err) {
-                removeChatMessage(loadingMsgId);
-                appendChatMessage('assistant', "⚠️ *Error connecting to AI service. Falling back to simulated mode:* " + getSimulatedAiResponse(prompt));
-            }
-        }
-
-        function appendChatMessage(sender, text) {
-            const container = document.getElementById('chat-messages');
-            const isUser = sender === 'user';
-            
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
-            
-            const content = `
-                <div class="flex items-start space-x-3 max-w-3xl ${isUser ? 'flex-row-reverse space-x-reverse' : ''}">
-                    <div class="w-8 h-8 rounded-xl ${isUser ? 'bg-indigo-600' : 'bg-purple-600'} flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
-                        <i class="fa-solid ${isUser ? 'fa-user' : 'fa-robot'}"></i>
-                    </div>
-                    <div class="p-4 rounded-2xl text-sm leading-relaxed ${isUser ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-900 border border-dark-border text-slate-200 rounded-tl-none'} shadow-md">
-                        ${formatMarkdownText(text)}
-                    </div>
-                </div>
-            `;
-            msgDiv.innerHTML = content;
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function appendLoadingChatMessage() {
-            const container = document.getElementById('chat-messages');
-            const id = 'msg-loading-' + Date.now();
-            const msgDiv = document.createElement('div');
-            msgDiv.id = id;
-            msgDiv.className = "flex justify-start mb-4";
-            msgDiv.innerHTML = `
-                <div class="flex items-start space-x-3">
-                    <div class="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                        <i class="fa-solid fa-robot"></i>
-                    </div>
-                    <div class="p-4 rounded-2xl bg-slate-900 border border-dark-border text-slate-400 text-sm rounded-tl-none flex items-center space-x-2">
-                        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce"></div>
-                        <div class="w-2 h-2 rounded-full bg-purple-500 animate-bounce [animation-delay:-0.15s]"></div>
-                        <div class="w-2 h-2 rounded-full bg-pink-500 animate-bounce [animation-delay:-0.3s]"></div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-            return id;
-        }
-
-        function removeChatMessage(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        }
-
-        function formatMarkdownText(txt) {
-            return txt
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/`([^`]+)`/g, '<code class="bg-slate-800 text-indigo-300 px-1 py-0.5 rounded text-xs">$1</code>')
-                .replace(/\n/g, '<br>');
-        }
-
-        async function fetchGeminiResponse(prompt) {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: {
-                    parts: [{ text: "You are OmniAI, a helpful, futuristic multi-modal AI assistant. Keep responses clear, polite, and well-formatted." }]
-                }
-            };
-            const res = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to get response from Gemini API.";
-        }
-
-        function getSimulatedAiResponse(prompt) {
-            const lower = prompt.toLowerCase();
-            if (lower.includes('bonjour') || lower.includes('hello') || lower.includes('hi')) {
-                return "Hello! I am **OmniAI Studio Assistant**. I can answer questions, discuss ideas, or help you synthesize custom images and videos directly. What would you like to build today?";
-            }
-            if (lower.includes('hole') || lower.includes('trou noir')) {
-                return "A **black hole** is a region of spacetime where gravity is so strong that nothing—no particles or light—can escape from it. It forms when a massive star collapses at the end of its life cycle!";
-            }
-            return `I have analyzed your input: "${prompt}". \n\nOmniAI is capable of processing multi-modal tasks. If you'd like to visualize this concept, try starting your message with \`/image\` or \`/video\`!`;
-        }
-
-        /* --- Image Generator Engine --- */
-        function selectImgStyle(btn, style) {
-            document.querySelectorAll('.img-style-btn').forEach(b => {
-                b.className = "img-style-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200 text-xs font-medium flex items-center justify-start space-x-2";
-            });
-            btn.className = "img-style-btn p-2.5 rounded-xl border border-indigo-500 bg-indigo-600/20 text-indigo-300 text-xs font-medium flex items-center justify-start space-x-2";
-            currentImgStyle = style;
-        }
-
-        function selectImgRatio(btn, ratio) {
-            document.querySelectorAll('.img-ratio-btn').forEach(b => {
-                b.className = "img-ratio-btn border border-slate-800 bg-slate-950 text-slate-400 p-2 rounded-lg text-xs text-center font-medium";
-            });
-            btn.className = "img-ratio-btn border border-indigo-500 bg-indigo-600/20 text-indigo-300 p-2 rounded-lg text-xs text-center font-medium";
-            currentImgRatio = ratio;
-        }
-
-        async function generateImage() {
-            const prompt = document.getElementById('img-prompt').value.trim();
-            if (!prompt) return;
-
-            const placeholder = document.getElementById('img-placeholder');
-            const loader = document.getElementById('img-loader');
-            const resultBox = document.getElementById('img-result-box');
-            const progressPct = document.getElementById('img-progress-pct');
-            const statusText = document.getElementById('img-status-text');
-
-            placeholder.classList.add('hidden');
-            resultBox.classList.add('hidden');
-            loader.classList.remove('hidden');
-            loader.classList.add('flex');
-
-            const steps = [
-                "Encoding textual prompt...",
-                "Sampling diffusion noise map...",
-                "Refining high-frequency details...",
-                "Applying style aesthetics...",
-                "Finalizing render..."
-            ];
-
-            for (let i = 0; i <= 100; i += 20) {
-                progressPct.textContent = `${i}%`;
-                statusText.textContent = steps[Math.min(Math.floor(i / 25), steps.length - 1)];
-                await new Promise(r => setTimeout(r, 250));
-            }
-
-            // Generate Image using Pollinations API fallback to high quality unspash with custom seed
-            const encodedPrompt = encodeURIComponent(`${prompt}, ${currentImgStyle} style, highly detailed`);
-            const width = currentImgRatio === '16:9' ? 1024 : (currentImgRatio === '9:16' ? 576 : 800);
-            const height = currentImgRatio === '16:9' ? 576 : (currentImgRatio === '9:16' ? 1024 : 800);
-            
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${Math.floor(Math.random()*100000)}&nologo=true`;
-
-            const imgEl = document.getElementById('img-result-element');
-            imgEl.src = imageUrl;
-
-            activeGeneratedMedia = {
-                type: 'image',
-                url: imageUrl,
-                prompt: prompt,
-                style: currentImgStyle,
-                timestamp: new Date().toLocaleTimeString()
-            };
-
-            // Add to Gallery
-            addToGallery(activeGeneratedMedia);
-
-            loader.classList.add('hidden');
-            loader.classList.remove('flex');
-            resultBox.classList.remove('hidden');
-            resultBox.classList.add('flex');
-        }
-
-        function sendImageToChat() {
-            if (!activeGeneratedMedia) return;
-            switchTab('chat');
-            appendChatMessage('assistant', `🖼️ **Generated Image:**\n\n![Generated Image](${activeGeneratedMedia.url})\n\n*Prompt:* "${activeGeneratedMedia.prompt}"`);
-        }
-
-        /* --- Video Generator Engine (Canvas Motion Synthesizer) --- */
-        async function generateVideo() {
-            const prompt = document.getElementById('vid-prompt').value.trim();
-            if (!prompt) return;
-
-            const placeholder = document.getElementById('vid-placeholder');
-            const loader = document.getElementById('vid-loader');
-            const resultBox = document.getElementById('vid-result-box');
-            const progressBar = document.getElementById('vid-progress-bar');
-            const progressPct = document.getElementById('vid-progress-pct');
-            const statusStep = document.getElementById('vid-status-step');
-
-            placeholder.classList.add('hidden');
-            resultBox.classList.add('hidden');
-            loader.classList.remove('hidden');
-            loader.classList.add('flex');
-
-            const steps = [
-                "Initializing video latent space...",
-                "Calculating camera trajectories...",
-                "Generating frame interpolation...",
-                "Synthesizing motion dynamics...",
-                "Optimizing video container..."
-            ];
-
-            for (let i = 0; i <= 100; i += 10) {
-                progressBar.style.width = `${i}%`;
-                progressPct.textContent = `${i}%`;
-                statusStep.textContent = steps[Math.min(Math.floor(i / 22), steps.length - 1)];
-                await new Promise(r => setTimeout(r, 200));
-            }
-
-            loader.classList.add('hidden');
-            loader.classList.remove('flex');
-            resultBox.classList.remove('hidden');
-            resultBox.classList.add('flex');
-
-            // Render animated Canvas Video simulation
-            playVidCanvas();
-
-            activeGeneratedMedia = {
-                type: 'video',
-                prompt: prompt,
-                motion: document.getElementById('vid-motion').value,
-                timestamp: new Date().toLocaleTimeString()
-            };
-
-            addToGallery(activeGeneratedMedia);
-        }
-
-        function playVidCanvas() {
-            const canvas = document.getElementById('vid-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 640;
-            canvas.height = 360;
-
-            if (vidAnimFrame) cancelAnimationFrame(vidAnimFrame);
-
-            let frame = 0;
-            const motion = document.getElementById('vid-motion').value;
-
-            function render() {
-                frame++;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Animated Futuristic Background
-                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                const hue1 = (frame) % 360;
-                const hue2 = (frame + 60) % 360;
-                grad.addColorStop(0, `hsl(${hue1}, 70%, 15%)`);
-                grad.addColorStop(1, `hsl(${hue2}, 80%, 10%)`);
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Grid lines animation
-                ctx.strokeStyle = `rgba(255, 255, 255, 0.08)`;
-                ctx.lineWidth = 1;
-                for (let x = 0; x < canvas.width; x += 40) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, canvas.height);
-                    ctx.stroke();
-                }
-
-                // Dynamic Moving Particles / Scene representation
-                const count = 30;
-                for (let i = 0; i < count; i++) {
-                    const speed = (i % 5) + 1;
-                    let x = (i * 30 + frame * speed) % canvas.width;
-                    let y = (Math.sin(frame * 0.03 + i) * 40) + (canvas.height / 2);
-
-                    if (motion === 'drone') {
-                        const scale = 1 + (frame % 100) * 0.01;
-                        x = (x - canvas.width / 2) * scale + canvas.width / 2;
-                    }
-
-                    ctx.fillStyle = `hsla(${(i * 20 + frame) % 360}, 90%, 65%, 0.8)`;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4 + (i % 6), 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Overlay Text watermark
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.font = '12px Inter, sans-serif';
-                ctx.fillText(`OmniAI Sora-Motion Synth • ${motion.toUpperCase()}`, 20, 30);
-
-                if (frame < 240) { // ~8 seconds loop
-                    vidAnimFrame = requestAnimationFrame(render);
-                }
-            }
-
-            render();
-        }
-
-        /* --- Gallery System --- */
-        function addToGallery(item) {
-            galleryItems.unshift(item);
-            document.getElementById('gallery-badge').textContent = galleryItems.length;
-            renderGallery();
-        }
-
-        function renderGallery() {
-            const grid = document.getElementById('gallery-grid');
-            const empty = document.getElementById('gallery-empty');
-
-            if (galleryItems.length === 0) {
-                grid.innerHTML = '';
-                empty.classList.remove('hidden');
-                return;
-            }
-
-            empty.classList.add('hidden');
-            grid.innerHTML = '';
-
-            galleryItems.forEach((item, idx) => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-dark-border rounded-xl overflow-hidden shadow-lg flex flex-col justify-between";
-
-                if (item.type === 'image') {
-                    card.innerHTML = `
-                        <div class="relative group aspect-square bg-slate-950 overflow-hidden">
-                            <img src="${item.url}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" alt="Gallery item">
-                            <span class="absolute top-2 left-2 bg-black/60 backdrop-blur text-[10px] text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30">Image</span>
-                        </div>
-                        <div class="p-3 space-y-2">
-                            <p class="text-xs text-slate-300 font-medium truncate">${item.prompt}</p>
-                            <div class="flex items-center justify-between text-[10px] text-slate-500">
-                                <span>${item.timestamp}</span>
-                                <button onclick="downloadMediaUrl('${item.url}')" class="text-indigo-400 hover:text-indigo-300">
-                                    <i class="fa-solid fa-download"></i> Save
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    card.innerHTML = `
-                        <div class="relative aspect-video bg-black flex items-center justify-center p-4">
-                            <i class="fa-solid fa-circle-play text-4xl text-pink-500/80"></i>
-                            <span class="absolute top-2 left-2 bg-black/60 backdrop-blur text-[10px] text-pink-300 px-2 py-0.5 rounded border border-pink-500/30">Video</span>
-                        </div>
-                        <div class="p-3 space-y-2">
-                            <p class="text-xs text-slate-300 font-medium truncate">${item.prompt}</p>
-                            <div class="flex items-center justify-between text-[10px] text-slate-500">
-                                <span>${item.timestamp}</span>
-                                <span class="text-pink-400">${item.motion}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                grid.appendChild(card);
-            });
-        }
-
-        function clearGallery() {
-            galleryItems = [];
-            document.getElementById('gallery-badge').textContent = '0';
-            renderGallery();
-        }
-
-        function downloadActiveMedia(type) {
-            if (!activeGeneratedMedia) return;
-            if (type === 'image') {
-                downloadMediaUrl(activeGeneratedMedia.url);
-            } else {
-                alert("Simulated video export initiated! Clipping available in studio memory.");
-            }
-        }
-
-        function downloadMediaUrl(url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            a.download = `OmniAI-${Date.now()}.png`;
-            a.click();
-        }
-
-        function clearCurrentView() {
-            if (activeTab === 'chat') {
-                document.getElementById('chat-messages').innerHTML = '';
-            } else if (activeTab === 'image') {
-                document.getElementById('img-placeholder').classList.remove('hidden');
-                document.getElementById('img-result-box').classList.add('hidden');
-            } else if (activeTab === 'video') {
-                document.getElementById('vid-placeholder').classList.remove('hidden');
-                document.getElementById('vid-result-box').classList.add('hidden');
-            }
-        }
-
-        // Mobile Sidebar Toggle
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            const nav = document.getElementById('nav-menu');
-            nav.classList.toggle('hidden');
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
-    </script>
+
+        const data = await response.json();
+        typingIndicator.classList.add('hidden');
+
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          const aiResponse = data.candidates[0].content.parts[0].text;
+          
+          // Save model turn
+          chatHistory.push({
+            role: "model",
+            parts: [{ text: aiResponse }]
+          });
+
+          appendMessage('ai', aiResponse);
+        } else {
+          appendMessage('ai', "Je suis désolée mon cœur, j'ai eu une petite absence... Tu peux me redire ça ? 💕");
+        }
+      } catch (err) {
+        console.error("Gemini API Error:", err);
+        typingIndicator.classList.add('hidden');
+        appendMessage('ai', "Oups... Ma connexion a sauté un court instant. Je suis toujours là pour toi ! 💕");
+      }
+    }
+
+    async function generateSelfieImage(promptHint = "pretty French girl smiling warmly at camera, cozy aesthetic portrait") {
+      if (isGeneratingImage) return;
+      isGeneratingImage = true;
+
+      appendMessage('user', "Envoie-moi un petit selfie, s'il te plaît ! 📸");
+
+      typingIndicator.classList.remove('hidden');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      const apiKey = userApiKey || "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+      const promptText = `A natural aesthetic selfie photo of a lovely 22yo brown-haired woman named Léna, realistic lighting, warm expression, high detail portrait, ${promptHint}`;
+
+      const payload = {
+        contents: [{
+          role: 'user',
+          parts: [{ text: promptText }]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE'],
+          imageConfig: { aspectRatio: "1:1" }
+        }
+      };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        typingIndicator.classList.add('hidden');
+        isGeneratingImage = false;
+
+        const part = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+        if (part) {
+          const imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          appendMessage('ai', "Voilà une petite photo rien que pour toi ! Tu aimes ? 💕", imageUrl);
+        } else {
+          // Fallback portrait placeholder
+          const fallbackUrls = [
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
+          ];
+          const randomFallback = fallbackUrls[Math.floor(Math.random() * fallbackUrls.length)];
+          appendMessage('ai', "Regarde ! Je viens de prendre cette photo pour toi 💕", randomFallback);
+        }
+      } catch (err) {
+        console.error("Gemini Image Gen Error:", err);
+        typingIndicator.classList.add('hidden');
+        isGeneratingImage = false;
+        
+        // Render stylized fallback image
+        const fallbackUrl = "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80";
+        appendMessage('ai', "Voici un doux souvenir pour toi ! ✨", fallbackUrl);
+      }
+    }
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      appendMessage('user', text);
+      userInput.value = '';
+
+      // Check if user is asking for photo
+      const lower = text.toLowerCase();
+      if (lower.includes('selfie') || lower.includes('photo') || lower.includes('image')) {
+        generateSelfieImage();
+      } else {
+        sendChatMessage(text);
+      }
+    });
+
+    // Quick action triggers
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const actionText = btn.getAttribute('data-quick');
+        if (actionText === 'Demander un selfie') {
+          generateSelfieImage();
+        } else {
+          appendMessage('user', actionText);
+          sendChatMessage(actionText);
+        }
+      });
+    });
+
+    requestPhotoBtn.addEventListener('click', () => {
+      generateSelfieImage();
+    });
+
+    // Toggle Voice Response
+    toggleVoiceBtn.addEventListener('click', () => {
+      voiceEnabled = !voiceEnabled;
+      if (voiceEnabled) {
+        voiceIcon.className = "fa-solid fa-volume-high text-pink-400";
+      } else {
+        voiceIcon.className = "fa-solid fa-volume-xmark text-slate-500";
+        window.speechSynthesis?.cancel();
+      }
+    });
+
+    // Clear Chat
+    clearChatBtn.addEventListener('click', () => {
+      chatMessages.innerHTML = '';
+      chatHistory.length = 0;
+      appendMessage('ai', "On repart à zéro mon cœur ! De quoi veux-tu discuter aujourd'hui ? 💕");
+    });
+
+    // Settings Modal
+    openSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+    saveSettingsBtn.addEventListener('click', () => {
+      userApiKey = apiKeyInput.value.trim();
+      nickname = userNicknameInput.value.trim() || "Mon Chéri";
+      
+      const selectedName = voiceSelect.value;
+      const voices = window.speechSynthesis.getVoices();
+      selectedVoice = voices.find(v => v.name === selectedName) || null;
+
+      settingsModal.classList.add('hidden');
+      appendMessage('ai', `C'est bien noté ! Je t'appellerai ${nickname} à partir de maintenant 💕`);
+    });
+
+    // Embed Code Modal
+    function generateEmbedCode() {
+      const code = `<!-- Léna AI Companion Widget -->
+<iframe 
+  src="${window.location.href}" 
+  style="width: 100%; height: 680px; border: none; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"
+  allow="microphone"
+></iframe>`;
+      embedCodeTextarea.value = code;
+    }
+
+    openEmbedBtn.addEventListener('click', () => {
+      generateEmbedCode();
+      embedModal.classList.remove('hidden');
+    });
+    closeEmbedBtn.addEventListener('click', () => embedModal.classList.add('hidden'));
+    closeEmbedModalBtn.addEventListener('click', () => embedModal.classList.add('hidden'));
+
+    copyCodeBtn.addEventListener('click', () => {
+      embedCodeTextarea.select();
+      document.execCommand('copy');
+      copyFeedback.classList.remove('hidden');
+      setTimeout(() => copyFeedback.classList.add('hidden'), 3000);
+    });
+
+    // Initialize speech synthesis voices on page load
+    window.onload = () => {
+      initVoices();
+    };
+  </script>
 </body>
 </html>
+
