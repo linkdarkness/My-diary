@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chroniques des Neuf Heroiques - Idle Rogue-lite RPG</title>
+    <title>La Tour des Cent Épreuves - Rogue-lite RPG</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -12,1453 +12,1456 @@
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#0f172a',
-                        cardBg: '#1e293b',
-                        accentGuerrier: '#ef4444',
-                        accentVoleur: '#eab308',
-                        accentMage: '#3b82f6',
-                        accentNecro: '#8b5cf6',
-                        accentDruid: '#22c55e',
-                        accentPretre: '#f59e0b',
-                        accentPaladin: '#fbbf24',
-                        accentArcher: '#10b981',
-                        accentMoine: '#ec4899',
+                        darkBg: '#0b0d12',
+                        cardBg: '#151922',
+                        borderBg: '#232a38',
+                        gold: '#f59e0b',
+                        commune: '#9ca3af',
+                        rare: '#3b82f6',
+                        epique: '#a855f7',
+                        legendaire: '#f97316',
+                        mythique: '#ef4444'
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { 'box-shadow': '0 0 5px rgba(245, 158, 11, 0.3)' },
+                            '100%': { 'box-shadow': '0 0 20px rgba(245, 158, 11, 0.8)' }
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
-        body { font-family: 'Outfit', sans-serif; background-color: #0b0f19; color: #f1f5f9; user-select: none; }
-        
-        .floating-text {
-            position: absolute;
-            animation: floatUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            pointer-events: none;
-            font-weight: 800;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0d12;
+            color: #e2e8f0;
+            user-select: none;
+            touch-action: manipulation;
         }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            50% { transform: translateY(-25px) scale(1.2); }
-            100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
+        h1, h2, h3, .font-cinzel {
+            font-family: 'Cinzel', serif;
         }
-
-        .damage-player { color: #f87171; }
-        .damage-enemy { color: #facc15; }
-        .crit-damage { color: #ef4444; font-size: 1.35rem; }
-        .heal-text { color: #4ade80; }
-        .shield-text { color: #38bdf8; }
-        .dodge-text { color: #9ca3af; font-style: italic; }
-
-        .rarity-Common { border-color: #64748b; color: #cbd5e1; }
-        .rarity-Rare { border-color: #3b82f6; color: #60a5fa; }
-        .rarity-Epic { border-color: #a855f7; color: #c084fc; }
-        .rarity-Legendary { border-color: #f59e0b; color: #fbbf24; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent); }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar-track { background: #0f1319; }
+        ::-webkit-scrollbar-thumb { background: #263143; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 
-        .class-card {
-            transition: all 0.25s ease;
+        /* Floating text animation */
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
         }
-        .class-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        .damage-float {
+            position: absolute;
+            animation: floatUp 0.8s ease-out forwards;
+            pointer-events: none;
+            font-weight: 900;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.9);
+            z-index: 50;
         }
+
+        /* Body Silhouette anatomical placement styles */
+        .silhouette-container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            height: 480px;
+            margin: 0 auto;
+            background: radial-gradient(circle, rgba(30,41,59,0.5) 0%, rgba(11,13,18,0.9) 80%);
+            border: 1px solid #232a38;
+            border-radius: 1rem;
+        }
+        .body-silhouette-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 85%;
+            opacity: 0.15;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+            pointer-events: none;
+        }
+        .slot-abs {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* Talent node connector lines */
+        .talent-line {
+            position: absolute;
+            background-color: #2e384d;
+            z-index: 1;
+            transition: background-color 0.3s;
+        }
+        .talent-line.active {
+            background-color: #f59e0b;
+            box-shadow: 0 0 8px #f59e0b;
+        }
+
+        /* Dynamic Item Rarity Styles */
+        .rarity-Commun { border-color: #9ca3af; box-shadow: 0 0 5px rgba(156,163,175,0.2); }
+        .rarity-Rare { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
+        .rarity-Épique { border-color: #a855f7; box-shadow: 0 0 12px rgba(168,85,247,0.4); }
+        .rarity-Légendaire { border-color: #f97316; box-shadow: 0 0 15px rgba(249,115,22,0.5); }
+        .rarity-Mythique { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.7); animation: pulse 1.5s infinite; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+<body class="bg-darkBg min-h-screen flex flex-col justify-between overflow-x-hidden text-slate-200">
 
-    <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-30 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <i id="headerClassIcon" class="fa-solid fa-shield-halved text-2xl text-red-500"></i>
-                <div>
-                    <h1 class="font-extrabold text-xl tracking-wide flex items-center gap-2">
-                        <span id="playerClassName">Guerrier</span>
-                        <span id="playerLevelBadge" class="text-xs bg-slate-800 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30">Niv. 1</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Étage Atteint : <span id="maxStageDisplay" class="text-slate-200 font-bold">1</span></p>
-                </div>
+    <!-- TOP HEADER / NAV -->
+    <header class="bg-cardBg border-b border-borderBg sticky top-0 z-40 px-4 py-2 flex flex-wrap justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div id="header-class-icon" class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl font-bold">
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
+            <div>
+                <h1 class="text-sm md:text-base font-bold text-amber-400 leading-tight font-cinzel tracking-wider">LA TOUR DES CENT ÉPREUVES</h1>
+                <p class="text-xs text-slate-400"><span id="hero-class-title">Héros</span> - Niv. <span id="hero-level">1</span></p>
+            </div>
+        </div>
 
-            <!-- Currency Tracker -->
-            <div class="flex items-center gap-6 text-sm font-semibold">
-                <div class="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
-                    <i class="fa-solid fa-coins text-yellow-400 text-base"></i>
-                    <span id="goldDisplay" class="text-yellow-300">0</span>
-                </div>
-                <div class="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
-                    <i class="fa-solid fa-ghost text-purple-400 text-base"></i>
-                    <span id="soulsDisplay" class="text-purple-300">0 Âmes</span>
-                </div>
-                <div class="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
-                    <i class="fa-solid fa-gem text-cyan-400 text-base"></i>
-                    <span id="prestigePointsDisplay" class="text-cyan-300">0 PTS</span>
-                </div>
+        <div class="flex items-center space-x-4 text-xs md:text-sm">
+            <div class="flex items-center space-x-1.5 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
+                <i class="fa-solid fa-coins text-amber-400"></i>
+                <span id="res-gold" class="font-semibold text-amber-300">0</span>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2">
-                <button onclick="game.togglePause()" id="pauseBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-pause"></i> <span>Pause</span>
-                </button>
-                <button onclick="game.openRebirthModal()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow flex items-center gap-2">
-                    <i class="fa-solid fa-rotate-right"></i> <span>Réincarnation</span>
-                </button>
-                <button onclick="game.openSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-slate-700">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
+            <div class="flex items-center space-x-1.5 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
+                <i class="fa-solid fa-ghost text-purple-400"></i>
+                <span id="res-souls" class="font-semibold text-purple-300">0</span>
             </div>
+            <button id="btn-save" onclick="saveGame(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 text-xs transition">
+                <i class="fa-solid fa-floppy-disk"></i>
+            </button>
         </div>
     </header>
 
-    <main class="max-w-7xl w-full mx-auto p-4 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-grow container mx-auto px-2 md:px-4 py-3 max-w-6xl">
+        
+        <!-- TOP COMBAT HUD & ARENA -->
+        <section class="bg-cardBg rounded-xl p-3 md:p-5 border border-borderBg mb-4 shadow-xl relative overflow-hidden">
+            <!-- Tower Floor Header -->
+            <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-red-950/80 text-red-400 border border-red-800/60 px-2.5 py-0.5 rounded text-xs font-bold font-cinzel">
+                        Étage <span id="floor-num">1</span>.<span id="subfloor-num">1</span> / 100
+                    </span>
+                    <span id="boss-badge" class="hidden bg-amber-500 text-black text-xs font-black px-2 py-0.5 rounded animate-pulse">BOSS DU PALIER</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="btn-auto-toggle" onclick="toggleAutoCombat()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                        <i id="auto-icon" class="fa-solid fa-robot text-slate-500"></i>
+                        <span>AUTO : <span id="auto-status-text" class="text-slate-400">OFF</span></span>
+                    </button>
+                </div>
+            </div>
 
-        <!-- LEFT COLUMN: Combat & Stage Visualizer (5 Cols) -->
-        <section class="lg:col-span-5 flex flex-col gap-4">
-            
-            <!-- Stage Header & Progress -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 shadow-md">
-                <div class="flex justify-between items-center">
+            <!-- Battlefield Canvas / Arena View -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center min-h-[190px]">
+                
+                <!-- Hero Combat Card -->
+                <div class="bg-slate-900/90 rounded-lg p-3 border border-slate-800 flex flex-col justify-between h-full relative">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span id="combat-hero-icon" class="text-amber-400 text-lg"><i class="fa-solid fa-user-shield"></i></span>
+                            <div>
+                                <h3 id="combat-hero-name" class="font-bold text-sm text-slate-200">Héros</h3>
+                                <p class="text-[10px] text-slate-400">Puissance: <span id="hero-cp" class="text-amber-400 font-semibold">10</span></p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-slate-400">Armure: <span id="hero-armor-pct" class="text-slate-200 font-semibold">0%</span></span>
+                    </div>
+
+                    <!-- Hero HP Bar -->
+                    <div class="my-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-heart"></i> PV Héros</span>
+                            <span class="text-slate-300"><span id="hero-hp-cur">100</span> / <span id="hero-hp-max">100</span></span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-3.5 p-0.5 border border-slate-800 overflow-hidden">
+                            <div id="hero-hp-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-200" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- CLASS COMBO BAR HUD -->
+                    <div id="combo-hud-box" class="bg-amber-950/20 border border-amber-500/30 rounded-lg p-2 mt-1">
+                        <div class="flex justify-between items-center text-xs mb-1">
+                            <span id="combo-name-label" class="font-bold text-amber-400 font-cinzel text-[11px] flex items-center gap-1">
+                                <i class="fa-solid fa-bolt"></i> COMBO
+                            </span>
+                            <span id="combo-stacks-text" class="text-xs font-black text-amber-300">0 / 5</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-2.5 border border-amber-900/50 overflow-hidden relative">
+                            <div id="combo-bar-fill" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-150" style="width: 0%;"></div>
+                        </div>
+                        <div id="combo-finisher-banner" class="hidden mt-1 text-center bg-gradient-to-r from-amber-500 to-red-600 text-black text-[10px] font-black uppercase py-0.5 rounded tracking-widest animate-pulse">
+                            🔥 FINISHER PRÊT! CLIQUEZ OU AUTO-FRAPPE !
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monster Combat Card -->
+                <div id="monster-card" class="bg-slate-900/90 rounded-lg p-3 border border-slate-800 flex flex-col justify-between h-full relative cursor-pointer hover:border-amber-500/50 transition active:scale-[0.99]" onclick="manualTapMonster(event)">
+                    <!-- Floating Damage Anchor -->
+                    <div id="floating-damage-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div id="monster-avatar" class="w-8 h-8 rounded bg-red-950/60 border border-red-700/50 flex items-center justify-center text-red-400 font-bold">
+                                <i class="fa-solid fa-skull"></i>
+                            </div>
+                            <div>
+                                <h3 id="monster-name" class="font-bold text-sm text-red-300">Gobelin de la Tour</h3>
+                                <p class="text-[10px] text-slate-400">Sous-palier <span id="monster-sublevel">1.1</span></p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-red-400 font-bold">Dégâts: <span id="monster-atk-val">12</span></span>
+                    </div>
+
+                    <!-- Monster Health Bar -->
+                    <div class="my-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-red-400 font-semibold"><i class="fa-solid fa-heart-crack"></i> PV Monstre</span>
+                            <span class="text-slate-300"><span id="monster-hp-cur">50</span> / <span id="monster-hp-max">50</span></span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-3.5 p-0.5 border border-slate-800 overflow-hidden">
+                            <div id="monster-hp-bar" class="bg-red-600 h-full rounded-full transition-all duration-200" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Monster Active Attack Bar (TIMER) -->
                     <div>
-                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Zone Actuelle</span>
-                        <h2 class="text-lg font-bold text-amber-400" id="stageTitle">Étage 1-1</h2>
-                    </div>
-                    <div id="bossBadge" class="hidden bg-red-950/80 border border-red-600 text-red-400 px-3 py-1 rounded-full text-xs font-bold tracking-wider animate-pulse flex items-center gap-1">
-                        <i class="fa-solid fa-skull"></i> BOSS
-                    </div>
-                </div>
-                
-                <!-- Stage Progress Bar -->
-                <div>
-                    <div class="flex justify-between text-xs text-slate-400 mb-1">
-                        <span>Progression de l'étage</span>
-                        <span id="stageKills">0/10 Ennemis</span>
-                    </div>
-                    <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800">
-                        <div id="stageProgressBar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COMBAT ARENA -->
-            <div id="combatArena" class="relative bg-slate-900/90 border border-slate-800 rounded-xl p-6 min-h-[320px] flex flex-col justify-between overflow-hidden shadow-inner">
-                
-                <!-- Floating combat text container -->
-                <div id="floatingTextContainer" class="absolute inset-0 pointer-events-none z-20"></div>
-
-                <!-- Enemies & Player Combat Cards -->
-                <div class="grid grid-cols-2 gap-4 items-center h-full my-auto z-10">
-                    
-                    <!-- HERO STAT CARD -->
-                    <div class="flex flex-col items-center p-3 rounded-xl bg-slate-950/50 border border-slate-800/80">
-                        <div class="relative mb-2">
-                            <div id="heroAvatar" class="w-20 h-20 rounded-full bg-slate-800 border-2 border-red-500 flex items-center justify-center text-3xl shadow-lg">
-                                ⚔️
-                            </div>
-                            <div id="heroShieldBadge" class="hidden absolute -top-1 -right-1 bg-cyan-500 text-slate-950 font-bold text-xs px-2 py-0.5 rounded-full">
-                                🛡️ <span id="heroShieldVal">0</span>
-                            </div>
+                        <div class="flex justify-between text-[10px] text-amber-400/80 mb-0.5 font-bold uppercase tracking-wider">
+                            <span><i class="fa-solid fa-stopwatch"></i> Charge d'attaque monstre</span>
+                            <span id="monster-timer-text">1.5s</span>
                         </div>
-                        <h3 id="heroName" class="font-bold text-sm text-slate-200">Guerrier</h3>
-                        
-                        <!-- Health Bar -->
-                        <div class="w-full mt-2">
-                            <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
-                                <span>PV</span>
-                                <span id="heroHpText">100/100</span>
-                            </div>
-                            <div class="w-full bg-slate-900 rounded-full h-3 border border-slate-800 overflow-hidden">
-                                <div id="heroHpBar" class="bg-emerald-500 h-3 rounded-full transition-all duration-200" style="width: 100%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Class Special Meter / Minions -->
-                        <div id="classSpecialContainer" class="w-full mt-2 text-xs flex flex-col gap-1">
-                            <!-- Populated dynamically per class -->
+                        <div class="w-full bg-slate-950 rounded-full h-2 border border-red-900/40 overflow-hidden">
+                            <div id="monster-attack-bar" class="bg-amber-500 h-full transition-all duration-75" style="width: 0%;"></div>
                         </div>
                     </div>
-
-                    <!-- ENEMY STAT CARD -->
-                    <div class="flex flex-col items-center p-3 rounded-xl bg-slate-950/50 border border-slate-800/80">
-                        <div class="relative mb-2">
-                            <div id="enemyAvatar" class="w-20 h-20 rounded-full bg-slate-800 border-2 border-amber-500 flex items-center justify-center text-3xl shadow-lg">
-                                🦇
-                            </div>
-                        </div>
-                        <h3 id="enemyName" class="font-bold text-sm text-amber-300">Chauve-souris</h3>
-                        
-                        <!-- Enemy Health Bar -->
-                        <div class="w-full mt-2">
-                            <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
-                                <span>PV</span>
-                                <span id="enemyHpText">50/50</span>
-                            </div>
-                            <div class="w-full bg-slate-900 rounded-full h-3 border border-slate-800 overflow-hidden">
-                                <div id="enemyHpBar" class="bg-red-500 h-3 rounded-full transition-all duration-200" style="width: 100%"></div>
-                            </div>
-                        </div>
-
-                        <div class="mt-2 text-[11px] text-slate-400 text-center">
-                            Dégâts: <span id="enemyAtkVal" class="text-slate-200 font-semibold">5</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Buffs / Skill Bar -->
-                <div id="activeSkillsBar" class="flex justify-center gap-2 mt-2 z-10">
-                    <!-- Dynamic skills/perk indicators -->
-                </div>
-            </div>
-
-            <!-- COMBAT LOG -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col h-36">
-                <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-1">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-list-ul mr-1"></i> Journal de Combat</span>
-                    <button onclick="game.clearCombatLog()" class="text-[10px] text-slate-500 hover:text-slate-300">Effacer</button>
-                </div>
-                <div id="combatLog" class="flex-1 overflow-y-auto text-xs space-y-1 font-mono text-slate-300">
-                    <p class="text-slate-500 italic">Bienvenue dans l'aventure ! Le combat démarre...</p>
                 </div>
             </div>
         </section>
 
-        <!-- RIGHT COLUMN: Tabs (Stats, Skills, Equipment, Meta Shop) (7 Cols) -->
-        <section class="lg:col-span-7 flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
-            
-            <!-- Navigation Tabs -->
-            <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
-                <button onclick="game.switchTab('stats')" id="tab-stats" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-amber-500 text-amber-400 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-chart-line"></i> Attributs
-                </button>
-                <button onclick="game.switchTab('inventory')" id="tab-inventory" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-shield-cat"></i> Équipement <span id="inventoryBadge" class="bg-slate-800 text-xs px-1.5 py-0.5 rounded-full">0/16</span>
-                </button>
-                <button onclick="game.switchTab('skills')" id="tab-skills" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Aptitudes
-                </button>
-                <button onclick="game.switchTab('shop')" id="tab-shop" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-[#f43f5e] fa-ankh text-purple-400"></i> Sanctuaire d'Âmes
-                </button>
-            </div>
+        <!-- NAVIGATION TABS -->
+        <nav class="flex border-b border-slate-800 mb-4 overflow-x-auto gap-1">
+            <button onclick="switchTab('equipement')" id="tab-btn-equipement" class="tab-btn bg-slate-800 text-amber-400 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-amber-500">
+                <i class="fa-solid fa-shirt"></i><span>Équipement</span>
+            </button>
+            <button onclick="switchTab('talents')" id="tab-btn-talents" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
+                <i class="fa-solid fa-sitemap"></i><span>Arbre de Talents</span>
+            </button>
+            <button onclick="switchTab('inventaire')" id="tab-btn-inventaire" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
+                <i class="fa-solid fa-sack-dollar"></i><span>Sac (<span id="inv-count">0</span>/30)</span>
+            </button>
+            <button onclick="switchTab('sanctuaire')" id="tab-btn-sanctuaire" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
+                <i class="fa-solid fa-place-of-worship"></i><span>Sanctuaire</span>
+            </button>
+            <button onclick="switchTab('histoire')" id="tab-btn-histoire" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
+                <i class="fa-solid fa-book"></i><span>Lore & Récits</span>
+            </button>
+        </nav>
 
-            <!-- TAB CONTENT CONTAINER -->
-            <div class="p-5 flex-1 overflow-y-auto max-h-[620px]">
+        <!-- TAB CONTENT 1: EQUIPEMENT (ANATOMICAL SILHOUETTE) -->
+        <div id="tab-equipement" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 
-                <!-- TAB 1: STATS & CHARACTER LEVELING -->
-                <div id="content-stats" class="tab-content flex flex-col gap-6">
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
-                        <div>
-                            <p class="text-xs text-slate-400 uppercase font-bold">Points d'Attributs Disponibles</p>
-                            <p class="text-2xl font-black text-amber-400" id="statPointsDisplay">0</p>
+                <!-- Center Hero Silhouette Body Grid (7 cols) -->
+                <div class="lg:col-span-7 bg-cardBg rounded-xl p-4 border border-borderBg flex flex-col items-center justify-center relative">
+                    <h2 class="text-sm font-bold text-slate-300 font-cinzel mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-street-view text-amber-400"></i> Dispositions Anatomique du Héros
+                    </h2>
+
+                    <!-- Body Silhouette Interactive Box -->
+                    <div class="silhouette-container shadow-2xl my-2">
+                        <!-- Dark Fantasy Body Vector Silhouette -->
+                        <svg class="body-silhouette-svg" viewBox="0 0 100 200" fill="currentColor">
+                            <path d="M50 10 C56 10, 60 15, 60 22 C60 29, 56 34, 50 34 C44 34, 40 29, 40 22 C40 15, 44 10, 50 10 Z M38 36 L62 36 L70 44 L78 68 L70 72 L66 52 L66 90 L70 120 L64 120 L58 92 L56 140 L58 190 L48 190 L48 142 L44 142 L44 190 L34 190 L36 140 L34 92 L28 120 L22 120 L26 52 L22 72 L14 68 L22 44 Z" class="text-slate-400"/>
+                        </svg>
+
+                        <!-- 9 Anatomically Positioned Equipment Slots -->
+                        <!-- 1. Tête (Helmet) -->
+                        <div class="slot-abs" style="top: 10%; left: 50%;" onclick="openSlotSelector('helm')">
+                            <div id="eslot-helm" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-helmet-safety text-slate-600 text-xl"></i>
+                                <span class="text-[9px] text-slate-400 mt-0.5">Casque</span>
+                            </div>
                         </div>
-                        <button onclick="game.autoAllocateStats()" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-3 py-2 rounded-lg">
-                            Répartition Auto
-                        </button>
+
+                        <!-- 2. Cou (Amulet) -->
+                        <div class="slot-abs" style="top: 23%; left: 50%;" onclick="openSlotSelector('amulet')">
+                            <div id="eslot-amulet" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-gem text-slate-600 text-lg"></i>
+                                <span class="text-[8px] text-slate-400">Amulette</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Arme Principale (Main Hand - Left of silhouette) -->
+                        <div class="slot-abs" style="top: 38%; left: 20%;" onclick="openSlotSelector('weapon')">
+                            <div id="eslot-weapon" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-sword text-slate-600 text-xl"></i>
+                                <span class="text-[9px] text-slate-400 mt-0.5">Arme P.</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. Plastron (Chest) -->
+                        <div class="slot-abs" style="top: 38%; left: 50%;" onclick="openSlotSelector('chest')">
+                            <div id="eslot-chest" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-vest text-slate-600 text-xl"></i>
+                                <span class="text-[9px] text-slate-400 mt-0.5">Plastron</span>
+                            </div>
+                        </div>
+
+                        <!-- 5. Arme Sec. / Bouclier (Off-Hand - Right of silhouette) -->
+                        <div class="slot-abs" style="top: 38%; left: 80%;" onclick="openSlotSelector('offhand')">
+                            <div id="eslot-offhand" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-shield text-slate-600 text-xl"></i>
+                                <span class="text-[9px] text-slate-400 mt-0.5">Secondaire</span>
+                            </div>
+                        </div>
+
+                        <!-- 6. Gants (Gloves) -->
+                        <div class="slot-abs" style="top: 57%; left: 22%;" onclick="openSlotSelector('gloves')">
+                            <div id="eslot-gloves" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-mitten text-slate-600 text-lg"></i>
+                                <span class="text-[8px] text-slate-400">Gants</span>
+                            </div>
+                        </div>
+
+                        <!-- 7. Anneau 1 (Ring 1) -->
+                        <div class="slot-abs" style="top: 57%; left: 78%;" onclick="openSlotSelector('ring1')">
+                            <div id="eslot-ring1" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-ring text-slate-600 text-lg"></i>
+                                <span class="text-[8px] text-slate-400">Anneau 1</span>
+                            </div>
+                        </div>
+
+                        <!-- 8. Anneau 2 (Ring 2) -->
+                        <div class="slot-abs" style="top: 72%; left: 78%;" onclick="openSlotSelector('ring2')">
+                            <div id="eslot-ring2" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-ring text-slate-600 text-lg"></i>
+                                <span class="text-[8px] text-slate-400">Anneau 2</span>
+                            </div>
+                        </div>
+
+                        <!-- 9. Bottes (Boots) -->
+                        <div class="slot-abs" style="top: 86%; left: 50%;" onclick="openSlotSelector('boots')">
+                            <div id="eslot-boots" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
+                                <i class="fa-solid fa-socks text-slate-600 text-xl"></i>
+                                <span class="text-[9px] text-slate-400 mt-0.5">Bottes</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Side Stats & Set Bonuses (5 cols) -->
+                <div class="lg:col-span-5 flex flex-col space-y-4">
+                    <!-- Hero Stats Panel -->
+                    <div class="bg-cardBg rounded-xl p-4 border border-borderBg">
+                        <h3 class="text-xs font-bold text-slate-300 font-cinzel mb-3 border-b border-slate-800 pb-1 flex justify-between">
+                            <span><i class="fa-solid fa-chart-simple text-amber-400"></i> Attributs du Héros</span>
+                            <span class="text-amber-400">CP Total: <span id="stat-cp">0</span></span>
+                        </h3>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
+                                <span class="text-slate-400">Attaque:</span>
+                                <span id="stat-atk" class="font-bold text-red-400 float-right">0</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
+                                <span class="text-slate-400">Armure:</span>
+                                <span id="stat-armor" class="font-bold text-blue-400 float-right">0</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
+                                <span class="text-slate-400">PV Max:</span>
+                                <span id="stat-hp" class="font-bold text-emerald-400 float-right">0</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
+                                <span class="text-slate-400">Critique:</span>
+                                <span id="stat-crit" class="font-bold text-amber-400 float-right">0%</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
+                                <span class="text-slate-400">Esquive:</span>
+                                <span id="stat-dodge" class="font-bold text-teal-400 float-right">0%</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
+                                <span class="text-slate-400">Régénération:</span>
+                                <span id="stat-regen" class="font-bold text-lime-400 float-right">0/s</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Primary Stats Allocation -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
-                        <!-- Force -->
-                        <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-sm text-red-400"><i class="fa-solid fa-hand-fist mr-1"></i> Force (STR)</div>
-                                <div class="text-[11px] text-slate-400">Augmente les Dégâts d'Attaque</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-slate-200" id="stat-str">10</span>
-                                <button onclick="game.addStatPoint('str')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold w-7 h-7 rounded flex items-center justify-center text-sm shadow">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Agilité -->
-                        <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-sm text-emerald-400"><i class="fa-solid fa-bolt mr-1"></i> Agilité (AGI)</div>
-                                <div class="text-[11px] text-slate-400">Vitesse d'Attaque & Esquive</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-slate-200" id="stat-agi">10</span>
-                                <button onclick="game.addStatPoint('agi')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold w-7 h-7 rounded flex items-center justify-center text-sm shadow">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Intelligence -->
-                        <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-sm text-blue-400"><i class="fa-solid fa-brain mr-1"></i> Intelligence (INT)</div>
-                                <div class="text-[11px] text-slate-400">Dégâts Critiques & Pouvoir Magique</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-slate-200" id="stat-int">10</span>
-                                <button onclick="game.addStatPoint('int')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold w-7 h-7 rounded flex items-center justify-center text-sm shadow">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Vitalité -->
-                        <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-sm text-rose-400"><i class="fa-solid fa-heart mr-1"></i> Vitalité (VIT)</div>
-                                <div class="text-[11px] text-slate-400">Points de Vie & Régénération</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-slate-200" id="stat-vit">10</span>
-                                <button onclick="game.addStatPoint('vit')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold w-7 h-7 rounded flex items-center justify-center text-sm shadow">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Secondary & Derived Overview -->
-                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Récapitulatif des Statistiques</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                            <div class="bg-slate-900 p-2 rounded">Dégâts Physiques: <span id="statOverviewAtk" class="font-bold text-slate-200">0</span></div>
-                            <div class="bg-slate-900 p-2 rounded">Défense / Armure: <span id="statOverviewDef" class="font-bold text-slate-200">0</span></div>
-                            <div class="bg-slate-900 p-2 rounded">Taux de Critique: <span id="statOverviewCrit" class="font-bold text-slate-200">5%</span></div>
-                            <div class="bg-slate-900 p-2 rounded">Dégâts Critiques: <span id="statOverviewCritDmg" class="font-bold text-slate-200">150%</span></div>
-                            <div class="bg-slate-900 p-2 rounded">Chances d'Esquive: <span id="statOverviewDodge" class="font-bold text-slate-200">3%</span></div>
-                            <div class="bg-slate-900 p-2 rounded">Régénération PV/s: <span id="statOverviewRegen" class="font-bold text-slate-200">1</span></div>
+                    <!-- Active Class Set Bonuses -->
+                    <div class="bg-cardBg rounded-xl p-4 border border-borderBg flex-grow">
+                        <h3 class="text-xs font-bold text-amber-400 font-cinzel mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group"></i> Bonus de Panoplie Actifs
+                        </h3>
+                        <div id="active-set-bonuses-container" class="space-y-2 text-xs">
+                            <!-- Populated dynamically -->
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 2: INVENTORY & EQUIPMENT -->
-                <div id="content-inventory" class="tab-content hidden flex flex-col gap-6">
-                    
-                    <!-- Equipped Gear Slots -->
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 2: COMPLEX TALENT TREES -->
+        <div id="tab-talents" class="tab-content hidden">
+            <div class="bg-cardBg rounded-xl p-4 border border-borderBg">
+                <div class="flex flex-wrap justify-between items-center mb-4 border-b border-slate-800 pb-3 gap-2">
                     <div>
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3"><i class="fa-solid fa-shirt mr-1"></i> Équipement Actuel</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            
-                            <!-- Weapon Slot -->
-                            <div id="slot-weapon" onclick="game.unequipItem('weapon')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-700 min-h-[90px]">
-                                <i class="fa-solid fa-gavel text-slate-600 text-2xl mb-1"></i>
-                                <span class="text-[10px] text-slate-500 uppercase">Arme</span>
-                                <span id="slotName-weapon" class="text-xs font-bold text-slate-300">Vide</span>
-                            </div>
-
-                            <!-- Armor Slot -->
-                            <div id="slot-armor" onclick="game.unequipItem('armor')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-700 min-h-[90px]">
-                                <i class="fa-solid fa-shield-halved text-slate-600 text-2xl mb-1"></i>
-                                <span class="text-[10px] text-slate-500 uppercase">Armure</span>
-                                <span id="slotName-armor" class="text-xs font-bold text-slate-300">Vide</span>
-                            </div>
-
-                            <!-- Accessory Slot -->
-                            <div id="slot-accessory" onclick="game.unequipItem('accessory')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-700 min-h-[90px]">
-                                <i class="fa-solid fa-ring text-slate-600 text-2xl mb-1"></i>
-                                <span class="text-[10px] text-slate-500 uppercase">Accessoire</span>
-                                <span id="slotName-accessory" class="text-xs font-bold text-slate-300">Vide</span>
-                            </div>
-
-                            <!-- Relic Slot -->
-                            <div id="slot-relic" onclick="game.unequipItem('relic')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-700 min-h-[90px]">
-                                <i class="fa-solid fa-scroll text-slate-600 text-2xl mb-1"></i>
-                                <span class="text-[10px] text-slate-500 uppercase">Relique</span>
-                                <span id="slotName-relic" class="text-xs font-bold text-slate-300">Vide</span>
-                            </div>
-
-                        </div>
+                        <h2 class="text-base font-bold text-amber-400 font-cinzel flex items-center gap-2">
+                            <i class="fa-solid fa-sitemap"></i> Arbre de Talents : <span id="talent-class-name">Nom de Classe</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Débloquez les prérequis pour progresser et perfectionner vos compétences de combo.</p>
                     </div>
-
-                    <!-- Inventory Management Header -->
-                    <div class="flex justify-between items-center border-t border-slate-800 pt-4">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-box-open mr-1"></i> Sac à dos</h4>
-                        <div class="flex gap-2">
-                            <button onclick="game.autoSellItems()" class="bg-slate-800 hover:bg-slate-700 text-xs text-red-400 border border-slate-700 px-3 py-1 rounded">
-                                Vendre Communs
-                            </button>
-                        </div>
+                    <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-xs font-bold">
+                        Points de Talents Dispo : <span id="talent-points-count" class="text-amber-400 font-black text-sm">0</span>
                     </div>
+                </div>
 
-                    <!-- Inventory Grid -->
-                    <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <!-- Combo Class Summary Banner -->
+                <div id="talent-combo-spec-desc" class="bg-amber-950/20 border border-amber-500/30 rounded-lg p-3 mb-5 text-xs text-amber-200">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Talent Tree Network Visual Viewport -->
+                <div class="relative overflow-x-auto p-4 bg-slate-950/80 rounded-xl border border-slate-800 min-h-[460px]" id="talent-tree-canvas-container">
+                    <div id="talent-tree-grid" class="min-w-[700px] relative">
+                        <!-- Node elements & connecting lines rendered via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 3: INVENTAIRE & COMPARATEUR -->
+        <div id="tab-inventaire" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Inventory Grid (7 cols) -->
+                <div class="lg:col-span-7 bg-cardBg rounded-xl p-4 border border-borderBg">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-xs font-bold text-slate-200 font-cinzel">Saccoche de Butin</h2>
+                        <button onclick="sellAllCommon()" class="text-xs bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/60 px-2.5 py-1 rounded transition">
+                            Vendre Objets Communs
+                        </button>
+                    </div>
+                    <div id="inventory-grid" class="grid grid-cols-5 md:grid-cols-6 gap-2 min-h-[250px]">
                         <!-- Populated dynamically -->
                     </div>
                 </div>
 
-                <!-- TAB 3: CLASS SPECIFIC SKILLS -->
-                <div id="content-skills" class="tab-content hidden flex flex-col gap-4">
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                        <h3 id="classSkillTitle" class="font-bold text-amber-400 text-lg mb-1">Aptitudes Spéciales de Classe</h3>
-                        <p id="classSkillDesc" class="text-xs text-slate-400">Les aptitudes passives et actives débloquées au fil de vos niveaux.</p>
-                    </div>
-
-                    <div id="classSkillsList" class="flex flex-col gap-3">
-                        <!-- Populated dynamically according to active Class -->
-                    </div>
-                </div>
-
-                <!-- TAB 4: META SHOP / REBIRTH SANCTUARY -->
-                <div id="content-shop" class="tab-content hidden flex flex-col gap-5">
-                    <div class="bg-gradient-to-r from-purple-950/60 to-slate-950 p-4 rounded-xl border border-purple-800/40">
-                        <h3 class="font-black text-purple-300 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-ankh text-purple-400"></i> Autel des Âmes Éternelles
+                <!-- Side-by-Side Equipment Comparator (5 cols) -->
+                <div class="lg:col-span-5 bg-cardBg rounded-xl p-4 border border-borderBg flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-amber-400 font-cinzel mb-2 border-b border-slate-800 pb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-code-compare"></i> Comparateur d'Équipement
                         </h3>
-                        <p class="text-xs text-slate-400 mt-1">Dépensez vos Âmes récoltées lors de vos réincarnations pour acheter des bonus permanents valables pour toutes les classes !</p>
-                    </div>
-
-                    <div id="metaUpgradesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic list of meta upgrades -->
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="bg-slate-950 border-t border-slate-900 py-3 text-center text-xs text-slate-500">
-        Chroniques des Neuf Heroiques &copy; 2026 - Jeu Idle Rogue-lite en HTML5 / JavaScript
-    </footer>
-
-    <!-- MODAL: CLASS SELECTION & REBIRTH -->
-    <div id="classModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full p-6 my-8 shadow-2xl flex flex-col max-h-[90vh]">
-            
-            <div class="text-center mb-6">
-                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200">Choix de votre Classe</h2>
-                <p class="text-slate-400 text-sm mt-1">Sélectionnez une classe héroïque pour commencer votre périple ou vous réincarner.</p>
-            </div>
-
-            <!-- Class Cards Grid (9 Classes) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto p-1 flex-1">
-                
-                <!-- 1. GUERRIER -->
-                <div onclick="game.selectClass('Guerrier')" class="class-card bg-slate-950 p-4 rounded-xl border border-red-500/30 hover:border-red-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">⚔️</span>
-                            <div>
-                                <h3 class="font-bold text-red-400">Guerrier</h3>
-                                <span class="text-[10px] bg-red-950 text-red-300 px-2 py-0.5 rounded-full">Tank & Contre</span>
-                            </div>
+                        <div id="comparator-container">
+                            <p class="text-xs text-slate-500 italic text-center py-8">Cliquez sur un objet de votre inventaire pour le comparer avec votre équipement actuel.</p>
                         </div>
-                        <p class="text-xs text-slate-400 mb-3">Solide et résistant. Bénéficie d'une régénération de PV accrue, d'une grande armure et de contre-attaques féroces.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Posture Défensive & Contre-attaque
                     </div>
                 </div>
-
-                <!-- 2. VOLEUR -->
-                <div onclick="game.selectClass('Voleur')" class="class-card bg-slate-950 p-4 rounded-xl border border-yellow-500/30 hover:border-yellow-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">🗡️</span>
-                            <div>
-                                <h3 class="font-bold text-yellow-400">Voleur</h3>
-                                <span class="text-[10px] bg-yellow-950 text-yellow-300 px-2 py-0.5 rounded-full">Vitesse & Or</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Attaque très rapidement, esquive fréquemment les coups et double les pièces d'or récoltées sur les monstrueux ennemis.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Frappe Sournoise (+Or & Esquive)
-                    </div>
-                </div>
-
-                <!-- 3. MAGE -->
-                <div onclick="game.selectClass('Mage')" class="class-card bg-slate-950 p-4 rounded-xl border border-blue-500/30 hover:border-blue-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">🔮</span>
-                            <div>
-                                <h3 class="font-bold text-blue-400">Mage</h3>
-                                <span class="text-[10px] bg-blue-950 text-blue-300 px-2 py-0.5 rounded-full">Dégâts Critiques</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Anéantit les monstres avec d'immenses sorts élémentaires critiques tout en générant un bouclier arcanique protecteur.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Bouclier Arcanique & Dégâts Crit. Boostés
-                    </div>
-                </div>
-
-                <!-- 4. NECROMANT -->
-                <div onclick="game.selectClass('Necromant')" class="class-card bg-slate-950 p-4 rounded-xl border border-purple-500/30 hover:border-purple-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">💀</span>
-                            <div>
-                                <h3 class="font-bold text-purple-400">Nécromant</h3>
-                                <span class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded-full">Invocations & Âmes</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Invoque une armée de squelettes passifs, draine la vie de ses victimes et gagne en puissance à chaque âme capturée.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Squelettes Passifs & Vol de Vie
-                    </div>
-                </div>
-
-                <!-- 5. DRUIDE -->
-                <div onclick="game.selectClass('Druide')" class="class-card bg-slate-950 p-4 rounded-xl border border-green-500/30 hover:border-green-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">🌿</span>
-                            <div>
-                                <h3 class="font-bold text-green-400">Druide</h3>
-                                <span class="text-[10px] bg-green-950 text-green-300 px-2 py-0.5 rounded-full">Metamorphe Hybride</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Alterne entre la forme d'Ours robuste, de Panthère agile et d'Arbre soigneur. Très polyvalent sur toutes les statistiques.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Métamorphose Active & Rajeunissement
-                    </div>
-                </div>
-
-                <!-- 6. PRETRE -->
-                <div onclick="game.selectClass('Pretre')" class="class-card bg-slate-950 p-4 rounded-xl border border-amber-500/30 hover:border-amber-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">☀️</span>
-                            <div>
-                                <h3 class="font-bold text-amber-300">Prêtre</h3>
-                                <span class="text-[10px] bg-amber-950 text-amber-200 px-2 py-0.5 rounded-full">Soin & Châtiment</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Canalise la lumière divine pour se soigner en continu et infliger un châtiment sacré indexé sur la santé maximale.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Soin Passif Continu & Châtiment Divin
-                    </div>
-                </div>
-
-                <!-- 7. PALADIN -->
-                <div onclick="game.selectClass('Paladin')" class="class-card bg-slate-950 p-4 rounded-xl border border-yellow-300/30 hover:border-yellow-300 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">🛡️</span>
-                            <div>
-                                <h3 class="font-bold text-yellow-200">Paladin</h3>
-                                <span class="text-[10px] bg-yellow-950 text-yellow-200 px-2 py-0.5 rounded-full">Renvoyeur de Dégâts</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Garde sacrée impénétrable. Bloque les attaques ennemies et renvoie de lourds dégâts d'épines bénies.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Blocage Divin & Dégâts d'Épines
-                    </div>
-                </div>
-
-                <!-- 8. ARCHER -->
-                <div onclick="game.selectClass('Archer')" class="class-card bg-slate-950 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">🏹</span>
-                            <div>
-                                <h3 class="font-bold text-emerald-400">Archer</h3>
-                                <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full">Tir Multiple & Précision</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Infiltre le combat avec une première frappe meurtrière, tire régulièrement deux flèches et possède une précision chirurgicale.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Première Frappe & Tirs Doubles
-                    </div>
-                </div>
-
-                <!-- 9. MOINE -->
-                <div onclick="game.selectClass('Moine')" class="class-card bg-slate-950 p-4 rounded-xl border border-pink-500/30 hover:border-pink-500 cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-3xl">🥋</span>
-                            <div>
-                                <h3 class="font-bold text-pink-400">Moine</h3>
-                                <span class="text-[10px] bg-pink-950 text-pink-300 px-2 py-0.5 rounded-full">Combos & Vitesse</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Enchaîne les coups à nu rapidement pour accumuler des points de combo libérant des vagues de dégâts dévastatrices.</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 border-t border-slate-900 pt-2">
-                        <strong class="text-slate-300">Spécial :</strong> Système de Combo & Enchaînement
-                    </div>
-                </div>
-
             </div>
         </div>
-    </div>
 
-    <!-- MODAL: SETTINGS & DATA SAVE -->
-    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-lg text-slate-200">Gestion de la Sauvegarde</h3>
-                <button onclick="game.closeSettingsModal()" class="text-slate-500 hover:text-slate-300"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="flex flex-col gap-3">
-                <button onclick="game.saveToLocalStorage()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-lg border border-slate-700 text-sm font-semibold flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-floppy-disk"></i> Sauvegarder Manuellement
-                </button>
-
-                <button onclick="game.exportSave()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-lg border border-slate-700 text-sm font-semibold flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-download"></i> Exporter le Fichier JSON
-                </button>
-
-                <div class="flex flex-col gap-1 mt-2">
-                    <label class="text-xs text-slate-400">Importer une Sauvegarde JSON :</label>
-                    <input type="file" id="importFileInput" onchange="game.importSave(event)" class="text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700">
+        <!-- TAB CONTENT 4: SANCTUAIRE DES ÂMES (REINCARNATION) -->
+        <div id="tab-sanctuaire" class="tab-content hidden">
+            <div class="bg-cardBg rounded-xl p-5 border border-borderBg">
+                <div class="text-center max-w-xl mx-auto mb-6">
+                    <i class="fa-solid fa-ankh text-4xl text-purple-400 mb-2"></i>
+                    <h2 class="text-xl font-bold text-purple-300 font-cinzel">Le Sanctuaire des Âmes</h2>
+                    <p class="text-xs text-slate-400 mt-1">Sacrifiez votre progression actuelle dans la Tour pour vous réincarner. Vous réinitialiserez votre niveau et votre étage, mais conserverez vos Âmes pour acquérir des bénédictions permanentes.</p>
                 </div>
 
-                <div class="border-t border-slate-800 pt-3 mt-2">
-                    <button onclick="game.hardResetGame()" class="w-full bg-red-950/80 hover:bg-red-900 text-red-300 py-2 rounded-lg border border-red-800 text-sm font-semibold flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-trash"></i> Recommencer à Zéro (Hard Reset)
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Soul Upgrade 1 -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-purple-300 font-cinzel"><i class="fa-solid fa-fire text-amber-400"></i> Puissance d'Âme</h4>
+                            <p class="text-xs text-slate-400 mt-1">+10% Attaque globale par niveau.</p>
+                            <p class="text-xs text-slate-300 mt-2">Niveau actuel: <span id="soul-atk-lvl" class="font-bold text-amber-400">0</span></p>
+                        </div>
+                        <button onclick="buySoulUpgrade('atk')" class="mt-4 w-full bg-purple-900/50 hover:bg-purple-800 border border-purple-700 text-purple-200 text-xs py-2 rounded-lg font-bold transition">
+                            Améliorer (<span id="soul-atk-cost">10</span> Âmes)
+                        </button>
+                    </div>
+
+                    <!-- Soul Upgrade 2 -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-purple-300 font-cinzel"><i class="fa-solid fa-heart text-emerald-400"></i> Vitalité Éternelle</h4>
+                            <p class="text-xs text-slate-400 mt-1">+15% PV Max globaux par niveau.</p>
+                            <p class="text-xs text-slate-300 mt-2">Niveau actuel: <span id="soul-hp-lvl" class="font-bold text-emerald-400">0</span></p>
+                        </div>
+                        <button onclick="buySoulUpgrade('hp')" class="mt-4 w-full bg-purple-900/50 hover:bg-purple-800 border border-purple-700 text-purple-200 text-xs py-2 rounded-lg font-bold transition">
+                            Améliorer (<span id="soul-hp-cost">10</span> Âmes)
+                        </button>
+                    </div>
+
+                    <!-- Soul Upgrade 3 -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-purple-300 font-cinzel"><i class="fa-solid fa-gem text-amber-400"></i> Fortune des Ancêtres</h4>
+                            <p class="text-xs text-slate-400 mt-1">+20% Or obtenu et meilleure rareté de butin.</p>
+                            <p class="text-xs text-slate-300 mt-2">Niveau actuel: <span id="soul-loot-lvl" class="font-bold text-amber-400">0</span></p>
+                        </div>
+                        <button onclick="buySoulUpgrade('loot')" class="mt-4 w-full bg-purple-900/50 hover:bg-purple-800 border border-purple-700 text-purple-200 text-xs py-2 rounded-lg font-bold transition">
+                            Améliorer (<span id="soul-loot-cost">10</span> Âmes)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reincarnation Action Banner -->
+                <div class="bg-purple-950/30 border border-purple-800/60 rounded-xl p-4 text-center">
+                    <p class="text-xs text-purple-200 mb-2">Âmes accumulables lors de la Réincarnation : <span id="reincarnate-souls-gain" class="font-black text-amber-300 text-sm">0</span></p>
+                    <button onclick="reincarnate()" class="bg-gradient-to-r from-purple-800 to-indigo-900 hover:from-purple-700 hover:to-indigo-800 text-purple-100 px-6 py-2.5 rounded-xl font-bold font-cinzel text-xs md:text-sm border border-purple-500/50 shadow-lg transition">
+                        ⚡ DÉCLENCHER LA RÉINCARNATION
                     </button>
                 </div>
             </div>
         </div>
+
+        <!-- TAB CONTENT 5: HISTOIRE ET LORE LOG -->
+        <div id="tab-histoire" class="tab-content hidden">
+            <div class="bg-cardBg rounded-xl p-5 border border-borderBg">
+                <h2 class="text-base font-bold text-amber-400 font-cinzel mb-3 border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-scroll"></i> Annales de la Tour
+                </h2>
+                <div id="story-log-container" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                    <!-- Dynamic narrative entries -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER & EXPORT/IMPORT MODALS BUTTONS -->
+    <footer class="bg-cardBg border-t border-borderBg py-3 px-4 text-center text-xs text-slate-500 flex flex-wrap justify-between items-center gap-2">
+        <span>La Tour des Cent Épreuves - Rogue-lite RPG Incremental</span>
+        <div class="flex space-x-3">
+            <button onclick="exportSave()" class="hover:text-amber-400"><i class="fa-solid fa-download"></i> Exporter Save</button>
+            <button onclick="importSavePrompt()" class="hover:text-amber-400"><i class="fa-solid fa-upload"></i> Importer Save</button>
+            <button onclick="resetGamePrompt()" class="hover:text-red-400"><i class="fa-solid fa-trash"></i> Recommencer</button>
+        </div>
+    </footer>
+
+    <!-- MODAL: MANDATORY CLASS SELECTION AT GAME START -->
+    <div id="modal-class-select" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-amber-500/40 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl">
+            <div class="text-center mb-5">
+                <h2 class="text-xl md:text-2xl font-black text-amber-400 font-cinzel tracking-wider">CHOISISSEZ VOTRE CLASSE DE DÉPART</h2>
+                <p class="text-xs text-slate-400 mt-1">Votre choix est irréversible jusqu'à votre prochaine réincarnation au Sanctuaire des Âmes.</p>
+            </div>
+
+            <!-- 9 Classes Grid -->
+            <div id="class-selection-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- Dynamically injected classes cards -->
+            </div>
+        </div>
     </div>
 
-    <!-- MAIN GAME LOGIC JAVASCRIPT -->
+    <!-- MODAL: DEFEAT / HERO DEATH -->
+    <div id="modal-death" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-red-800 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+            <i class="fa-solid fa-skull-crossbones text-5xl text-red-500 mb-3 animate-bounce"></i>
+            <h2 class="text-2xl font-bold text-red-400 font-cinzel">VOUS ÊTES MORT !</h2>
+            <p class="text-xs text-slate-300 mt-2">Le monstre a terrassé votre héros. Vous avez été repoussé au sous-palier précédent pour récupérer de vos blessures.</p>
+            <button onclick="closeDeathModal()" class="mt-6 w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition">
+                REPRENDRE COMBAT
+            </button>
+        </div>
+    </div>
+
     <script>
-        const CLASSES_DATA = {
-            'Guerrier': { icon: '⚔️', str: 14, agi: 8, int: 6, vit: 14, desc: 'Guerrier résistant avec haute défense et régénération.', skillTitle: 'Postures Guerrières', skillDesc: 'Plus votre Vitalité augmente, plus vos contre-attaques sont puissantes.' },
-            'Voleur': { icon: '🗡️', str: 9, agi: 16, int: 8, vit: 9, desc: 'Rapide, esquive souvent et récolte le double d'or.', skillTitle: 'Art de l\'Ombre', skillDesc: 'Chaque esquive réussie augmente vos dégâts critiques de 20% pendant 5 secondes.' },
-            'Mage': { icon: '🔮', str: 5, agi: 8, int: 18, vit: 8, desc: 'Sorts critiques dévastateurs et boucliers arcaniques.', skillTitle: 'Maîtrise Arcanique', skillDesc: 'Chaque coup critique génère un bouclier égal à 25% des dégâts infligés.' },
-            'Necromant': { icon: '💀', str: 7, agi: 7, int: 15, vit: 10, desc: 'Invoque des squelettes, vol de vie et bonus d'âmes.', skillTitle: 'Armée des Morts', skillDesc: 'Invoque un squelette passif tous les 5 niveaux qui attaque périodiquement.' },
-            'Druide': { icon: '🌿', str: 10, agi: 10, int: 11, vit: 11, desc: 'Métamorphe versatile s'adaptant à toutes les situations.', skillTitle: 'Harmonie Naturelle', skillDesc: 'Bascule périodiquement entre la Forme d\'Ours (+PV) et de Panthère (+Vitesse).' },
-            'Pretre': { icon: '☀️', str: 6, agi: 8, int: 14, vit: 12, desc: 'Haute capacité de soin et châtiment sacré proportionnel.', skillTitle: 'Ferveur Divine', skillDesc: 'Soigne 3% des PV max chaque seconde et libère un châtiment divin.' },
-            'Paladin': { icon: '🛡️', str: 12, agi: 6, int: 10, vit: 14, desc: 'Garde sacrée impénétrable qui renvoie les dégâts subis.', skillTitle: 'Aura d\'Épines', skillDesc: 'Renvoie 30% des dégâts subis sous forme de dégâts sacrés au monstre.' },
-            'Archer': { icon: '🏹', str: 10, agi: 16, int: 8, vit: 8, desc: 'Précision extrême, première frappe mortelle et double tir.', skillTitle: 'Tir Réflexe', skillDesc: 'A 25% de chance de décocher une seconde flèche instantanée à chaque attaque.' },
-            'Moine': { icon: '🥋', str: 11, agi: 14, int: 8, vit: 10, desc: 'Génère des points de combo rapides pour des coups féroces.', skillTitle: 'Enchaînement de la Paume', skillDesc: 'Accumule des combos. À 5 combos, déclenche une frappe dévastatrice.' }
+        /* ==========================================================================
+           CLASS DATA & COMBO SYSTEM CONFIGURATIONS
+           ========================================================================== */
+        const CLASSES = {
+            guerrier: {
+                id: 'guerrier', name: 'Guerrier', icon: 'fa-shield-halved', color: '#f59e0b',
+                desc: 'Combattant lourd maîtrisant la furie au combat.',
+                comboName: 'Rage Incandescente', maxCombo: 5,
+                comboDesc: 'Gagne de la Rage à chaque attaque. À 5 stacks, déclenche un Exécuter dévastateur (+300% Dégâts).',
+                baseStats: { atk: 15, armor: 10, hp: 140, crit: 5, dodge: 2, regen: 1 }
+            },
+            voleur: {
+                id: 'voleur', name: 'Voleur', icon: 'fa-user-ninja', color: '#10b981',
+                desc: 'Maître de l\'esquive et des coups critiques mortels.',
+                comboName: 'Flambée d\'Ombres', maxCombo: 5,
+                comboDesc: 'Accumule des points de combo furtifs. À 5 stacks, exécute un Éviscérer critique garanti.',
+                baseStats: { atk: 20, armor: 4, hp: 95, crit: 18, dodge: 12, regen: 0.5 }
+            },
+            mage: {
+                id: 'mage', name: 'Mage', icon: 'fa-wand-magic-sparkles', color: '#3b82f6',
+                desc: 'Érudit de la magie arcanique élémentaire.',
+                comboName: 'Résonance Arcanique', maxCombo: 4,
+                comboDesc: 'Tisse des charges de mana elemental. À 4 stacks, invoque un Météore instantané sur le monstre.',
+                baseStats: { atk: 24, armor: 3, hp: 85, crit: 12, dodge: 4, regen: 0.8 }
+            },
+            necromancien: {
+                id: 'necromancien', name: 'Nécromancien', icon: 'fa-skull', color: '#a855f7',
+                desc: 'Invocateur manipulant la mort et le sang.',
+                comboName: 'Moisson d\'Âmes', maxCombo: 6,
+                comboDesc: 'Aspire l\'essence vitale. À 6 stacks, déchaîne l\'Armée des Morts (Vol de vie massif).',
+                baseStats: { atk: 18, armor: 5, hp: 110, crit: 8, dodge: 3, regen: 2 }
+            },
+            druide: {
+                id: 'druide', name: 'Druide', icon: 'fa-tree', color: '#84cc16',
+                desc: 'Gardien de la nature alternant les formes féroces.',
+                comboName: 'Harmonie Sauvage', maxCombo: 5,
+                comboDesc: 'Alterne griffes et soins. À 5 stacks, déclenche une Colère de la Nature (Dégâts + Soin total).',
+                baseStats: { atk: 16, armor: 8, hp: 125, crit: 7, dodge: 6, regen: 2.5 }
+            },
+            pretre: {
+                id: 'pretre', name: 'Prêtre', icon: 'fa-cross', color: '#facc15',
+                desc: 'Canaliseur de lumière divine et de boucliers sacrés.',
+                comboName: 'Ferveur Divine', maxCombo: 4,
+                comboDesc: 'Accumule la lumière céleste. À 4 stacks, lance un Châtiment Sacré divin et vous soigne.',
+                baseStats: { atk: 14, armor: 6, hp: 115, crit: 6, dodge: 3, regen: 3 }
+            },
+            paladin: {
+                id: 'paladin', name: 'Paladin', icon: 'fa-ankh', color: '#eab308',
+                desc: 'Champion en armure sacrée au marteau foudroyant.',
+                comboName: 'Jugement Sacré', maxCombo: 5,
+                comboDesc: 'Emmagasine le Courroux Divin. À 5 stacks, assène un Jugement Purificateur lourd.',
+                baseStats: { atk: 17, armor: 12, hp: 135, crit: 6, dodge: 2, regen: 1.2 }
+            },
+            archer: {
+                id: 'archer', name: 'Archer', icon: 'fa-bow-arrow', color: '#06b6d4',
+                desc: 'Tireur d\'élite perçant les armures à distance.',
+                comboName: 'Tir de Précision', maxCombo: 5,
+                comboDesc: 'Marque les points faibles de la cible. À 5 stacks, décoche une Flèche Perçante multiple.',
+                baseStats: { atk: 22, armor: 4, hp: 90, crit: 15, dodge: 10, regen: 0.5 }
+            },
+            moine: {
+                id: 'moine', name: 'Moine', icon: 'fa-hand-fist', color: '#f97316',
+                desc: 'Maître des arts martiaux et de l\'énergie du Qi.',
+                comboName: 'Enchaînement du Qi', maxCombo: 6,
+                comboDesc: 'Maintient le fluide du Qi. À 6 stacks, canalise la Paume Explosive du Dragon.',
+                baseStats: { atk: 19, armor: 7, hp: 105, crit: 10, dodge: 14, regen: 1.5 }
+            }
         };
 
-        const ENEMY_TYPES = [
-            { name: 'Chauve-souris', icon: '🦇', hpMult: 0.8, atkMult: 0.9 },
-            { name: 'Gobelin', icon: '👺', hpMult: 1.0, atkMult: 1.0 },
-            { name: 'Squelette', icon: '💀', hpMult: 1.1, atkMult: 1.1 },
-            { name: 'Loup Sauvage', icon: '🐺', hpMult: 1.2, atkMult: 1.2 },
-            { name: 'Orc Guerrier', icon: '👹', hpMult: 1.5, atkMult: 1.3 },
-            { name: 'Golem de Pierre', icon: '🗿', hpMult: 2.2, atkMult: 1.1 },
-            { name: 'Démon du Crépuscule', icon: '👿', hpMult: 2.5, atkMult: 1.6 }
-        ];
-
-        const ITEM_SLOTS = ['weapon', 'armor', 'accessory', 'relic'];
-        const RARITIES = ['Common', 'Rare', 'Epic', 'Legendary'];
-
-        class IdleRPG {
-            constructor() {
-                this.isPaused = false;
-                this.lastTick = Date.now();
-
-                // Player Progress
-                this.player = {
-                    className: 'Guerrier',
-                    level: 1,
-                    xp: 0,
-                    xpToNextLevel: 100,
-                    gold: 0,
-                    souls: 0,
-                    prestigePoints: 0,
-                    
-                    // Stats Base
-                    str: 10,
-                    agi: 10,
-                    int: 10,
-                    vit: 10,
-                    statPoints: 0,
-
-                    // Current Combat Dynamic Stats
-                    currentHp: 100,
-                    shield: 0,
-                    comboPoints: 0,
-                    skeletonsCount: 0,
-
-                    // Gear equipped
-                    equipment: {
-                        weapon: null,
-                        armor: null,
-                        accessory: null,
-                        relic: null
-                    },
-
-                    // Inventory
-                    inventory: [],
-                    maxInventorySize: 16
-                };
-
-                // Meta Shop Upgrades
-                this.metaUpgrades = {
-                    healthBoost: { level: 0, cost: 10, name: 'Vitalité Éternelle', desc: '+10% PV Max totaux', mult: 1.15 },
-                    atkBoost: { level: 0, cost: 15, name: 'Puissance des Âmes', desc: '+10% Dégâts globaux', mult: 1.20 },
-                    goldBoost: { level: 0, cost: 10, name: 'Avarice Céleste', desc: '+15% Or obtenu', mult: 1.15 },
-                    xpBoost: { level: 0, cost: 20, name: 'Sagesse Antique', desc: '+15% Expérience gagnée', mult: 1.20 }
-                };
-
-                // Stage Progress
-                this.stage = 1;
-                this.subStage = 1;
-                this.maxStage = 1;
-                this.stageKills = 0;
-                this.killsRequired = 10;
-                this.isBossFloor = false;
-
-                // Current Enemy
-                this.enemy = null;
-
-                // Ticks & Timers
-                this.combatTimer = 0;
-                this.regenTimer = 0;
-
-                this.init();
-            }
-
-            init() {
-                this.loadFromLocalStorage();
+        /* ==========================================================================
+           COMPLEX TALENT TREES DATA (Branching Nodes with Prerequisites)
+           ========================================================================== */
+        const TALENT_TREES = {
+            guerrier: [
+                { id: 'g1', name: 'Fureur Initiale', branch: 'Combattant', row: 0, col: 1, prereq: [], max: 3, desc: '+10% Dégâts d\'attaque par rang.', effect: (lvl) => ({ atkPct: lvl * 10 }) },
+                { id: 'g2', name: 'Cuirassé', branch: 'Défense', row: 0, col: 3, prereq: [], max: 3, desc: '+15% Armure globale par rang.', effect: (lvl) => ({ armorPct: lvl * 15 }) },
+                { id: 'g3', name: 'Rage Naissante', branch: 'Combo', row: 0, col: 5, prereq: [], max: 3, desc: '+10% chance de doubler les stacks de Rage.', effect: (lvl) => ({ comboDoubleChance: lvl * 10 }) },
                 
-                // Show class selection modal if no class selected or new run
-                if (!localStorage.getItem('chroniques_save')) {
-                    document.getElementById('classModal').classList.remove('hidden');
-                } else {
-                    document.getElementById('classModal').classList.add('hidden');
-                }
-
-                this.spawnEnemy();
-                this.updateUI();
-
-                // Main Game Loop (10 TPS)
-                setInterval(() => {
-                    if (!this.isPaused) {
-                        this.gameLoop();
-                    }
-                }, 100);
-
-                // Auto save every 15 seconds
-                setInterval(() => {
-                    this.saveToLocalStorage();
-                }, 15000);
-            }
-
-            gameLoop() {
-                const now = Date.now();
-                const dt = (now - this.lastTick) / 1000;
-                this.lastTick = now;
-
-                if (!this.enemy) return;
-
-                // Combat Timers
-                this.combatTimer += dt;
-                this.regenTimer += dt;
-
-                const attackSpeed = Math.max(0.4, 1.5 - (this.getDerivedStats().agi * 0.02));
-
-                // Player Attack Turn
-                if (this.combatTimer >= attackSpeed) {
-                    this.combatTimer = 0;
-                    this.executePlayerAttack();
-                }
-
-                // Enemy Attack Turn (Every 1.8 seconds)
-                if (!this.enemy.attackTimer) this.enemy.attackTimer = 0;
-                this.enemy.attackTimer += dt;
-                if (this.enemy.attackTimer >= 1.8) {
-                    this.enemy.attackTimer = 0;
-                    this.executeEnemyAttack();
-                }
-
-                // Regeneration & Passive Class Effects (Every 1 sec)
-                if (this.regenTimer >= 1.0) {
-                    this.regenTimer = 0;
-                    this.executePassiveEffects();
-                }
-
-                this.updateCombatVisuals();
-            }
-
-            getDerivedStats() {
-                let metaHpMult = 1 + (this.metaUpgrades.healthBoost.level * 0.10);
-                let metaAtkMult = 1 + (this.metaUpgrades.atkBoost.level * 0.10);
-
-                let stats = {
-                    str: this.player.str,
-                    agi: this.player.agi,
-                    int: this.player.int,
-                    vit: this.player.vit,
-                    maxHp: Math.floor((100 + (this.player.vit * 15)) * metaHpMult),
-                    atk: Math.floor((10 + (this.player.str * 2.5)) * metaAtkMult),
-                    def: Math.floor(this.player.vit * 1.2),
-                    critChance: Math.min(75, 5 + (this.player.agi * 0.5) + (this.player.int * 0.2)),
-                    critDmg: 150 + (this.player.int * 2),
-                    dodgeChance: Math.min(40, 3 + (this.player.agi * 0.4)),
-                    regen: Math.floor(1 + (this.player.vit * 0.3))
-                };
-
-                // Add Equipment Modifiers
-                Object.values(this.player.equipment).forEach(item => {
-                    if (item) {
-                        stats.atk += item.stats.atk || 0;
-                        stats.def += item.stats.def || 0;
-                        stats.maxHp += item.stats.hp || 0;
-                        stats.critChance += item.stats.crit || 0;
-                    }
-                });
-
-                return stats;
-            }
-
-            executePlayerAttack() {
-                if (!this.enemy || this.enemy.hp <= 0) return;
-
-                const stats = this.getDerivedStats();
-                let isCrit = Math.random() * 100 < stats.critChance;
-                let damage = stats.atk;
-
-                if (isCrit) {
-                    damage = Math.floor(damage * (stats.critDmg / 100));
-                }
-
-                // Class Specific Combat Passives & Modifiers
-                if (this.player.className === 'Mage' && isCrit) {
-                    const shieldGain = Math.floor(damage * 0.25);
-                    this.player.shield += shieldGain;
-                    this.createFloatingText(`+${shieldGain} Bouclier`, 'heroAvatar', 'shield-text');
-                }
-
-                if (this.player.className === 'Moine') {
-                    this.player.comboPoints = (this.player.comboPoints || 0) + 1;
-                    if (this.player.comboPoints >= 5) {
-                        damage *= 2.5;
-                        this.player.comboPoints = 0;
-                        this.createFloatingText('💥 COMBO PAUME !', 'heroAvatar', 'crit-damage');
-                    }
-                }
-
-                if (this.player.className === 'Archer') {
-                    if (Math.random() < 0.25) {
-                        const extraDmg = Math.floor(damage * 0.7);
-                        this.enemy.hp -= extraDmg;
-                        this.createFloatingText(`🏹 ${extraDmg}`, 'enemyAvatar', 'damage-enemy');
-                    }
-                }
-
-                this.enemy.hp -= damage;
-                this.createFloatingText(isCrit ? `💥 ${damage}!` : `${damage}`, 'enemyAvatar', isCrit ? 'crit-damage' : 'damage-enemy');
-
-                this.addCombatLog(`Vous attaquez <span class="text-amber-400">${this.enemy.name}</span> et infligez <span class="font-bold text-yellow-400">${damage}</span> dégâts.`);
-
-                if (this.enemy.hp <= 0) {
-                    this.onEnemyKilled();
-                }
-            }
-
-            executeEnemyAttack() {
-                if (!this.enemy || this.enemy.hp <= 0) return;
-
-                const stats = this.getDerivedStats();
-
-                // Check Player Dodge
-                if (Math.random() * 100 < stats.dodgeChance) {
-                    this.createFloatingText('ESQUIVÉ !', 'heroAvatar', 'dodge-text');
-                    this.addCombatLog(`Vous esquivez l'attaque de <span class="text-amber-400">${this.enemy.name}</span>.`);
-                    return;
-                }
-
-                let rawDmg = this.enemy.atk;
-                let actualDmg = Math.max(1, rawDmg - Math.floor(stats.def * 0.4));
-
-                // Class Paladin Thorns
-                if (this.player.className === 'Paladin') {
-                    const thornsDmg = Math.floor(actualDmg * 0.35);
-                    this.enemy.hp -= thornsDmg;
-                    this.createFloatingText(`🛡️ ${thornsDmg}`, 'enemyAvatar', 'damage-enemy');
-                }
-
-                // Damage Shield First
-                if (this.player.shield > 0) {
-                    if (this.player.shield >= actualDmg) {
-                        this.player.shield -= actualDmg;
-                        actualDmg = 0;
-                    } else {
-                        actualDmg -= this.player.shield;
-                        this.player.shield = 0;
-                    }
-                }
-
-                this.player.currentHp = Math.max(0, this.player.currentHp - actualDmg);
-                if (actualDmg > 0) {
-                    this.createFloatingText(`-${actualDmg}`, 'heroAvatar', 'damage-player');
-                    this.addCombatLog(`<span class="text-red-400">${this.enemy.name}</span> vous inflige <span class="font-bold text-red-400">${actualDmg}</span> dégâts.`);
-                }
-
-                if (this.player.currentHp <= 0) {
-                    this.onPlayerDeath();
-                }
-            }
-
-            executePassiveEffects() {
-                const stats = this.getDerivedStats();
-
-                // Health Regen
-                if (this.player.currentHp < stats.maxHp) {
-                    let regenVal = stats.regen;
-                    if (this.player.className === 'Pretre') regenVal += Math.floor(stats.maxHp * 0.03);
-
-                    this.player.currentHp = Math.min(stats.maxHp, this.player.currentHp + regenVal);
-                }
-
-                // Necromancer Minion Damage
-                if (this.player.className === 'Necromant' && this.enemy) {
-                    const minions = Math.floor(this.player.level / 5) + 1;
-                    const minionDmg = minions * (5 + Math.floor(stats.int * 0.5));
-                    this.enemy.hp -= minionDmg;
-                    this.createFloatingText(`💀 ${minionDmg}`, 'enemyAvatar', 'damage-enemy');
-                    
-                    if (this.enemy.hp <= 0) {
-                        this.onEnemyKilled();
-                    }
-                }
-            }
-
-            onEnemyKilled() {
-                const goldMult = 1 + (this.metaUpgrades.goldBoost.level * 0.15) + (this.player.className === 'Voleur' ? 0.5 : 0);
-                const xpMult = 1 + (this.metaUpgrades.xpBoost.level * 0.15);
-
-                const baseGold = Math.floor((10 + (this.stage * 4)) * goldMult);
-                const baseXp = Math.floor((15 + (this.stage * 5)) * xpMult);
-                const soulGain = this.isBossFloor ? 5 + Math.floor(this.stage / 2) : (Math.random() < 0.25 ? 1 : 0);
-
-                this.player.gold += baseGold;
-                this.player.xp += baseXp;
-                this.player.souls += soulGain;
-
-                this.addCombatLog(`<span class="text-emerald-400">Ennemi vaincu !</span> +${baseGold} Or, +${baseXp} XP ${soulGain ? `(+${soulGain} Âmes)` : ''}.`);
-
-                // Roll for Equipment Loot
-                if (Math.random() < (this.isBossFloor ? 0.85 : 0.20)) {
-                    this.dropLootItem();
-                }
-
-                // Check Level Up
-                this.checkLevelUp();
-
-                // Stage Progression
-                if (this.isBossFloor) {
-                    this.stage++;
-                    this.subStage = 1;
-                    this.stageKills = 0;
-                    this.isBossFloor = false;
-                    if (this.stage > this.maxStage) this.maxStage = this.stage;
-                } else {
-                    this.stageKills++;
-                    if (this.stageKills >= this.killsRequired) {
-                        this.isBossFloor = true;
-                    }
-                }
-
-                this.spawnEnemy();
-                this.updateUI();
-            }
-
-            checkLevelUp() {
-                if (this.player.xp >= this.player.xpToNextLevel) {
-                    this.player.xp -= this.player.xpToNextLevel;
-                    this.player.level++;
-                    this.player.statPoints += 3;
-                    this.player.xpToNextLevel = Math.floor(this.player.xpToNextLevel * 1.35);
-
-                    const stats = this.getDerivedStats();
-                    this.player.currentHp = stats.maxHp;
-
-                    this.addCombatLog(`<span class="text-amber-300 font-bold">🎉 NIVEAU SUPÉRIEUR ! Vous êtes désormais Niveau ${this.player.level} ! (+3 Points)</span>`);
-                    this.createFloatingText('NIVEAU SUPÉRIEUR !', 'heroAvatar', 'heal-text');
-                }
-            }
-
-            dropLootItem() {
-                if (this.player.inventory.length >= this.player.maxInventorySize) {
-                    this.addCombatLog(`<span class="text-slate-500">Inventaire plein, objet ignoré.</span>`);
-                    return;
-                }
-
-                const slot = ITEM_SLOTS[Math.floor(Math.random() * ITEM_SLOTS.length)];
+                { id: 'g4', name: 'Enchaînement Brutal', branch: 'Combattant', row: 1, col: 1, prereq: ['g1'], max: 2, desc: '+5% Chance de coup critique.', effect: (lvl) => ({ crit: lvl * 5 }) },
+                { id: 'g5', name: 'Peau de Fer', branch: 'Défense', row: 1, col: 3, prereq: ['g2'], max: 2, desc: '+20% PV Max.', effect: (lvl) => ({ hpPct: lvl * 20 }) },
+                { id: 'g6', name: 'Frénésie du Finisher', branch: 'Combo', row: 1, col: 5, prereq: ['g3'], max: 2, desc: 'L\'Exécuter augmente l\'attaque de +25% pendant 5s.', effect: (lvl) => ({ finisherBuffAtk: lvl * 25 }) },
                 
-                // Rarity roll
-                const rand = Math.random();
-                let rarity = 'Common';
-                if (rand > 0.92) rarity = 'Legendary';
-                else if (rand > 0.75) rarity = 'Epic';
-                else if (rand > 0.45) rarity = 'Rare';
-
-                const levelPower = this.stage * (rarity === 'Legendary' ? 4 : rarity === 'Epic' ? 2.5 : rarity === 'Rare' ? 1.8 : 1.0);
-
-                const itemNames = {
-                    weapon: ['Épée', 'Hache', 'Bâton', 'Dague', 'Arc'],
-                    armor: ['Cotte de Mailles', 'Robe d\'Arcane', 'Cuirassé', 'Armure d\'Écailles'],
-                    accessory: ['Anneau de Force', 'Amulette de Sagesse', 'Bracelet d\'Esquive'],
-                    relic: ['Totem Ancien', 'Tome Interdit', 'Orbe Céleste']
-                };
-
-                const baseName = itemNames[slot][Math.floor(Math.random() * itemNames[slot].length)];
-
-                const item = {
-                    id: Date.now() + Math.random(),
-                    name: `${baseName} de l'Étage ${this.stage}`,
-                    slot: slot,
-                    rarity: rarity,
-                    stats: {
-                        atk: slot === 'weapon' ? Math.floor(5 + levelPower * 1.5) : 0,
-                        def: slot === 'armor' ? Math.floor(3 + levelPower * 1.2) : 0,
-                        hp: slot === 'accessory' || slot === 'relic' ? Math.floor(20 + levelPower * 5) : 0,
-                        crit: rarity === 'Legendary' ? 8 : rarity === 'Epic' ? 5 : 0
-                    },
-                    value: Math.floor(15 * levelPower)
-                };
-
-                this.player.inventory.push(item);
-                this.addCombatLog(`<span class="rarity-${rarity}">📦 Objet Obtenu: ${item.name} (${rarity})</span>`);
-                this.updateInventoryUI();
-            }
-
-            spawnEnemy() {
-                const template = ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
-                const isBoss = this.isBossFloor;
-
-                const baseHp = Math.floor((40 + (this.stage * 25)) * template.hpMult * (isBoss ? 2.8 : 1.0));
-                const baseAtk = Math.floor((6 + (this.stage * 4)) * template.atkMult * (isBoss ? 1.8 : 1.0));
-
-                this.enemy = {
-                    name: isBoss ? `[BOSS] ${template.name} Élite` : template.name,
-                    icon: isBoss ? '👑' : template.icon,
-                    hp: baseHp,
-                    maxHp: baseHp,
-                    atk: baseAtk,
-                    attackTimer: 0
-                };
-            }
-
-            onPlayerDeath() {
-                this.addCombatLog(`<span class="text-red-500 font-bold">☠️ VOUX ÊTES MORT ! Réinitialisation à l'étage précédent...</span>`);
+                { id: 'g7', name: 'Exécuteur Suprême', branch: 'Combo Ultime', row: 2, col: 3, prereq: ['g4', 'g6'], max: 1, desc: 'Dégâts du Finisher Rage augmentés à +500% !', effect: (lvl) => ({ finisherBonusDmg: 200 }) }
+            ],
+            voleur: [
+                { id: 'v1', name: 'Lames Aiguisées', branch: 'Assassinat', row: 0, col: 1, prereq: [], max: 3, desc: '+8% Dégâts critiques par rang.', effect: (lvl) => ({ critDmgPct: lvl * 8 }) },
+                { id: 'v2', name: 'Pas Furtif', branch: 'Furtivité', row: 0, col: 3, prereq: [], max: 3, desc: '+5% Chance d\'esquive par rang.', effect: (lvl) => ({ dodge: lvl * 5 }) },
+                { id: 'v3', name: 'Ombres Cumulatives', branch: 'Combo', row: 0, col: 5, prereq: [], max: 3, desc: 'Chaque stack d\'Ombre donne +2% Esquive.', effect: (lvl) => ({ comboDodgeBonus: lvl * 2 }) },
                 
-                // Penalty: Reset to start of current stage or stage 1
-                this.stage = Math.max(1, this.stage - 1);
-                this.stageKills = 0;
-                this.isBossFloor = false;
-
-                const stats = this.getDerivedStats();
-                this.player.currentHp = stats.maxHp;
-
-                this.spawnEnemy();
-                this.updateUI();
-            }
-
-            createFloatingText(text, targetId, cssClass) {
-                const target = document.getElementById(targetId);
-                if (!target) return;
-
-                const container = document.getElementById('floatingTextContainer');
-                const rect = target.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-
-                const el = document.createElement('div');
-                el.className = `floating-text ${cssClass}`;
-                el.innerText = text;
-
-                // Position offset
-                const x = (rect.left - containerRect.left) + (rect.width / 2) + (Math.random() * 30 - 15);
-                const y = (rect.top - containerRect.top) + (Math.random() * 20);
-
-                el.style.left = `${x}px`;
-                el.style.top = `${y}px`;
-
-                container.appendChild(el);
-
-                setTimeout(() => {
-                    if (el.parentNode) el.parentNode.removeChild(el);
-                }, 1200);
-            }
-
-            updateUI() {
-                const stats = this.getDerivedStats();
-
-                // Header Info
-                document.getElementById('playerClassName').innerText = this.player.className;
-                document.getElementById('playerLevelBadge').innerText = `Niv. ${this.player.level}`;
-                document.getElementById('maxStageDisplay').innerText = this.maxStage;
-                document.getElementById('goldDisplay').innerText = this.player.gold.toLocaleString('fr-FR');
-                document.getElementById('soulsDisplay').innerText = `${this.player.souls} Âmes`;
-                document.getElementById('prestigePointsDisplay').innerText = `${this.player.prestigePoints} PTS`;
-
-                // Stage Info
-                document.getElementById('stageTitle').innerText = this.isBossFloor ? `Étage ${this.stage} - ANTRE DU BOSS` : `Étage ${this.stage}-${this.stageKills + 1}`;
-                document.getElementById('stageKills').innerText = `${this.stageKills}/${this.killsRequired}`;
-                document.getElementById('stageProgressBar').style.width = `${(this.stageKills / this.killsRequired) * 100}%`;
+                { id: 'v4', name: 'Poisons Mortels', branch: 'Assassinat', row: 1, col: 1, prereq: ['v1'], max: 2, desc: '+15% Attaque.', effect: (lvl) => ({ atkPct: lvl * 15 }) },
+                { id: 'v5', name: 'Éviscération Profonde', branch: 'Combo', row: 1, col: 5, prereq: ['v3'], max: 2, desc: 'Le Finisher d\'Ombre vole 20% des PV infligés.', effect: (lvl) => ({ finisherLifesteal: lvl * 20 }) },
                 
-                if (this.isBossFloor) {
-                    document.getElementById('bossBadge').classList.remove('hidden');
-                } else {
-                    document.getElementById('bossBadge').classList.add('hidden');
-                }
+                { id: 'v6', name: 'Danse des Ombres', branch: 'Combo Ultime', row: 2, col: 3, prereq: ['v4', 'v5'], max: 1, desc: 'Le Finisher réduit le combo max requis à 4 !', effect: (lvl) => ({ reduceMaxCombo: 1 }) }
+            ]
+            // Standard generic fallback generation for other classes to maintain rich trees
+        };
 
-                // Hero Combat Card
-                document.getElementById('heroAvatar').innerText = CLASSES_DATA[this.player.className]?.icon || '⚔️';
-                document.getElementById('heroName').innerText = this.player.className;
-                document.getElementById('heroHpText').innerText = `${Math.ceil(this.player.currentHp)}/${stats.maxHp}`;
-                document.getElementById('heroHpBar').style.width = `${Math.max(0, (this.player.currentHp / stats.maxHp) * 100)}%`;
-
-                // Shield Badge
-                if (this.player.shield > 0) {
-                    document.getElementById('heroShieldBadge').classList.remove('hidden');
-                    document.getElementById('heroShieldVal').innerText = this.player.shield;
-                } else {
-                    document.getElementById('heroShieldBadge').classList.add('hidden');
-                }
-
-                // Enemy Combat Card
-                if (this.enemy) {
-                    document.getElementById('enemyAvatar').innerText = this.enemy.icon;
-                    document.getElementById('enemyName').innerText = this.enemy.name;
-                    document.getElementById('enemyHpText').innerText = `${Math.ceil(Math.max(0, this.enemy.hp))}/${this.enemy.maxHp}`;
-                    document.getElementById('enemyHpBar').style.width = `${Math.max(0, (this.enemy.hp / this.enemy.maxHp) * 100)}%`;
-                    document.getElementById('enemyAtkVal').innerText = this.enemy.atk;
-                }
-
-                // Stats Tab Update
-                document.getElementById('statPointsDisplay').innerText = this.player.statPoints;
-                document.getElementById('stat-str').innerText = this.player.str;
-                document.getElementById('stat-agi').innerText = this.player.agi;
-                document.getElementById('stat-int').innerText = this.player.int;
-                document.getElementById('stat-vit').innerText = this.player.vit;
-
-                document.getElementById('statOverviewAtk').innerText = stats.atk;
-                document.getElementById('statOverviewDef').innerText = stats.def;
-                document.getElementById('statOverviewCrit').innerText = `${stats.critChance.toFixed(1)}%`;
-                document.getElementById('statOverviewCritDmg').innerText = `${stats.critDmg}%`;
-                document.getElementById('statOverviewDodge').innerText = `${stats.dodgeChance.toFixed(1)}%`;
-                document.getElementById('statOverviewRegen').innerText = `${stats.regen}/s`;
-
-                // Render Equipment Slots
-                ITEM_SLOTS.forEach(slot => {
-                    const item = this.player.equipment[slot];
-                    const slotEl = document.getElementById(`slotName-${slot}`);
-                    if (item) {
-                        slotEl.innerText = item.name;
-                        slotEl.className = `text-xs font-bold rarity-${item.rarity}`;
-                    } else {
-                        slotEl.innerText = 'Vide';
-                        slotEl.className = 'text-xs font-bold text-slate-500';
-                    }
-                });
-
-                this.updateInventoryUI();
-                this.updateSkillsUI();
-                this.updateMetaShopUI();
+        // Fill generic robust talent trees for classes without explicitly unique trees
+        Object.keys(CLASSES).forEach(clsId => {
+            if (!TALENTS_TREES[clsId]) {
+                TALENT_TREES[clsId] = [
+                    { id: `${clsId}_1`, name: 'Puissance Brute', branch: 'Voie 1', row: 0, col: 1, prereq: [], max: 3, desc: '+10% Attaque par rang.', effect: (l) => ({ atkPct: l * 10 }) },
+                    { id: `${clsId}_2`, name: 'Endurance de la Tour', branch: 'Voie 2', row: 0, col: 3, prereq: [], max: 3, desc: '+15% PV Max par rang.', effect: (l) => ({ hpPct: l * 15 }) },
+                    { id: `${clsId}_3`, name: 'Régénération du Qi/Mana', branch: 'Voie 3', row: 0, col: 5, prereq: [], max: 3, desc: '+2 PV/s de régénération.', effect: (l) => ({ regen: l * 2 }) },
+                    { id: `${clsId}_4`, name: 'Affinité de Combo', branch: 'Voie 1', row: 1, col: 1, prereq: [`${clsId}_1`], max: 2, desc: 'Stacks de combo augmentent l\'attaque de +3%.', effect: (l) => ({ comboAtkBonus: l * 3 }) },
+                    { id: `${clsId}_5`, name: 'Maîtrise du Finisher', branch: 'Voie 3', row: 1, col: 5, prereq: [`${clsId}_3`], max: 2, desc: 'Les Finishers soignent 15% des PV Max.', effect: (l) => ({ finisherHealPct: l * 15 }) },
+                    { id: `${clsId}_6`, name: 'Éveil Ultime', branch: 'Ultime', row: 2, col: 3, prereq: [`${clsId}_4`, `${clsId}_5`], max: 1, desc: '+30% Dégâts globaux et Finisher explosif.', effect: (l) => ({ atkPct: 30 }) }
+                ];
             }
+        });
 
-            updateInventoryUI() {
-                const grid = document.getElementById('inventoryGrid');
-                grid.innerHTML = '';
+        /* ==========================================================================
+           GAME STATE ENGINE & PERSISTENCE
+           ========================================================================== */
+        let gameState = {
+            hero: {
+                selectedClass: null,
+                level: 1,
+                xp: 0,
+                gold: 0,
+                souls: 0,
+                hpCur: 100,
+                stats: { atk: 10, armor: 0, hpMax: 100, crit: 5, dodge: 2, regen: 1 },
+                equipment: { helm: null, amulet: null, weapon: null, chest: null, offhand: null, gloves: null, ring1: null, ring2: null, boots: null },
+                inventory: [],
+                talents: {}, // { node_id: level }
+                comboStacks: 0
+            },
+            tower: { floor: 1, subFloor: 1 },
+            sanctuary: { atkLvl: 0, hpLvl: 0, lootLvl: 0 },
+            autoCombat: false,
+            logs: []
+        };
 
-                document.getElementById('inventoryBadge').innerText = `${this.player.inventory.length}/${this.player.maxInventorySize}`;
+        let currentMonster = null;
+        let monsterAttackTimer = null;
+        let monsterTimerVal = 0;
+        let combatLoopInterval = null;
 
-                this.player.inventory.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = `bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between hover:border-slate-600 transition cursor-pointer`;
-                    
-                    let statText = item.stats.atk ? `+${item.stats.atk} ATK` : item.stats.def ? `+${item.stats.def} DEF` : `+${item.stats.hp} PV`;
+        /* ==========================================================================
+           INIT & CORE LIFECYCLE
+           ========================================================================== */
+        window.onload = function() {
+            loadGame();
+            if (!gameState.hero.selectedClass) {
+                renderClassSelectionModal();
+            } else {
+                initGameUI();
+                startCombatLoop();
+            }
+        };
 
-                    card.innerHTML = `
-                        <div>
-                            <div class="text-[10px] uppercase tracking-wider text-slate-500">${item.slot}</div>
-                            <div class="text-xs font-bold rarity-${item.rarity} truncate">${item.name}</div>
-                            <div class="text-[11px] text-amber-300 font-semibold mt-1">${statText}</div>
+        function initGameUI() {
+            updateHeader();
+            updateHeroStats();
+            renderEquipmentSilhouette();
+            renderInventoryGrid();
+            renderTalentTree();
+            renderSanctuaire();
+            spawnMonster();
+            updateComboHUD();
+        }
+
+        /* ==========================================================================
+           CLASS SELECTION ENGINE
+           ========================================================================== */
+        function renderClassSelectionModal() {
+            const grid = document.getElementById('class-selection-grid');
+            grid.innerHTML = '';
+
+            Object.values(CLASSES).forEach(cls => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-800 hover:border-amber-500/80 rounded-xl p-4 flex flex-col justify-between cursor-pointer transition transform hover:-translate-y-1 shadow-lg";
+                card.onclick = () => selectClass(cls.id);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style="background-color: ${cls.color}20; color: ${cls.color}">
+                                <i class="fa-solid ${cls.icon}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm font-cinzel text-slate-200">${cls.name}</h3>
+                                <span class="text-[10px] text-amber-400 font-semibold">${cls.comboName}</span>
+                            </div>
                         </div>
-                        <div class="flex gap-1 mt-2">
-                            <button onclick="game.equipItem('${item.id}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] py-1 rounded">Équiper</button>
-                            <button onclick="game.sellItem('${item.id}')" class="bg-slate-800 hover:bg-slate-700 text-red-400 font-bold text-[10px] px-2 rounded"><i class="fa-solid fa-coins"></i></button>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-
-            updateSkillsUI() {
-                const classInfo = CLASSES_DATA[this.player.className];
-                if (!classInfo) return;
-
-                document.getElementById('classSkillTitle').innerText = classInfo.skillTitle;
-                document.getElementById('classSkillDesc').innerText = classInfo.skillDesc;
-
-                const container = document.getElementById('classSkillsList');
-                container.innerHTML = `
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80 flex items-center gap-4">
-                        <div class="text-3xl p-3 bg-slate-900 rounded-xl border border-slate-800">${classInfo.icon}</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-slate-200">Aptitude Passive Principale</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">${classInfo.desc}</p>
+                        <p class="text-xs text-slate-400 mb-3">${cls.desc}</p>
+                        <div class="bg-slate-950 p-2 rounded text-[11px] text-slate-300 border border-slate-800">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> <span class="font-bold">Maniement Combo :</span> ${cls.comboDesc}
                         </div>
                     </div>
+                    <button class="mt-4 w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs py-2 rounded-lg transition font-cinzel">
+                        INCARNER CETTE CLASSE
+                    </button>
                 `;
-            }
+                grid.appendChild(card);
+            });
 
-            updateMetaShopUI() {
-                const container = document.getElementById('metaUpgradesList');
-                container.innerHTML = '';
+            document.getElementById('modal-class-select').classList.remove('hidden');
+        }
 
-                Object.keys(this.metaUpgrades).forEach(key => {
-                    const upg = this.metaUpgrades[key];
-                    const card = document.createElement('div');
-                    card.className = 'bg-slate-950 p-4 rounded-xl border border-slate-800/80 flex flex-col justify-between';
+        function selectClass(classId) {
+            gameState.hero.selectedClass = classId;
+            const cls = CLASSES[classId];
+            gameState.hero.stats = { ...cls.baseStats, hpMax: cls.baseStats.hp };
+            gameState.hero.hpCur = cls.baseStats.hp;
 
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <h4 class="font-bold text-sm text-purple-300">${upg.name}</h4>
-                                <span class="text-xs bg-purple-950 text-purple-300 px-2 py-0.5 rounded-full">Niv. ${upg.level}</span>
-                            </div>
-                            <p class="text-xs text-slate-400 mb-3">${upg.desc}</p>
-                        </div>
-                        <button onclick="game.buyMetaUpgrade('${key}')" class="w-full bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs py-2 rounded-lg flex items-center justify-center gap-2">
-                            <span>Améliorer</span>
-                            <span class="bg-purple-900 px-2 py-0.5 rounded text-[10px] text-purple-200">${upg.cost} Âmes</span>
-                        </button>
-                    `;
-                    container.appendChild(card);
-                });
-            }
+            document.getElementById('modal-class-select').classList.add('hidden');
+            addLog(`Vous avez débuté votre périlleuse ascension en tant que <strong>${cls.name}</strong> !`);
+            saveGame();
+            initGameUI();
+            startCombatLoop();
+        }
 
-            addStatPoint(stat) {
-                if (this.player.statPoints > 0) {
-                    this.player.statPoints--;
-                    this.player[stat]++;
-                    this.updateUI();
+        /* ==========================================================================
+           DYNAMIC STATS & COMBO HUD COMPUTATION
+           ========================================================================== */
+        function updateHeroStats() {
+            if (!gameState.hero.selectedClass) return;
+            const cls = CLASSES[gameState.hero.selectedClass];
+
+            // Base stats + level scaling
+            let atk = cls.baseStats.atk + (gameState.hero.level - 1) * 3;
+            let armor = cls.baseStats.armor + (gameState.hero.level - 1) * 1.5;
+            let hpMax = cls.baseStats.hp + (gameState.hero.level - 1) * 12;
+            let crit = cls.baseStats.crit;
+            let dodge = cls.baseStats.dodge;
+            let regen = cls.baseStats.regen;
+
+            // Equipment bonuses
+            Object.values(gameState.hero.equipment).forEach(item => {
+                if (item) {
+                    atk += item.stats.atk || 0;
+                    armor += item.stats.armor || 0;
+                    hpMax += item.stats.hp || 0;
+                    crit += item.stats.crit || 0;
+                    dodge += item.stats.dodge || 0;
+                    regen += item.stats.regen || 0;
                 }
-            }
+            });
 
-            autoAllocateStats() {
-                while (this.player.statPoints > 0) {
-                    if (this.player.className === 'Mage' || this.player.className === 'Necromant') this.addStatPoint('int');
-                    else if (this.player.className === 'Voleur' || this.player.className === 'Archer') this.addStatPoint('agi');
-                    else if (this.player.className === 'Guerrier' || this.player.className === 'Paladin') this.addStatPoint('vit');
-                    else this.addStatPoint('str');
+            // Talent tree effects
+            const talentList = TALENT_TREES[gameState.hero.selectedClass] || [];
+            talentList.forEach(t => {
+                const lvl = gameState.hero.talents[t.id] || 0;
+                if (lvl > 0 && t.effect) {
+                    const eff = t.effect(lvl);
+                    if (eff.atkPct) atk *= (1 + eff.atkPct / 100);
+                    if (eff.armorPct) armor *= (1 + eff.armorPct / 100);
+                    if (eff.hpPct) hpMax *= (1 + eff.hpPct / 100);
+                    if (eff.crit) crit += eff.crit;
+                    if (eff.dodge) dodge += eff.dodge;
+                    if (eff.regen) regen += eff.regen;
                 }
+            });
+
+            // Sanctuary upgrades
+            atk *= (1 + gameState.sanctuary.atkLvl * 0.10);
+            hpMax *= (1 + gameState.sanctuary.hpLvl * 0.15);
+
+            gameState.hero.stats.atk = Math.round(atk);
+            gameState.hero.stats.armor = Math.round(armor);
+            gameState.hero.stats.hpMax = Math.round(hpMax);
+            gameState.hero.stats.crit = Math.min(75, Math.round(crit));
+            gameState.hero.stats.dodge = Math.min(50, Math.round(dodge));
+            gameState.hero.stats.regen = Math.round(regen * 10) / 10;
+
+            if (gameState.hero.hpCur > gameState.hero.stats.hpMax) {
+                gameState.hero.hpCur = gameState.hero.stats.hpMax;
             }
 
-            equipItem(itemId) {
-                const index = this.player.inventory.findIndex(i => i.id == itemId);
-                if (index === -1) return;
+            // Update UI elements
+            const cp = Math.round(gameState.hero.stats.atk * 2 + gameState.hero.stats.armor * 1.5 + gameState.hero.stats.hpMax * 0.5);
+            document.getElementById('stat-cp').innerText = cp;
+            document.getElementById('hero-cp').innerText = cp;
+            document.getElementById('stat-atk').innerText = gameState.hero.stats.atk;
+            document.getElementById('stat-armor').innerText = gameState.hero.stats.armor;
+            document.getElementById('stat-hp').innerText = gameState.hero.stats.hpMax;
+            document.getElementById('stat-crit').innerText = gameState.hero.stats.crit + '%';
+            document.getElementById('stat-dodge').innerText = gameState.hero.stats.dodge + '%';
+            document.getElementById('stat-regen').innerText = gameState.hero.stats.regen + '/s';
 
-                const item = this.player.inventory[index];
-                const currentEquipped = this.player.equipment[item.slot];
+            // Armor mitigation formula: Armor / (Armor + 100)
+            const armorMitigation = Math.round((gameState.hero.stats.armor / (gameState.hero.stats.armor + 100)) * 100);
+            document.getElementById('hero-armor-pct').innerText = armorMitigation + '%';
 
-                // Remove from inventory
-                this.player.inventory.splice(index, 1);
+            updateHeroHealthBar();
+        }
 
-                // Swap
-                if (currentEquipped) {
-                    this.player.inventory.push(currentEquipped);
-                }
+        function updateHeroHealthBar() {
+            document.getElementById('hero-hp-cur').innerText = Math.max(0, Math.round(gameState.hero.hpCur));
+            document.getElementById('hero-hp-max').innerText = gameState.hero.stats.hpMax;
+            const pct = Math.max(0, Math.min(100, (gameState.hero.hpCur / gameState.hero.stats.hpMax) * 100));
+            document.getElementById('hero-hp-bar').style.width = pct + '%';
+        }
 
-                this.player.equipment[item.slot] = item;
-                this.updateUI();
-            }
+        function updateComboHUD() {
+            const cls = CLASSES[gameState.hero.selectedClass];
+            if (!cls) return;
 
-            unequipItem(slot) {
-                const item = this.player.equipment[slot];
-                if (!item) return;
+            document.getElementById('combo-name-label').innerHTML = `<i class="fa-solid fa-bolt"></i> ${cls.comboName.toUpperCase()}`;
+            document.getElementById('combo-stacks-text').innerText = `${gameState.hero.comboStacks} / ${cls.maxCombo}`;
 
-                if (this.player.inventory.length >= this.player.maxInventorySize) {
-                    this.addCombatLog('<span class="text-red-400">Sac à dos plein ! Impossible de déséquiper.</span>');
-                    return;
-                }
+            const pct = (gameState.hero.comboStacks / cls.maxCombo) * 100;
+            document.getElementById('combo-bar-fill').style.width = pct + '%';
 
-                this.player.equipment[slot] = null;
-                this.player.inventory.push(item);
-                this.updateUI();
-            }
-
-            sellItem(itemId) {
-                const index = this.player.inventory.findIndex(i => i.id == itemId);
-                if (index === -1) return;
-
-                const item = this.player.inventory[index];
-                this.player.gold += item.value;
-                this.player.inventory.splice(index, 1);
-                this.updateUI();
-            }
-
-            autoSellItems() {
-                this.player.inventory = this.player.inventory.filter(item => {
-                    if (item.rarity === 'Common') {
-                        this.player.gold += item.value;
-                        return false;
-                    }
-                    return true;
-                });
-                this.updateUI();
-            }
-
-            buyMetaUpgrade(key) {
-                const upg = this.metaUpgrades[key];
-                if (this.player.souls >= upg.cost) {
-                    this.player.souls -= upg.cost;
-                    upg.level++;
-                    upg.cost = Math.floor(upg.cost * upg.mult);
-                    this.updateUI();
-                } else {
-                    this.addCombatLog('<span class="text-red-400">Âmes insuffisantes !</span>');
-                }
-            }
-
-            selectClass(className) {
-                const classData = CLASSES_DATA[className];
-                if (!classData) return;
-
-                this.player.className = className;
-                this.player.str = classData.str;
-                this.player.agi = classData.agi;
-                this.player.int = classData.int;
-                this.player.vit = classData.vit;
-
-                const stats = this.getDerivedStats();
-                this.player.currentHp = stats.maxHp;
-
-                document.getElementById('classModal').classList.add('hidden');
-                this.addCombatLog(`<span class="text-amber-400 font-bold">Vous incarnez désormais la classe : ${className} !</span>`);
-                this.updateUI();
-            }
-
-            openRebirthModal() {
-                document.getElementById('classModal').classList.remove('hidden');
-            }
-
-            switchTab(tabId) {
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.tab-btn').forEach(el => {
-                    el.classList.remove('border-amber-500', 'text-amber-400');
-                    el.classList.add('border-transparent', 'text-slate-400');
-                });
-
-                document.getElementById(`content-${tabId}`).classList.remove('hidden');
-                const btn = document.getElementById(`tab-${tabId}`);
-                btn.classList.add('border-amber-500', 'text-amber-400');
-                btn.classList.remove('border-transparent', 'text-slate-400');
-            }
-
-            togglePause() {
-                this.isPaused = !this.isPaused;
-                document.getElementById('pauseBtn').querySelector('span').innerText = this.isPaused ? 'Reprendre' : 'Pause';
-            }
-
-            addCombatLog(msg) {
-                const log = document.getElementById('combatLog');
-                const p = document.createElement('p');
-                p.innerHTML = msg;
-                log.prepend(p);
-
-                if (log.children.length > 30) {
-                    log.removeChild(log.lastChild);
-                }
-            }
-
-            clearCombatLog() {
-                document.getElementById('combatLog').innerHTML = '';
-            }
-
-            openSettingsModal() {
-                document.getElementById('settingsModal').classList.remove('hidden');
-            }
-
-            closeSettingsModal() {
-                document.getElementById('settingsModal').classList.add('hidden');
-            }
-
-            saveToLocalStorage() {
-                const saveData = {
-                    player: this.player,
-                    metaUpgrades: this.metaUpgrades,
-                    stage: this.stage,
-                    maxStage: this.maxStage
-                };
-                localStorage.setItem('chroniques_save', JSON.stringify(saveData));
-            }
-
-            loadFromLocalStorage() {
-                const data = localStorage.getItem('chroniques_save');
-                if (!data) return;
-
-                try {
-                    const parsed = JSON.parse(data);
-                    this.player = { ...this.player, ...parsed.player };
-                    this.metaUpgrades = { ...this.metaUpgrades, ...parsed.metaUpgrades };
-                    this.stage = parsed.stage || 1;
-                    this.maxStage = parsed.maxStage || 1;
-                } catch (e) {
-                    console.error('Failed to parse save game:', e);
-                }
-            }
-
-            exportSave() {
-                const saveData = JSON.stringify({
-                    player: this.player,
-                    metaUpgrades: this.metaUpgrades,
-                    stage: this.stage,
-                    maxStage: this.maxStage
-                });
-
-                const blob = new Blob([saveData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Chroniques_Sauvegarde_${Date.now()}.json`;
-                a.click();
-            }
-
-            importSave(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const parsed = JSON.parse(e.target.result);
-                        this.player = parsed.player;
-                        this.metaUpgrades = parsed.metaUpgrades;
-                        this.stage = parsed.stage;
-                        this.maxStage = parsed.maxStage;
-                        this.saveToLocalStorage();
-                        this.updateUI();
-                        this.closeSettingsModal();
-                        alert('Sauvegarde importée avec succès !');
-                    } catch (err) {
-                        alert('Fichier de sauvegarde invalide.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-
-            hardResetGame() {
-                if (confirm('Voulez-vous vraiment TOUT réinitialiser ? Toutes les données seront perdues.')) {
-                    localStorage.removeItem('chroniques_save');
-                    window.location.reload();
-                }
+            const finisherBanner = document.getElementById('combo-finisher-banner');
+            if (gameState.hero.comboStacks >= cls.maxCombo) {
+                finisherBanner.classList.remove('hidden');
+            } else {
+                finisherBanner.classList.add('hidden');
             }
         }
 
-        // Initialize game on window load
-        let game = null;
-        window.onload = () => {
-            game = new IdleRPG();
-        };
+        /* ==========================================================================
+           MONSTER COMBAT ENGINE & TIMER-BASED ACTIVE ATTACKS
+           ========================================================================== */
+        function spawnMonster() {
+            const floor = gameState.tower.floor;
+            const subFloor = gameState.tower.subFloor;
+            const isBoss = (subFloor === 50);
+
+            // Brutal x100 scaling multiplier per floor boss
+            const floorMultiplier = Math.pow(100, floor - 1);
+            const subMultiplier = 1 + (subFloor - 1) * 0.15;
+
+            const baseHp = (40 + subFloor * 25) * floorMultiplier * subMultiplier * (isBoss ? 5 : 1);
+            const baseAtk = (8 + subFloor * 3) * floorMultiplier * subMultiplier * (isBoss ? 2.5 : 1);
+
+            const monsterNames = ["Gobelin Guerrier", "Ombre Renégate", "Squelette Maudit", "Gargouille de Pierre", "Démon Inférieur", "Bête de la Tour"];
+            const bossNames = ["SEIGNEUR DU DÉSENCHANTEMENT", "GARDIEEN DE RUNE MYTHIQUE", "COLOSSE INFERNAL"];
+
+            const name = isBoss ? bossNames[(floor - 1) % bossNames.length] : monsterNames[Math.floor(Math.random() * monsterNames.length)];
+
+            currentMonster = {
+                name: name,
+                subFloor: `${floor}.${subFloor}`,
+                hpMax: Math.round(baseHp),
+                hpCur: Math.round(baseHp),
+                atk: Math.round(baseAtk),
+                attackSpeedSec: isBoss ? 2.0 : 2.5,
+                isBoss: isBoss
+            };
+
+            monsterTimerVal = 0;
+            updateMonsterUI();
+        }
+
+        function updateMonsterUI() {
+            if (!currentMonster) return;
+            document.getElementById('monster-name').innerText = currentMonster.name;
+            document.getElementById('monster-sublevel').innerText = currentMonster.subFloor;
+            document.getElementById('monster-atk-val').innerText = currentMonster.atk;
+            document.getElementById('monster-hp-cur').innerText = Math.max(0, Math.round(currentMonster.hpCur));
+            document.getElementById('monster-hp-max').innerText = currentMonster.hpMax;
+
+            const pct = Math.max(0, Math.min(100, (currentMonster.hpCur / currentMonster.hpMax) * 100));
+            document.getElementById('monster-hp-bar').style.width = pct + '%';
+
+            document.getElementById('boss-badge').classList.toggle('hidden', !currentMonster.isBoss);
+        }
+
+        function startCombatLoop() {
+            if (combatLoopInterval) clearInterval(combatLoopInterval);
+            combatLoopInterval = setInterval(() => {
+                const tickSec = 0.1;
+                
+                // 1. Hero Regeneration
+                if (gameState.hero.hpCur > 0 && gameState.hero.hpCur < gameState.hero.stats.hpMax) {
+                    gameState.hero.hpCur = Math.min(gameState.hero.stats.hpMax, gameState.hero.hpCur + gameState.hero.stats.regen * tickSec);
+                    updateHeroHealthBar();
+                }
+
+                // 2. Active Monster Attack Timer Progress
+                if (currentMonster && currentMonster.hpCur > 0 && gameState.hero.hpCur > 0) {
+                    monsterTimerVal += tickSec;
+                    const timerPct = Math.min(100, (monsterTimerVal / currentMonster.attackSpeedSec) * 100);
+                    document.getElementById('monster-attack-bar').style.width = timerPct + '%';
+                    document.getElementById('monster-timer-text').innerText = (Math.max(0, currentMonster.attackSpeedSec - monsterTimerVal)).toFixed(1) + 's';
+
+                    if (monsterTimerVal >= currentMonster.attackSpeedSec) {
+                        monsterTimerVal = 0;
+                        monsterAttackHero();
+                    }
+                }
+
+                // 3. Auto Combat Strikes
+                if (gameState.autoCombat && currentMonster && currentMonster.hpCur > 0 && gameState.hero.hpCur > 0) {
+                    heroStrikeMonster(false);
+                }
+            }, 100);
+        }
+
+        function monsterAttackHero() {
+            // Check hero dodge
+            if (Math.random() * 100 < gameState.hero.stats.dodge) {
+                spawnFloatingText("ESQUIVÉ !", "#2dd4bf", false);
+                return;
+            }
+
+            // Calculate damage with armor mitigation
+            const mitigation = gameState.hero.stats.armor / (gameState.hero.stats.armor + 100);
+            const dmgTaken = Math.max(1, Math.round(currentMonster.atk * (1 - mitigation)));
+
+            gameState.hero.hpCur -= dmgTaken;
+            updateHeroHealthBar();
+            spawnFloatingText(`-${dmgTaken}`, "#ef4444", false);
+
+            // Check Hero Death
+            if (gameState.hero.hpCur <= 0) {
+                gameState.hero.hpCur = 0;
+                handleHeroDeath();
+            }
+        }
+
+        function manualTapMonster(e) {
+            heroStrikeMonster(true, e);
+        }
+
+        function heroStrikeMonster(isManual = false, event = null) {
+            if (!currentMonster || currentMonster.hpCur <= 0 || gameState.hero.hpCur <= 0) return;
+
+            const cls = CLASSES[gameState.hero.selectedClass];
+            let isCrit = Math.random() * 100 < gameState.hero.stats.crit;
+            let baseDmg = gameState.hero.stats.atk;
+
+            // Check Combo Finisher
+            let isFinisher = false;
+            if (gameState.hero.comboStacks >= cls.maxCombo) {
+                isFinisher = true;
+                baseDmg *= 3.0; // 300% Finisher multiplier
+                gameState.hero.comboStacks = 0;
+                spawnFloatingText("🔥 FINISHER EXÉCUTÉ !", "#f59e0b", true, event);
+            } else {
+                gameState.hero.comboStacks++;
+            }
+
+            updateComboHUD();
+
+            let finalDmg = isCrit ? Math.round(baseDmg * 1.8) : Math.round(baseDmg);
+            currentMonster.hpCur -= finalDmg;
+
+            spawnFloatingText(isCrit ? `⚡ ${finalDmg}!` : `-${finalDmg}`, isCrit ? "#f59e0b" : "#ffffff", true, event);
+            updateMonsterUI();
+
+            // Monster Defeated
+            if (currentMonster.hpCur <= 0) {
+                handleMonsterDefeated();
+            }
+        }
+
+        function handleMonsterDefeated() {
+            // Gold & XP gains
+            const goldGain = Math.round((10 + gameState.tower.subFloor * 5) * Math.pow(2, gameState.tower.floor - 1));
+            const xpGain = Math.round(15 + gameState.tower.subFloor * 8);
+
+            gameState.hero.gold += goldGain;
+            gameState.hero.xp += xpGain;
+
+            checkLevelUp();
+            rollLootDrop();
+
+            // Tower sub-floor advancement
+            if (gameState.tower.subFloor < 50) {
+                gameState.tower.subFloor++;
+            } else {
+                gameState.tower.floor++;
+                gameState.tower.subFloor = 1;
+                addLog(`🎉 FELICITATIONS ! Vous avez surmonté l'Étage ${gameState.tower.floor - 1} ! Difficulty scaling x100 activé !`);
+            }
+
+            updateHeader();
+            spawnMonster();
+        }
+
+        function handleHeroDeath() {
+            gameState.autoCombat = false;
+            updateAutoButtonUI();
+
+            // Retreat 1 subfloor
+            if (gameState.tower.subFloor > 1) {
+                gameState.tower.subFloor--;
+            }
+
+            document.getElementById('modal-death').classList.remove('hidden');
+        }
+
+        function closeDeathModal() {
+            gameState.hero.hpCur = gameState.hero.stats.hpMax;
+            updateHeroHealthBar();
+            document.getElementById('modal-death').classList.add('hidden');
+            spawnMonster();
+        }
+
+        /* ==========================================================================
+           TAB EQUIPMENT SILHOUETTE & INVENTORY SYSTEM
+           ========================================================================== */
+        function renderEquipmentSilhouette() {
+            const slots = ['helm', 'amulet', 'weapon', 'chest', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
+            const icons = {
+                helm: 'fa-helmet-safety', amulet: 'fa-gem', weapon: 'fa-sword', chest: 'fa-vest',
+                offhand: 'fa-shield', gloves: 'fa-mitten', ring1: 'fa-ring', ring2: 'fa-ring', boots: 'fa-socks'
+            };
+
+            slots.forEach(slot => {
+                const container = document.getElementById(`eslot-${slot}`);
+                const item = gameState.hero.equipment[slot];
+
+                if (item) {
+                    container.className = `w-14 h-14 rounded-xl border-2 bg-slate-900 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group rarity-${item.rarity}`;
+                    container.innerHTML = `
+                        <i class="fa-solid ${item.icon} text-lg text-slate-200"></i>
+                        <span class="text-[8px] font-bold text-amber-300 mt-0.5 truncate max-w-[50px]">${item.name}</span>
+                    `;
+                } else {
+                    container.className = "w-14 h-14 rounded-xl border-2 border-slate-700/60 bg-slate-900/60 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group";
+                    container.innerHTML = `
+                        <i class="fa-solid ${icons[slot]} text-slate-600 text-xl"></i>
+                        <span class="text-[8px] text-slate-500 mt-0.5 capitalize">${slot}</span>
+                    `;
+                }
+            });
+        }
+
+        function rollLootDrop() {
+            if (Math.random() > 0.45) return; // 45% drop rate
+
+            const rarities = ['Commun', 'Rare', 'Épique', 'Légendaire', 'Mythique'];
+            const rarityWeights = [60, 25, 10, 4, 1];
+            
+            // Weighted random selection
+            let rand = Math.random() * 100;
+            let chosenRarity = 'Commun';
+            let cumulative = 0;
+
+            for (let i = 0; i < rarities.length; i++) {
+                cumulative += rarityWeights[i];
+                if (rand <= cumulative) {
+                    chosenRarity = rarities[i];
+                    break;
+                }
+            }
+
+            const slotKeys = ['helm', 'amulet', 'weapon', 'chest', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
+            const slot = slotKeys[Math.floor(Math.random() * slotKeys.length)];
+            
+            const mult = (rarities.indexOf(chosenRarity) + 1) * gameState.tower.floor;
+            const item = {
+                id: 'item_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+                name: `${chosenRarity} ${slot}`,
+                slot: slot,
+                rarity: chosenRarity,
+                icon: 'fa-shield-halved',
+                stats: {
+                    atk: Math.round(5 * mult),
+                    hp: Math.round(20 * mult),
+                    armor: Math.round(3 * mult)
+                }
+            };
+
+            if (gameState.hero.inventory.length < 30) {
+                gameState.hero.inventory.push(item);
+                addLog(`Butin trouvé : <span class="text-amber-400 font-bold">${item.name}</span> (${item.rarity})`);
+                renderInventoryGrid();
+            }
+        }
+
+        function renderInventoryGrid() {
+            const grid = document.getElementById('inventory-grid');
+            document.getElementById('inv-count').innerText = gameState.hero.inventory.length;
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 30; i++) {
+                const item = gameState.hero.inventory[i];
+                const cell = document.createElement('div');
+
+                if (item) {
+                    cell.className = `h-14 rounded-xl border-2 bg-slate-900 p-1 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 transition rarity-${item.rarity}`;
+                    cell.onclick = () => selectInventoryItem(item);
+                    cell.innerHTML = `
+                        <i class="fa-solid fa-shield-halved text-xs text-slate-300"></i>
+                        <span class="text-[8px] text-slate-300 font-bold truncate max-w-[45px] mt-1">${item.name}</span>
+                    `;
+                } else {
+                    cell.className = "h-14 rounded-xl border border-slate-800/60 bg-slate-950/40";
+                }
+                grid.appendChild(cell);
+            });
+        }
+
+        function selectInventoryItem(item) {
+            const comp = document.getElementById('comparator-container');
+            const equipped = gameState.hero.equipment[item.slot];
+
+            const itemAtk = item.stats.atk || 0;
+            const eqAtk = equipped ? (equipped.stats.atk || 0) : 0;
+            const diffAtk = itemAtk - eqAtk;
+
+            comp.innerHTML = `
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-1">
+                        <span class="font-bold text-amber-400">${item.name}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded border rarity-${item.rarity}">${item.rarity}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Attaque :</span>
+                            <span>${itemAtk} <strong class="${diffAtk >= 0 ? 'text-emerald-400' : 'text-red-400'}">(${diffAtk >= 0 ? '+' : ''}${diffAtk})</strong></span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="equipItem('${item.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 rounded text-xs transition">Équiper</button>
+                        <button onclick="sellItem('${item.id}')" class="bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 px-3 py-1.5 rounded text-xs transition">Vendre</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function equipItem(itemId) {
+            const idx = gameState.hero.inventory.findIndex(i => i.id === itemId);
+            if (idx === -1) return;
+
+            const item = gameState.hero.inventory[idx];
+            const currentEquipped = gameState.hero.equipment[item.slot];
+
+            gameState.hero.inventory.splice(idx, 1);
+            if (currentEquipped) {
+                gameState.hero.inventory.push(currentEquipped);
+            }
+
+            gameState.hero.equipment[item.slot] = item;
+            updateHeroStats();
+            renderEquipmentSilhouette();
+            renderInventoryGrid();
+            document.getElementById('comparator-container').innerHTML = `<p class="text-xs text-slate-500 italic text-center py-8">Cliquez sur un objet pour comparer.</p>`;
+        }
+
+        /* ==========================================================================
+           COMPLEX BRANCHING TALENT TREES ENGINE WITH PREREQUISITES
+           ========================================================================== */
+        function renderTalentTree() {
+            if (!gameState.hero.selectedClass) return;
+
+            const cls = CLASSES[gameState.hero.selectedClass];
+            const tree = TALENT_TREES[gameState.hero.selectedClass] || [];
+            
+            document.getElementById('talent-class-name').innerText = cls.name;
+            document.getElementById('talent-points-count').innerText = getAvailableTalentPoints();
+
+            // Spec Banner
+            document.getElementById('talent-combo-spec-desc').innerHTML = `
+                <div class="font-bold font-cinzel text-amber-300 mb-1"><i class="fa-solid fa-bolt"></i> SPÉCIALISATION COMBO : ${cls.comboName}</div>
+                <div>${cls.comboDesc}</div>
+            `;
+
+            const grid = document.getElementById('talent-tree-grid');
+            grid.innerHTML = '';
+
+            // Render Nodes
+            tree.forEach(node => {
+                const nodeLvl = gameState.hero.talents[node.id] || 0;
+                const isUnlocked = checkPrerequisites(node, tree);
+                const isMax = nodeLvl >= node.max;
+
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-xl border transition flex flex-col justify-between mb-3 ${
+                    isMax ? 'bg-amber-950/40 border-amber-500' :
+                    nodeLvl > 0 ? 'bg-slate-900 border-amber-500/60' :
+                    isUnlocked ? 'bg-slate-900 border-slate-700 hover:border-slate-500' :
+                    'bg-slate-950/60 border-slate-800/40 opacity-50'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">${node.branch}</span>
+                            <h4 class="font-bold text-xs text-slate-200 font-cinzel">${node.name}</h4>
+                        </div>
+                        <span class="text-xs font-bold ${nodeLvl > 0 ? 'text-amber-400' : 'text-slate-500'}">${nodeLvl} / ${node.max}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 my-2">${node.desc}</p>
+                    <button onclick="upgradeTalent('${node.id}')" ${(!isUnlocked || isMax || getAvailableTalentPoints() <= 0) ? 'disabled' : ''} 
+                            class="mt-1 w-full text-xs font-bold py-1 rounded transition ${
+                                isMax ? 'bg-amber-500/20 text-amber-400 cursor-default' :
+                                (isUnlocked && getAvailableTalentPoints() > 0) ? 'bg-amber-500 hover:bg-amber-400 text-black' :
+                                'bg-slate-800 text-slate-600 cursor-not-allowed'
+                            }">
+                        ${isMax ? 'MAX' : 'AMÉLIORER (+1 PT)'}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function checkPrerequisites(node, tree) {
+            if (!node.prereq || node.prereq.length === 0) return true;
+            return node.prereq.every(reqId => (gameState.hero.talents[reqId] || 0) > 0);
+        }
+
+        function getAvailableTalentPoints() {
+            const spent = Object.values(gameState.hero.talents).reduce((a, b) => a + b, 0);
+            return Math.max(0, (gameState.hero.level - 1) - spent);
+        }
+
+        function upgradeTalent(nodeId) {
+            if (getAvailableTalentPoints() <= 0) return;
+            const tree = TALENT_TREES[gameState.hero.selectedClass] || [];
+            const node = tree.find(n => n.id === nodeId);
+            if (!node) return;
+
+            const curLvl = gameState.hero.talents[nodeId] || 0;
+            if (curLvl < node.max && checkPrerequisites(node, tree)) {
+                gameState.hero.talents[nodeId] = curLvl + 1;
+                updateHeroStats();
+                renderTalentTree();
+                saveGame();
+            }
+        }
+
+        /* ==========================================================================
+           HELPERS & UI CONTROLS
+           ========================================================================== */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-amber-400', 'border-amber-500');
+                btn.classList.add('bg-cardBg', 'text-slate-400', 'border-transparent');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.add('bg-slate-800', 'text-amber-400', 'border-amber-500');
+            activeBtn.classList.remove('bg-cardBg', 'text-slate-400', 'border-transparent');
+        }
+
+        function toggleAutoCombat() {
+            gameState.autoCombat = !gameState.autoCombat;
+            updateAutoButtonUI();
+        }
+
+        function updateAutoButtonUI() {
+            const btnText = document.getElementById('auto-status-text');
+            const icon = document.getElementById('auto-icon');
+            if (gameState.autoCombat) {
+                btnText.innerText = 'ON';
+                btnText.className = 'text-emerald-400 font-black';
+                icon.className = 'fa-solid fa-robot text-emerald-400 animate-pulse';
+            } else {
+                btnText.innerText = 'OFF';
+                btnText.className = 'text-slate-400';
+                icon.className = 'fa-solid fa-robot text-slate-500';
+            }
+        }
+
+        function spawnFloatingText(text, color, isMonsterHit = true, event = null) {
+            const container = document.getElementById('floating-damage-container');
+            if (!container) return;
+
+            const el = document.createElement('div');
+            el.className = 'damage-float text-sm md:text-base';
+            el.innerText = text;
+            el.style.color = color;
+
+            let left = event ? (event.offsetX || 50) : Math.random() * 80 + 10;
+            let top = event ? (event.offsetY || 50) : Math.random() * 60 + 20;
+
+            el.style.left = left + 'px';
+            el.style.top = top + 'px';
+
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function checkLevelUp() {
+            const reqXp = gameState.hero.level * 50;
+            if (gameState.hero.xp >= reqXp) {
+                gameState.hero.xp -= reqXp;
+                gameState.hero.level++;
+                addLog(`🌟 NIVAU SUPÉRIEUR ! Vous avez atteint le niveau ${gameState.hero.level} ! (+1 Point de Talent)`);
+                updateHeroStats();
+                renderTalentTree();
+            }
+        }
+
+        function updateHeader() {
+            document.getElementById('hero-level').innerText = gameState.hero.level;
+            document.getElementById('res-gold').innerText = gameState.hero.gold;
+            document.getElementById('res-souls').innerText = gameState.hero.souls;
+            document.getElementById('floor-num').innerText = gameState.tower.floor;
+            document.getElementById('subfloor-num').innerText = gameState.tower.subFloor;
+
+            if (gameState.hero.selectedClass) {
+                document.getElementById('hero-class-title').innerText = CLASSES[gameState.hero.selectedClass].name;
+                document.getElementById('combat-hero-name').innerText = CLASSES[gameState.hero.selectedClass].name;
+            }
+        }
+
+        function addLog(msg) {
+            gameState.logs.unshift({ date: new Date().toLocaleTimeString(), msg: msg });
+            if (gameState.logs.length > 20) gameState.logs.pop();
+
+            const container = document.getElementById('story-log-container');
+            if (container) {
+                container.innerHTML = gameState.logs.map(l => `
+                    <div class="bg-slate-900/80 p-2 rounded border border-slate-800 text-xs">
+                        <span class="text-slate-500 font-mono">[${l.date}]</span> <span class="text-slate-300">${l.msg}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        /* ==========================================================================
+           SANCTUAIRE & SAVE MANAGEMENT
+           ========================================================================== */
+        function renderSanctuaire() {
+            document.getElementById('soul-atk-lvl').innerText = gameState.sanctuary.atkLvl;
+            document.getElementById('soul-hp-lvl').innerText = gameState.sanctuary.hpLvl;
+            document.getElementById('soul-loot-lvl').innerText = gameState.sanctuary.lootLvl;
+
+            document.getElementById('soul-atk-cost').innerText = (gameState.sanctuary.atkLvl + 1) * 10;
+            document.getElementById('soul-hp-cost').innerText = (gameState.sanctuary.hpLvl + 1) * 10;
+            document.getElementById('soul-loot-cost').innerText = (gameState.sanctuary.lootLvl + 1) * 10;
+
+            const soulsGain = Math.floor(gameState.tower.floor * 5 + gameState.hero.level * 2);
+            document.getElementById('reincarnate-souls-gain').innerText = soulsGain;
+        }
+
+        function reincarnate() {
+            const soulsGain = Math.floor(gameState.tower.floor * 5 + gameState.hero.level * 2);
+            gameState.hero.souls += soulsGain;
+
+            // Reset progression
+            gameState.tower.floor = 1;
+            gameState.tower.subFloor = 1;
+            gameState.hero.level = 1;
+            gameState.hero.xp = 0;
+            gameState.hero.selectedClass = null;
+            gameState.hero.talents = {};
+
+            saveGame();
+            renderClassSelectionModal();
+        }
+
+        function saveGame(showNotice = false) {
+            localStorage.setItem('la_tour_save_v3', JSON.stringify(gameState));
+            if (showNotice) addLog("Partie sauvegardée dans le navigateur.");
+        }
+
+        function loadGame() {
+            const data = localStorage.getItem('la_tour_save_v3');
+            if (data) {
+                try {
+                    gameState = JSON.parse(data);
+                } catch(e) { console.error("Save loading error", e); }
+            }
+        }
+
+        function exportSave() {
+            const str = btoa(JSON.stringify(gameState));
+            navigator.clipboard.writeText(str);
+            alert("Sauvegarde copiée dans le presse-papier !");
+        }
+
+        function importSavePrompt() {
+            const str = prompt("Collez le code de sauvegarde :");
+            if (str) {
+                try {
+                    gameState = JSON.parse(atob(str));
+                    saveGame();
+                    location.reload();
+                } catch(e) { alert("Code invalide !"); }
+            }
+        }
+
+        function resetGamePrompt() {
+            if (confirm("Réinitialiser totalement votre partie ?")) {
+                localStorage.removeItem('la_tour_save_v3');
+                location.reload();
+            }
+        }
     </script>
 </body>
 </html>
