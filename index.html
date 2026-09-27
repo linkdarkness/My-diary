@@ -63,7 +63,7 @@
 </head>
 <body class="min-h-screen flex flex-col select-none overflow-x-hidden pb-20">
 
-    <!-- ÉCRAN DE SÉLECTION DE CLASSE (MODAL INITIAL OU RESET) -->
+    <!-- ÉCRAN DE SÉLECTION DE CLASSE -->
     <div id="ecran-selection-classe" class="fixed inset-0 bg-[#05070b] z-50 flex flex-col p-4 overflow-y-auto">
         <div class="max-w-md mx-auto w-full my-auto flex flex-col gap-4 py-6">
             <div class="text-center">
@@ -83,7 +83,7 @@
                 <!-- Rempli dynamiquement par JS -->
             </div>
 
-            <button onclick="validerSelectionClasse()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-bold text-sm shadow-xl mt-2 flex items-center justify-center gap-2">
+            <button type="button" id="btn-valider-classe" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-bold text-sm shadow-xl mt-2 flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-play"></i> Commencer l'Aventure
             </button>
         </div>
@@ -93,7 +93,7 @@
     <header class="bg-cardBg border-b border-cardBorder px-3 py-2.5 sticky top-0 z-40 shadow-lg">
         <div class="flex justify-between items-center gap-2">
             <div class="flex items-center gap-2">
-                <div id="header-classe-icone-wrap" class="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-900/50 shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-900/50 shrink-0">
                     <i class="fa-solid fa-user-shield text-base" id="header-classe-icone"></i>
                 </div>
                 <div class="overflow-hidden">
@@ -245,7 +245,7 @@
 
         </div>
 
-        <!-- ONGLET 2 : HÉROS & ÉQUIPEMENT (SILHOUETTE / PAPER DOLL AVEC BONUS DE SET DE CLASSE) -->
+        <!-- ONGLET 2 : HÉROS & ÉQUIPEMENT -->
         <div id="tab-heros" class="tab-content hidden flex flex-col gap-4">
             <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-xl flex flex-col gap-3">
                 <div class="flex justify-between items-center">
@@ -590,6 +590,11 @@
             chargerJeu();
             peuplerEcranSelectionClasse();
 
+            const btnValider = document.getElementById('btn-valider-classe');
+            if (btnValider) {
+                btnValider.addEventListener('click', validerSelectionClasse);
+            }
+
             if (!etatJeu.classeChoisie) {
                 document.getElementById('ecran-selection-classe').classList.remove('hidden');
             } else {
@@ -633,7 +638,6 @@
             const nomSaisi = document.getElementById('input-creation-nom').value.trim() || "Valen";
             etatJeu.classeChoisie = classeSelectionneeTmp;
             etatJeu.hero.nom = nomSaisi;
-            document.getElementById('input-nom-hero').value = nomSaisi;
 
             const cData = CLASSES_DATA[etatJeu.classeChoisie];
             etatJeu.hero.pvMax = cData.stats.pv;
@@ -829,7 +833,6 @@
                 const deg = Math.max(1, Math.floor((atqTot * (1.5 + (lFrappe * 0.2))) - (ennemiActuel.def * 0.4)));
                 ennemiActuel.pv -= deg;
                 
-                // Bonus set Nécromancien (vol de vie)
                 if (compterSetEquipe() >= 4 && etatJeu.classeChoisie === 'necromancien') {
                     const vol = Math.floor(deg * 0.1);
                     hero.pv = Math.min(hero.pvMax, hero.pv + vol);
@@ -946,7 +949,6 @@
             const mult = rData.mult * (1 + (etatJeu.village.forge * 0.1)) * etatJeu.etage;
             const cData = CLASSES_DATA[etatJeu.classeChoisie];
 
-            // 15% de chance de looter une pièce du set de classe légendaire
             let estSetClass = (choix === 'legendaire' && Math.random() < 0.4) || (Math.random() < 0.08);
             if (estSetClass) choix = 'legendaire';
 
@@ -1200,7 +1202,6 @@
                 }
             });
 
-            // Application bonus set complet si 4+ pièces équipées
             const nbSet = compterSetEquipe();
             if (nbSet >= 4) {
                 if (etatJeu.classeChoisie === 'voleur') { crit += 20; vit += 5; }
