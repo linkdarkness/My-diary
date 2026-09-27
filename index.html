@@ -1,1465 +1,1562 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Tour des Cent Épreuves - Rogue-lite RPG</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0b0d12',
-                        cardBg: '#151922',
-                        borderBg: '#232a38',
-                        gold: '#f59e0b',
-                        commune: '#9ca3af',
-                        rare: '#3b82f6',
-                        epique: '#a855f7',
-                        legendaire: '#f97316',
-                        mythique: '#ef4444'
-                    },
-                    animation: {
-                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                    },
-                    keyframes: {
-                        glow: {
-                            '0%': { 'box-shadow': '0 0 5px rgba(245, 158, 11, 0.3)' },
-                            '100%': { 'box-shadow': '0 0 20px rgba(245, 158, 11, 0.8)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title>La Tour des Cent Épreuves - Idle RPG Rogue-lite</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0b0d12;
-            color: #e2e8f0;
+        :root {
+            --bg-main: #0c0d12;
+            --bg-card: #151821;
+            --bg-card-hover: #1e2230;
+            --accent-gold: #f1c40f;
+            --accent-red: #e74c3c;
+            --accent-blue: #3498db;
+            --accent-green: #2ecc71;
+            --accent-purple: #9b59b6;
+            --text-main: #ecf0f1;
+            --text-muted: #95a5a6;
+            --border-color: #2c3e50;
+            
+            /* Gear Rarities */
+            --rarity-commun: #bdc3c7;
+            --rarity-rare: #3498db;
+            --rarity-epique: #9b59b6;
+            --rarity-legendaire: #f1c40f;
+            --rarity-mythique: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             user-select: none;
-            touch-action: manipulation;
-        }
-        h1, h2, h3, .font-cinzel {
-            font-family: 'Cinzel', serif;
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0f1319; }
-        ::-webkit-scrollbar-thumb { background: #263143; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
-
-        /* Floating text animation */
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
-            100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
-        }
-        .damage-float {
-            position: absolute;
-            animation: floatUp 0.8s ease-out forwards;
-            pointer-events: none;
-            font-weight: 900;
-            text-shadow: 0px 2px 4px rgba(0,0,0,0.9);
-            z-index: 50;
+            -webkit-user-select: none;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Body Silhouette anatomical placement styles */
-        .silhouette-container {
-            position: relative;
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #app-container {
             width: 100%;
-            max-width: 380px;
-            height: 480px;
-            margin: 0 auto;
-            background: radial-gradient(circle, rgba(30,41,59,0.5) 0%, rgba(11,13,18,0.9) 80%);
-            border: 1px solid #232a38;
-            border-radius: 1rem;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 900px;
+            background-color: #10121a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
         }
-        .body-silhouette-svg {
+
+        /* Top Bar & Status */
+        header {
+            background: linear-gradient(180deg, #1a1e2b 0%, #12141d 100%);
+            padding: 12px 15px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hero-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .class-avatar-small {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #252a3a;
+            border: 2px solid var(--accent-gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+        }
+
+        .class-avatar-small svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--accent-gold);
+        }
+
+        .hero-info {
+            flex-grow: 1;
+        }
+
+        .hero-name-class {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .level-badge {
+            background-color: var(--accent-gold);
+            color: #000;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 800;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #090a0f;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 4px;
+            position: relative;
+            border: 1px solid #2a2e3d;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.2s linear;
+        }
+
+        .hp-fill { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+        .xp-fill { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+
+        .bar-text {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .resources-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .res-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Navigation Tabs */
+        nav {
+            display: flex;
+            background-color: #0d0e14;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px 5px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-btn.active {
+            color: var(--accent-gold);
+            border-bottom-color: var(--accent-gold);
+            background-color: rgba(241, 196, 15, 0.05);
+        }
+
+        /* Main View Area */
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            padding: 12px;
+            gap: 12px;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* COMBAT TAB */
+        .floor-header {
+            text-align: center;
+            background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.1), transparent);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .floor-title {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subfloor-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .combat-arena {
+            flex-grow: 1;
+            background: radial-gradient(circle at center, #1c202e 0%, #0a0b10 100%);
+            border: 1px solid #2a2f42;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .monster-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .monster-sprite-container {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .monster-sprite {
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.4));
+            transition: transform 0.1s;
+        }
+
+        .monster-card:active .monster-sprite {
+            transform: scale(0.92);
+        }
+
+        .monster-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-red);
+            text-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+        }
+
+        .monster-attack-bar {
+            width: 80%;
+            height: 6px;
+            background-color: #111;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .monster-attack-fill {
+            height: 100%;
+            background-color: #f39c12;
+            width: 0%;
+        }
+
+        .floating-text {
+            position: absolute;
+            font-weight: 900;
+            font-size: 1.4rem;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+        }
+
+        .combo-container {
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #2c3e50;
+        }
+
+        .combo-pips {
+            display: flex;
+            gap: 6px;
+        }
+
+        .combo-pip {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2c3e50;
+            border: 1px solid #455a64;
+            transition: all 0.2s;
+        }
+
+        .combo-pip.active {
+            background: var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-gold);
+            border-color: #fff;
+        }
+
+        .finisher-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(211, 84, 0, 0.4);
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .finisher-btn:disabled {
+            background: #34495e;
+            color: #7f8c8d;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .combat-controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-action:active { transform: scale(0.97); }
+
+        .btn-auto { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
+        .btn-auto.paused { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+
+        /* EQUIPMENT TAB (BODY SILHOUETTE) */
+        .equip-grid-container {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            background: radial-gradient(circle, #1a1e2d 0%, #0c0d13 100%);
+            border-radius: 12px;
+            border: 1px solid #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .silhouette-bg {
+            position: absolute;
             height: 85%;
             opacity: 0.15;
-            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
             pointer-events: none;
         }
-        .slot-abs {
+
+        .equip-slot {
             position: absolute;
-            transform: translate(-50%, -50%);
-            z-index: 10;
+            width: 58px;
+            height: 58px;
+            background: #12141d;
+            border: 2px dashed #34495e;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* Talent node connector lines */
-        .talent-line {
-            position: absolute;
-            background-color: #2e384d;
-            z-index: 1;
-            transition: background-color 0.3s;
-        }
-        .talent-line.active {
-            background-color: #f59e0b;
-            box-shadow: 0 0 8px #f59e0b;
+        .equip-slot.has-item {
+            border-style: solid;
+            background: #181b26;
         }
 
-        /* Dynamic Item Rarity Styles */
-        .rarity-Commun { border-color: #9ca3af; box-shadow: 0 0 5px rgba(156,163,175,0.2); }
-        .rarity-Rare { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
-        .rarity-Épique { border-color: #a855f7; box-shadow: 0 0 12px rgba(168,85,247,0.4); }
-        .rarity-Légendaire { border-color: #f97316; box-shadow: 0 0 15px rgba(249,115,22,0.5); }
-        .rarity-Mythique { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.7); animation: pulse 1.5s infinite; }
+        .equip-slot svg {
+            width: 28px;
+            height: 28px;
+            fill: #4a5568;
+        }
+
+        .equip-slot.has-item svg {
+            fill: #fff;
+        }
+
+        /* Slot Positions around silhouette */
+        .slot-head { top: 15px; left: calc(50% - 29px); }
+        .slot-amulet { top: 85px; left: calc(50% - 29px); }
+        .slot-chest { top: 155px; left: calc(50% - 29px); }
+        .slot-mainhand { top: 120px; left: 15px; }
+        .slot-offhand { top: 120px; right: 15px; }
+        .slot-gloves { top: 195px; left: 15px; }
+        .slot-ring1 { top: 195px; right: 15px; }
+        .slot-ring2 { bottom: 65px; right: 15px; }
+        .slot-boots { bottom: 15px; left: calc(50% - 29px); }
+
+        /* Rarity Borders & Glows */
+        .rarity-Commun { border-color: var(--rarity-commun) !important; }
+        .rarity-Rare { border-color: var(--rarity-rare) !important; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
+        .rarity-Épique { border-color: var(--rarity-epique) !important; box-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
+        .rarity-Légendaire { border-color: var(--rarity-legendaire) !important; box-shadow: 0 0 12px rgba(241, 196, 15, 0.6); }
+        .rarity-Mythique { border-color: var(--rarity-mythique) !important; box-shadow: 0 0 15px rgba(231, 76, 60, 0.8); animation: pulseGlow 1.5s infinite alternate; }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); }
+            100% { box-shadow: 0 0 18px rgba(231, 76, 60, 1); }
+        }
+
+        .inventory-section {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-height: 160px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .inv-item {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #10121a;
+            border: 2px solid #2c3e50;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* TALENTS TAB */
+        .talents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .talent-tree-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .talent-branch {
+            background: rgba(21, 24, 33, 0.7);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #2a2e3d;
+        }
+
+        .branch-title {
+            font-size: 0.95rem;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+            border-bottom: 1px solid #2a2e3d;
+            padding-bottom: 4px;
+        }
+
+        .branch-nodes {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px;
+        }
+
+        .talent-node {
+            min-width: 70px;
+            height: 80px;
+            background: #10121a;
+            border: 2px solid #34495e;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            font-size: 0.65rem;
+        }
+
+        .talent-node.unlocked {
+            border-color: var(--accent-green);
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .talent-node.can-unlock {
+            border-color: var(--accent-gold);
+            animation: bounce 1s infinite alternate;
+        }
+
+        .talent-node.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .talent-node-rank {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-weight: bold;
+            color: var(--accent-gold);
+            font-size: 0.6rem;
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 6, 9, 0.95);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-header {
+            padding: 12px 15px;
+            background: linear-gradient(180deg, #1e2230 0%, #151821 100%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .class-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .class-select-card {
+            background: #10121a;
+            border: 2px solid #2a2e3d;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .class-select-card:hover, .class-select-card.selected {
+            border-color: var(--accent-gold);
+            background: rgba(241, 196, 15, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .class-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1f2433;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--accent-gold);
+        }
+
+        .class-card-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--accent-gold);
+        }
+
+        .class-card-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .class-card-desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        /* Item Comparison Modal */
+        .item-compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .item-card-detail {
+            background: #10121a;
+            border: 1px solid #2c3e50;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .stat-delta-positive { color: var(--accent-green); }
+        .stat-delta-negative { color: var(--accent-red); }
+
+        /* General Utilities */
+        .btn-prime {
+            padding: 10px;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .pause-banner {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            text-align: center;
+            padding: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 4px;
+        }
     </style>
 </head>
-<body class="bg-darkBg min-h-screen flex flex-col justify-between overflow-x-hidden text-slate-200">
+<body>
 
-    <!-- TOP HEADER / NAV -->
-    <header class="bg-cardBg border-b border-borderBg sticky top-0 z-40 px-4 py-2 flex flex-wrap justify-between items-center shadow-lg">
-        <div class="flex items-center space-x-3">
-            <div id="header-class-icon" class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl font-bold">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div>
-                <h1 class="text-sm md:text-base font-bold text-amber-400 leading-tight font-cinzel tracking-wider">LA TOUR DES CENT ÉPREUVES</h1>
-                <p class="text-xs text-slate-400"><span id="hero-class-title">Héros</span> - Niv. <span id="hero-level">1</span></p>
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-4 text-xs md:text-sm">
-            <div class="flex items-center space-x-1.5 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
-                <i class="fa-solid fa-coins text-amber-400"></i>
-                <span id="res-gold" class="font-semibold text-amber-300">0</span>
-            </div>
-            <div class="flex items-center space-x-1.5 bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-800">
-                <i class="fa-solid fa-ghost text-purple-400"></i>
-                <span id="res-souls" class="font-semibold text-purple-300">0</span>
-            </div>
-            <button id="btn-save" onclick="saveGame(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 text-xs transition">
-                <i class="fa-solid fa-floppy-disk"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- MAIN APP CONTAINER -->
-    <main class="flex-grow container mx-auto px-2 md:px-4 py-3 max-w-6xl">
-        
-        <!-- TOP COMBAT HUD & ARENA -->
-        <section class="bg-cardBg rounded-xl p-3 md:p-5 border border-borderBg mb-4 shadow-xl relative overflow-hidden">
-            <!-- Tower Floor Header -->
-            <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
-                <div class="flex items-center space-x-2">
-                    <span class="bg-red-950/80 text-red-400 border border-red-800/60 px-2.5 py-0.5 rounded text-xs font-bold font-cinzel">
-                        Étage <span id="floor-num">1</span>.<span id="subfloor-num">1</span> / 100
-                    </span>
-                    <span id="boss-badge" class="hidden bg-amber-500 text-black text-xs font-black px-2 py-0.5 rounded animate-pulse">BOSS DU PALIER</span>
+    <div id="app-container">
+        <!-- HEADER / HERO STATUS -->
+        <header>
+            <div class="hero-banner">
+                <div class="class-avatar-small" id="hero-avatar">
+                    <!-- SVG Avatar dynamically injected -->
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="btn-auto-toggle" onclick="toggleAutoCombat()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                        <i id="auto-icon" class="fa-solid fa-robot text-slate-500"></i>
-                        <span>AUTO : <span id="auto-status-text" class="text-slate-400">OFF</span></span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Battlefield Canvas / Arena View -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center min-h-[190px]">
-                
-                <!-- Hero Combat Card -->
-                <div class="bg-slate-900/90 rounded-lg p-3 border border-slate-800 flex flex-col justify-between h-full relative">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <span id="combat-hero-icon" class="text-amber-400 text-lg"><i class="fa-solid fa-user-shield"></i></span>
-                            <div>
-                                <h3 id="combat-hero-name" class="font-bold text-sm text-slate-200">Héros</h3>
-                                <p class="text-[10px] text-slate-400">Puissance: <span id="hero-cp" class="text-amber-400 font-semibold">10</span></p>
-                            </div>
-                        </div>
-                        <span class="text-xs text-slate-400">Armure: <span id="hero-armor-pct" class="text-slate-200 font-semibold">0%</span></span>
+                <div class="hero-info">
+                    <div class="hero-name-class">
+                        <span id="hero-name">Héros</span>
+                        <span class="level-badge">Niv. <span id="hero-level">1</span></span>
                     </div>
-
-                    <!-- Hero HP Bar -->
-                    <div class="my-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-heart"></i> PV Héros</span>
-                            <span class="text-slate-300"><span id="hero-hp-cur">100</span> / <span id="hero-hp-max">100</span></span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-3.5 p-0.5 border border-slate-800 overflow-hidden">
-                            <div id="hero-hp-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-200" style="width: 100%;"></div>
-                        </div>
+                    <div class="bar-container">
+                        <div class="bar-fill hp-fill" id="hp-bar-fill" style="width: 100%;"></div>
+                        <div class="bar-text" id="hp-bar-text">PV: 100 / 100</div>
                     </div>
-
-                    <!-- CLASS COMBO BAR HUD -->
-                    <div id="combo-hud-box" class="bg-amber-950/20 border border-amber-500/30 rounded-lg p-2 mt-1">
-                        <div class="flex justify-between items-center text-xs mb-1">
-                            <span id="combo-name-label" class="font-bold text-amber-400 font-cinzel text-[11px] flex items-center gap-1">
-                                <i class="fa-solid fa-bolt"></i> COMBO
-                            </span>
-                            <span id="combo-stacks-text" class="text-xs font-black text-amber-300">0 / 5</span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-2.5 border border-amber-900/50 overflow-hidden relative">
-                            <div id="combo-bar-fill" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-150" style="width: 0%;"></div>
-                        </div>
-                        <div id="combo-finisher-banner" class="hidden mt-1 text-center bg-gradient-to-r from-amber-500 to-red-600 text-black text-[10px] font-black uppercase py-0.5 rounded tracking-widest animate-pulse">
-                            🔥 FINISHER PRÊT! CLIQUEZ OU AUTO-FRAPPE !
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monster Combat Card -->
-                <div id="monster-card" class="bg-slate-900/90 rounded-lg p-3 border border-slate-800 flex flex-col justify-between h-full relative cursor-pointer hover:border-amber-500/50 transition active:scale-[0.99]" onclick="manualTapMonster(event)">
-                    <!-- Floating Damage Anchor -->
-                    <div id="floating-damage-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <div id="monster-avatar" class="w-8 h-8 rounded bg-red-950/60 border border-red-700/50 flex items-center justify-center text-red-400 font-bold">
-                                <i class="fa-solid fa-skull"></i>
-                            </div>
-                            <div>
-                                <h3 id="monster-name" class="font-bold text-sm text-red-300">Gobelin de la Tour</h3>
-                                <p class="text-[10px] text-slate-400">Sous-palier <span id="monster-sublevel">1.1</span></p>
-                            </div>
-                        </div>
-                        <span class="text-xs text-red-400 font-bold">Dégâts: <span id="monster-atk-val">12</span></span>
-                    </div>
-
-                    <!-- Monster Health Bar -->
-                    <div class="my-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-red-400 font-semibold"><i class="fa-solid fa-heart-crack"></i> PV Monstre</span>
-                            <span class="text-slate-300"><span id="monster-hp-cur">50</span> / <span id="monster-hp-max">50</span></span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-3.5 p-0.5 border border-slate-800 overflow-hidden">
-                            <div id="monster-hp-bar" class="bg-red-600 h-full rounded-full transition-all duration-200" style="width: 100%;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Monster Active Attack Bar (TIMER) -->
-                    <div>
-                        <div class="flex justify-between text-[10px] text-amber-400/80 mb-0.5 font-bold uppercase tracking-wider">
-                            <span><i class="fa-solid fa-stopwatch"></i> Charge d'attaque monstre</span>
-                            <span id="monster-timer-text">1.5s</span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-2 border border-red-900/40 overflow-hidden">
-                            <div id="monster-attack-bar" class="bg-amber-500 h-full transition-all duration-75" style="width: 0%;"></div>
-                        </div>
+                    <div class="bar-container">
+                        <div class="bar-fill xp-fill" id="xp-bar-fill" style="width: 0%;"></div>
+                        <div class="bar-text" id="xp-bar-text">XP: 0 / 100</div>
                     </div>
                 </div>
             </div>
-        </section>
+            <div class="resources-bar">
+                <div class="res-item">🪙 <span id="res-gold">0</span></div>
+                <div class="res-item">🔮 <span id="res-souls">0</span></div>
+                <div class="res-item">⚔️ CP: <span id="res-cp">10</span></div>
+            </div>
+        </header>
 
-        <!-- NAVIGATION TABS -->
-        <nav class="flex border-b border-slate-800 mb-4 overflow-x-auto gap-1">
-            <button onclick="switchTab('equipement')" id="tab-btn-equipement" class="tab-btn bg-slate-800 text-amber-400 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-amber-500">
-                <i class="fa-solid fa-shirt"></i><span>Équipement</span>
-            </button>
-            <button onclick="switchTab('talents')" id="tab-btn-talents" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
-                <i class="fa-solid fa-sitemap"></i><span>Arbre de Talents</span>
-            </button>
-            <button onclick="switchTab('inventaire')" id="tab-btn-inventaire" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
-                <i class="fa-solid fa-sack-dollar"></i><span>Sac (<span id="inv-count">0</span>/30)</span>
-            </button>
-            <button onclick="switchTab('sanctuaire')" id="tab-btn-sanctuaire" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
-                <i class="fa-solid fa-place-of-worship"></i><span>Sanctuaire</span>
-            </button>
-            <button onclick="switchTab('histoire')" id="tab-btn-histoire" class="tab-btn bg-cardBg text-slate-400 hover:text-slate-200 px-4 py-2.5 rounded-t-lg font-bold text-xs md:text-sm flex items-center space-x-2 border-t-2 border-transparent">
-                <i class="fa-solid fa-book"></i><span>Lore & Récits</span>
-            </button>
+        <!-- NAVIGATION -->
+        <nav>
+            <button class="nav-btn active" data-tab="tab-combat">⚔️ Combat</button>
+            <button class="nav-btn" data-tab="tab-equipement">🛡️ Équipement</button>
+            <button class="nav-btn" data-tab="tab-talents">📜 Talents</button>
+            <button class="nav-btn" data-tab="tab-sanctuaire">⛩️ Sanctuaire</button>
         </nav>
 
-        <!-- TAB CONTENT 1: EQUIPEMENT (ANATOMICAL SILHOUETTE) -->
-        <div id="tab-equipement" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                
-                <!-- Center Hero Silhouette Body Grid (7 cols) -->
-                <div class="lg:col-span-7 bg-cardBg rounded-xl p-4 border border-borderBg flex flex-col items-center justify-center relative">
-                    <h2 class="text-sm font-bold text-slate-300 font-cinzel mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-street-view text-amber-400"></i> Dispositions Anatomique du Héros
-                    </h2>
-
-                    <!-- Body Silhouette Interactive Box -->
-                    <div class="silhouette-container shadow-2xl my-2">
-                        <!-- Dark Fantasy Body Vector Silhouette -->
-                        <svg class="body-silhouette-svg" viewBox="0 0 100 200" fill="currentColor">
-                            <path d="M50 10 C56 10, 60 15, 60 22 C60 29, 56 34, 50 34 C44 34, 40 29, 40 22 C40 15, 44 10, 50 10 Z M38 36 L62 36 L70 44 L78 68 L70 72 L66 52 L66 90 L70 120 L64 120 L58 92 L56 140 L58 190 L48 190 L48 142 L44 142 L44 190 L34 190 L36 140 L34 92 L28 120 L22 120 L26 52 L22 72 L14 68 L22 44 Z" class="text-slate-400"/>
-                        </svg>
-
-                        <!-- 9 Anatomically Positioned Equipment Slots -->
-                        <!-- 1. Tête (Helmet) -->
-                        <div class="slot-abs" style="top: 10%; left: 50%;" onclick="openSlotSelector('helm')">
-                            <div id="eslot-helm" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-helmet-safety text-slate-600 text-xl"></i>
-                                <span class="text-[9px] text-slate-400 mt-0.5">Casque</span>
-                            </div>
-                        </div>
-
-                        <!-- 2. Cou (Amulet) -->
-                        <div class="slot-abs" style="top: 23%; left: 50%;" onclick="openSlotSelector('amulet')">
-                            <div id="eslot-amulet" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-gem text-slate-600 text-lg"></i>
-                                <span class="text-[8px] text-slate-400">Amulette</span>
-                            </div>
-                        </div>
-
-                        <!-- 3. Arme Principale (Main Hand - Left of silhouette) -->
-                        <div class="slot-abs" style="top: 38%; left: 20%;" onclick="openSlotSelector('weapon')">
-                            <div id="eslot-weapon" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-sword text-slate-600 text-xl"></i>
-                                <span class="text-[9px] text-slate-400 mt-0.5">Arme P.</span>
-                            </div>
-                        </div>
-
-                        <!-- 4. Plastron (Chest) -->
-                        <div class="slot-abs" style="top: 38%; left: 50%;" onclick="openSlotSelector('chest')">
-                            <div id="eslot-chest" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-vest text-slate-600 text-xl"></i>
-                                <span class="text-[9px] text-slate-400 mt-0.5">Plastron</span>
-                            </div>
-                        </div>
-
-                        <!-- 5. Arme Sec. / Bouclier (Off-Hand - Right of silhouette) -->
-                        <div class="slot-abs" style="top: 38%; left: 80%;" onclick="openSlotSelector('offhand')">
-                            <div id="eslot-offhand" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-shield text-slate-600 text-xl"></i>
-                                <span class="text-[9px] text-slate-400 mt-0.5">Secondaire</span>
-                            </div>
-                        </div>
-
-                        <!-- 6. Gants (Gloves) -->
-                        <div class="slot-abs" style="top: 57%; left: 22%;" onclick="openSlotSelector('gloves')">
-                            <div id="eslot-gloves" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-mitten text-slate-600 text-lg"></i>
-                                <span class="text-[8px] text-slate-400">Gants</span>
-                            </div>
-                        </div>
-
-                        <!-- 7. Anneau 1 (Ring 1) -->
-                        <div class="slot-abs" style="top: 57%; left: 78%;" onclick="openSlotSelector('ring1')">
-                            <div id="eslot-ring1" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-ring text-slate-600 text-lg"></i>
-                                <span class="text-[8px] text-slate-400">Anneau 1</span>
-                            </div>
-                        </div>
-
-                        <!-- 8. Anneau 2 (Ring 2) -->
-                        <div class="slot-abs" style="top: 72%; left: 78%;" onclick="openSlotSelector('ring2')">
-                            <div id="eslot-ring2" class="w-12 h-12 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-ring text-slate-600 text-lg"></i>
-                                <span class="text-[8px] text-slate-400">Anneau 2</span>
-                            </div>
-                        </div>
-
-                        <!-- 9. Bottes (Boots) -->
-                        <div class="slot-abs" style="top: 86%; left: 50%;" onclick="openSlotSelector('boots')">
-                            <div id="eslot-boots" class="w-14 h-14 rounded-xl border-2 border-slate-700 bg-slate-900/90 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group">
-                                <i class="fa-solid fa-socks text-slate-600 text-xl"></i>
-                                <span class="text-[9px] text-slate-400 mt-0.5">Bottes</span>
-                            </div>
-                        </div>
-
-                    </div>
+        <!-- MAIN VIEWS -->
+        <main>
+            <!-- COMBAT TAB -->
+            <div class="tab-content active" id="tab-combat">
+                <div class="floor-header">
+                    <div class="floor-title">Étage <span id="floor-num">1</span></div>
+                    <div class="subfloor-badge">Sous-palier <span id="subfloor-num">1</span> / 50</div>
                 </div>
 
-                <!-- Right Side Stats & Set Bonuses (5 cols) -->
-                <div class="lg:col-span-5 flex flex-col space-y-4">
-                    <!-- Hero Stats Panel -->
-                    <div class="bg-cardBg rounded-xl p-4 border border-borderBg">
-                        <h3 class="text-xs font-bold text-slate-300 font-cinzel mb-3 border-b border-slate-800 pb-1 flex justify-between">
-                            <span><i class="fa-solid fa-chart-simple text-amber-400"></i> Attributs du Héros</span>
-                            <span class="text-amber-400">CP Total: <span id="stat-cp">0</span></span>
-                        </h3>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
-                                <span class="text-slate-400">Attaque:</span>
-                                <span id="stat-atk" class="font-bold text-red-400 float-right">0</span>
-                            </div>
-                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
-                                <span class="text-slate-400">Armure:</span>
-                                <span id="stat-armor" class="font-bold text-blue-400 float-right">0</span>
-                            </div>
-                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
-                                <span class="text-slate-400">PV Max:</span>
-                                <span id="stat-hp" class="font-bold text-emerald-400 float-right">0</span>
-                            </div>
-                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
-                                <span class="text-slate-400">Critique:</span>
-                                <span id="stat-crit" class="font-bold text-amber-400 float-right">0%</span>
-                            </div>
-                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
-                                <span class="text-slate-400">Esquive:</span>
-                                <span id="stat-dodge" class="font-bold text-teal-400 float-right">0%</span>
-                            </div>
-                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800/80">
-                                <span class="text-slate-400">Régénération:</span>
-                                <span id="stat-regen" class="font-bold text-lime-400 float-right">0/s</span>
-                            </div>
+                <div class="combat-arena" id="arena-container">
+                    <div class="monster-card" id="monster-click-zone">
+                        <div class="monster-name" id="monster-name">Gobelin Malingre</div>
+                        <div class="monster-sprite-container">
+                            <svg class="monster-sprite" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="#2ecc71" />
+                                <circle cx="35" cy="40" r="8" fill="#fff" />
+                                <circle cx="65" cy="40" r="8" fill="#fff" />
+                                <circle cx="35" cy="40" r="3" fill="#000" />
+                                <circle cx="65" cy="40" r="3" fill="#000" />
+                                <path d="M 30 70 Q 50 80 70 70" stroke="#000" stroke-width="4" fill="none" />
+                            </svg>
+                        </div>
+                        <div class="bar-container" style="width: 80%;">
+                            <div class="bar-fill hp-fill" id="monster-hp-fill" style="width: 100%;"></div>
+                            <div class="bar-text" id="monster-hp-text">100 / 100</div>
+                        </div>
+                        <div class="monster-attack-bar">
+                            <div class="monster-attack-fill" id="monster-atk-fill"></div>
                         </div>
                     </div>
 
-                    <!-- Active Class Set Bonuses -->
-                    <div class="bg-cardBg rounded-xl p-4 border border-borderBg flex-grow">
-                        <h3 class="text-xs font-bold text-amber-400 font-cinzel mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group"></i> Bonus de Panoplie Actifs
-                        </h3>
-                        <div id="active-set-bonuses-container" class="space-y-2 text-xs">
-                            <!-- Populated dynamically -->
+                    <div class="combo-container">
+                        <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">
+                            COMBOS DE CLASSE (<span id="combo-count">0</span>/5)
                         </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- TAB CONTENT 2: COMPLEX TALENT TREES -->
-        <div id="tab-talents" class="tab-content hidden">
-            <div class="bg-cardBg rounded-xl p-4 border border-borderBg">
-                <div class="flex flex-wrap justify-between items-center mb-4 border-b border-slate-800 pb-3 gap-2">
-                    <div>
-                        <h2 class="text-base font-bold text-amber-400 font-cinzel flex items-center gap-2">
-                            <i class="fa-solid fa-sitemap"></i> Arbre de Talents : <span id="talent-class-name">Nom de Classe</span>
-                        </h2>
-                        <p class="text-xs text-slate-400">Débloquez les prérequis pour progresser et perfectionner vos compétences de combo.</p>
-                    </div>
-                    <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-xs font-bold">
-                        Points de Talents Dispo : <span id="talent-points-count" class="text-amber-400 font-black text-sm">0</span>
-                    </div>
-                </div>
-
-                <!-- Combo Class Summary Banner -->
-                <div id="talent-combo-spec-desc" class="bg-amber-950/20 border border-amber-500/30 rounded-lg p-3 mb-5 text-xs text-amber-200">
-                    <!-- Populated dynamically -->
-                </div>
-
-                <!-- Talent Tree Network Visual Viewport -->
-                <div class="relative overflow-x-auto p-4 bg-slate-950/80 rounded-xl border border-slate-800 min-h-[460px]" id="talent-tree-canvas-container">
-                    <div id="talent-tree-grid" class="min-w-[700px] relative">
-                        <!-- Node elements & connecting lines rendered via JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB CONTENT 3: INVENTAIRE & COMPARATEUR -->
-        <div id="tab-inventaire" class="tab-content hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                <!-- Inventory Grid (7 cols) -->
-                <div class="lg:col-span-7 bg-cardBg rounded-xl p-4 border border-borderBg">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-xs font-bold text-slate-200 font-cinzel">Saccoche de Butin</h2>
-                        <button onclick="sellAllCommon()" class="text-xs bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/60 px-2.5 py-1 rounded transition">
-                            Vendre Objets Communs
-                        </button>
-                    </div>
-                    <div id="inventory-grid" class="grid grid-cols-5 md:grid-cols-6 gap-2 min-h-[250px]">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-
-                <!-- Side-by-Side Equipment Comparator (5 cols) -->
-                <div class="lg:col-span-5 bg-cardBg rounded-xl p-4 border border-borderBg flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-xs font-bold text-amber-400 font-cinzel mb-2 border-b border-slate-800 pb-1 flex items-center gap-2">
-                            <i class="fa-solid fa-code-compare"></i> Comparateur d'Équipement
-                        </h3>
-                        <div id="comparator-container">
-                            <p class="text-xs text-slate-500 italic text-center py-8">Cliquez sur un objet de votre inventaire pour le comparer avec votre équipement actuel.</p>
+                        <div class="combo-pips" id="combo-pips">
+                            <div class="combo-pip"></div>
+                            <div class="combo-pip"></div>
+                            <div class="combo-pip"></div>
+                            <div class="combo-pip"></div>
+                            <div class="combo-pip"></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB CONTENT 4: SANCTUAIRE DES ÂMES (REINCARNATION) -->
-        <div id="tab-sanctuaire" class="tab-content hidden">
-            <div class="bg-cardBg rounded-xl p-5 border border-borderBg">
-                <div class="text-center max-w-xl mx-auto mb-6">
-                    <i class="fa-solid fa-ankh text-4xl text-purple-400 mb-2"></i>
-                    <h2 class="text-xl font-bold text-purple-300 font-cinzel">Le Sanctuaire des Âmes</h2>
-                    <p class="text-xs text-slate-400 mt-1">Sacrifiez votre progression actuelle dans la Tour pour vous réincarner. Vous réinitialiserez votre niveau et votre étage, mais conserverez vos Âmes pour acquérir des bénédictions permanentes.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <!-- Soul Upgrade 1 -->
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sm text-purple-300 font-cinzel"><i class="fa-solid fa-fire text-amber-400"></i> Puissance d'Âme</h4>
-                            <p class="text-xs text-slate-400 mt-1">+10% Attaque globale par niveau.</p>
-                            <p class="text-xs text-slate-300 mt-2">Niveau actuel: <span id="soul-atk-lvl" class="font-bold text-amber-400">0</span></p>
-                        </div>
-                        <button onclick="buySoulUpgrade('atk')" class="mt-4 w-full bg-purple-900/50 hover:bg-purple-800 border border-purple-700 text-purple-200 text-xs py-2 rounded-lg font-bold transition">
-                            Améliorer (<span id="soul-atk-cost">10</span> Âmes)
-                        </button>
-                    </div>
-
-                    <!-- Soul Upgrade 2 -->
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sm text-purple-300 font-cinzel"><i class="fa-solid fa-heart text-emerald-400"></i> Vitalité Éternelle</h4>
-                            <p class="text-xs text-slate-400 mt-1">+15% PV Max globaux par niveau.</p>
-                            <p class="text-xs text-slate-300 mt-2">Niveau actuel: <span id="soul-hp-lvl" class="font-bold text-emerald-400">0</span></p>
-                        </div>
-                        <button onclick="buySoulUpgrade('hp')" class="mt-4 w-full bg-purple-900/50 hover:bg-purple-800 border border-purple-700 text-purple-200 text-xs py-2 rounded-lg font-bold transition">
-                            Améliorer (<span id="soul-hp-cost">10</span> Âmes)
-                        </button>
-                    </div>
-
-                    <!-- Soul Upgrade 3 -->
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sm text-purple-300 font-cinzel"><i class="fa-solid fa-gem text-amber-400"></i> Fortune des Ancêtres</h4>
-                            <p class="text-xs text-slate-400 mt-1">+20% Or obtenu et meilleure rareté de butin.</p>
-                            <p class="text-xs text-slate-300 mt-2">Niveau actuel: <span id="soul-loot-lvl" class="font-bold text-amber-400">0</span></p>
-                        </div>
-                        <button onclick="buySoulUpgrade('loot')" class="mt-4 w-full bg-purple-900/50 hover:bg-purple-800 border border-purple-700 text-purple-200 text-xs py-2 rounded-lg font-bold transition">
-                            Améliorer (<span id="soul-loot-cost">10</span> Âmes)
+                        <button class="finisher-btn" id="finisher-btn" disabled>
+                            ⚡ COUP DE GRÂCE ⚡
                         </button>
                     </div>
                 </div>
 
-                <!-- Reincarnation Action Banner -->
-                <div class="bg-purple-950/30 border border-purple-800/60 rounded-xl p-4 text-center">
-                    <p class="text-xs text-purple-200 mb-2">Âmes accumulables lors de la Réincarnation : <span id="reincarnate-souls-gain" class="font-black text-amber-300 text-sm">0</span></p>
-                    <button onclick="reincarnate()" class="bg-gradient-to-r from-purple-800 to-indigo-900 hover:from-purple-700 hover:to-indigo-800 text-purple-100 px-6 py-2.5 rounded-xl font-bold font-cinzel text-xs md:text-sm border border-purple-500/50 shadow-lg transition">
-                        ⚡ DÉCLENCHER LA RÉINCARNATION
+                <div class="combat-controls">
+                    <button class="btn-action btn-auto" id="btn-auto-toggle">
+                        ▶️ COMBAT AUTO : ACTIF
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB CONTENT 5: HISTOIRE ET LORE LOG -->
-        <div id="tab-histoire" class="tab-content hidden">
-            <div class="bg-cardBg rounded-xl p-5 border border-borderBg">
-                <h2 class="text-base font-bold text-amber-400 font-cinzel mb-3 border-b border-slate-800 pb-2">
-                    <i class="fa-solid fa-scroll"></i> Annales de la Tour
-                </h2>
-                <div id="story-log-container" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                    <!-- Dynamic narrative entries -->
+            <!-- EQUIPMENT TAB -->
+            <div class="tab-content" id="tab-equipement">
+                <div class="pause-banner">⏸️ COMBAT EN PAUSE DANS CET ONGLET</div>
+
+                <div class="equip-grid-container">
+                    <!-- Silhouette SVG Background -->
+                    <svg class="silhouette-bg" viewBox="0 0 100 200">
+                        <path d="M 50 10 C 60 10 65 20 65 30 C 65 40 60 45 50 45 C 40 45 35 40 35 30 C 35 20 40 10 50 10 Z
+                                 M 30 50 L 70 50 L 80 90 L 70 140 L 60 140 L 60 190 L 40 190 L 40 140 L 30 140 L 20 90 Z" fill="#ffffff" />
+                    </svg>
+
+                    <!-- Anatomical Equipment Slots -->
+                    <div class="equip-slot slot-head" data-slot="head">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 0-9 9v7h18v-7a9 9 0 0 0-9-9zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-amulet" data-slot="amulet">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L8 8h8l-4-6zm0 8a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-chest" data-slot="chest">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-5.45 8-12V5l-8-3z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-mainhand" data-slot="mainhand">
+                        <svg viewBox="0 0 24 24"><path d="M6.92 5L5 6.92l7.06 7.06-1.41 1.42 2.83 2.83 1.41-1.42 2.83 2.83 1.92-1.92-2.83-2.83 1.41-1.41-2.83-2.83-1.42 1.41L6.92 5z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-offhand" data-slot="offhand">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L3 6v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-5.45 8-12V6l-9-4z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-gloves" data-slot="gloves">
+                        <svg viewBox="0 0 24 24"><path d="M19 8h-2V3a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4h-1V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6H7a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V9a1 1 0 0 0-1-1z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-ring1" data-slot="ring1">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-ring2" data-slot="ring2">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                    </div>
+                    <div class="equip-slot slot-boots" data-slot="boots">
+                        <svg viewBox="0 0 24 24"><path d="M19 18h-4v-8a2 2 0 0 0-2-2H5v12h14a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z"/></svg>
+                    </div>
+                </div>
+
+                <div class="inventory-section">
+                    <div style="font-weight: bold; font-size: 0.85rem; display: flex; justify-content: space-between;">
+                        <span>SAC À DOS</span>
+                        <span id="inv-capacity">0 / 20</span>
+                    </div>
+                    <div class="inventory-grid" id="inventory-grid">
+                        <!-- Dynamic items -->
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- FOOTER & EXPORT/IMPORT MODALS BUTTONS -->
-    <footer class="bg-cardBg border-t border-borderBg py-3 px-4 text-center text-xs text-slate-500 flex flex-wrap justify-between items-center gap-2">
-        <span>La Tour des Cent Épreuves - Rogue-lite RPG Incremental</span>
-        <div class="flex space-x-3">
-            <button onclick="exportSave()" class="hover:text-amber-400"><i class="fa-solid fa-download"></i> Exporter Save</button>
-            <button onclick="importSavePrompt()" class="hover:text-amber-400"><i class="fa-solid fa-upload"></i> Importer Save</button>
-            <button onclick="resetGamePrompt()" class="hover:text-red-400"><i class="fa-solid fa-trash"></i> Recommencer</button>
-        </div>
-    </footer>
-
-    <!-- MODAL: MANDATORY CLASS SELECTION AT GAME START -->
-    <div id="modal-class-select" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-cardBg border border-amber-500/40 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl">
-            <div class="text-center mb-5">
-                <h2 class="text-xl md:text-2xl font-black text-amber-400 font-cinzel tracking-wider">CHOISISSEZ VOTRE CLASSE DE DÉPART</h2>
-                <p class="text-xs text-slate-400 mt-1">Votre choix est irréversible jusqu'à votre prochaine réincarnation au Sanctuaire des Âmes.</p>
+            <!-- TALENTS TAB -->
+            <div class="tab-content" id="tab-talents">
+                <div class="talents-header">
+                    <div>Points de Talents: <b id="talent-pts" style="color: var(--accent-gold);">0</b></div>
+                    <button class="btn-prime" id="btn-reset-talents" style="padding: 4px 8px; font-size: 0.7rem;">Réinitialiser</button>
+                </div>
+                <div class="talent-tree-container" id="talent-tree-render">
+                    <!-- Talent trees dynamically generated per class -->
+                </div>
             </div>
 
-            <!-- 9 Classes Grid -->
-            <div id="class-selection-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <!-- Dynamically injected classes cards -->
+            <!-- SANCTUARY TAB -->
+            <div class="tab-content" id="tab-sanctuaire">
+                <div class="talent-branch" style="text-align: center;">
+                    <h3 style="color: var(--accent-purple); margin-bottom: 8px;"> Sanctuaire des Âmes</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
+                        Réincarnez-vous pour obtenir des Âmes Célestes et changer de classe. Vous repartirez au premier étage.
+                    </p>
+                    <button class="btn-prime" id="btn-reincarnate" style="background: var(--accent-purple); color: #fff; width: 100%;">
+                        🌀 Réincarnation (+<span id="souls-gained">0</span> Âmes)
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MANDATORY CLASS SELECTION OVERLAY MODAL -->
+    <div class="modal-overlay" id="class-select-modal" style="display: flex;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">⚔️ Choisissez votre Classe</div>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                    Ce choix déterminera vos compétences, vos arbres de talents et vos panoplies exclusives pour toute cette vie !
+                </p>
+                <div class="class-selection-grid" id="class-selection-container">
+                    <!-- 12 Classes populated dynamically -->
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: DEFEAT / HERO DEATH -->
-    <div id="modal-death" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-cardBg border border-red-800 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
-            <i class="fa-solid fa-skull-crossbones text-5xl text-red-500 mb-3 animate-bounce"></i>
-            <h2 class="text-2xl font-bold text-red-400 font-cinzel">VOUS ÊTES MORT !</h2>
-            <p class="text-xs text-slate-300 mt-2">Le monstre a terrassé votre héros. Vous avez été repoussé au sous-palier précédent pour récupérer de vos blessures.</p>
-            <button onclick="closeDeathModal()" class="mt-6 w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition">
-                REPRENDRE COMBAT
-            </button>
+    <!-- ITEM COMPARISON & EQUIP MODAL -->
+    <div class="modal-overlay" id="item-compare-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Comparatif d'Équipement</div>
+                <button id="close-item-modal" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="item-compare-grid">
+                    <div class="item-card-detail" id="compare-equipped-card">
+                        <div style="color: var(--text-muted);">ÉQUIPÉ</div>
+                        <div id="comp-eq-name" class="item-name">-</div>
+                        <div id="comp-eq-stats"></div>
+                    </div>
+                    <div class="item-card-detail" id="compare-new-card">
+                        <div style="color: var(--accent-gold);">NOUVEAU</div>
+                        <div id="comp-new-name" class="item-name">-</div>
+                        <div id="comp-new-stats"></div>
+                    </div>
+                </div>
+                <button class="btn-prime" id="btn-equip-selected" style="width: 100%; margin-top: 10px;">Équiper l'Objet</button>
+            </div>
         </div>
     </div>
 
     <script>
-        /* ==========================================================================
-           CLASS DATA & COMBO SYSTEM CONFIGURATIONS
-           ========================================================================== */
+        /* FULL GAME ENGINE AND DATA STRUCTURES */
+        
+        // 12 Classes Definitions with thematic icons & finisher abilities
         const CLASSES = {
             guerrier: {
-                id: 'guerrier', name: 'Guerrier', icon: 'fa-shield-halved', color: '#f59e0b',
-                desc: 'Combattant lourd maîtrisant la furie au combat.',
-                comboName: 'Rage Incandescente', maxCombo: 5,
-                comboDesc: 'Gagne de la Rage à chaque attaque. À 5 stacks, déclenche un Exécuter dévastateur (+300% Dégâts).',
-                baseStats: { atk: 15, armor: 10, hp: 140, crit: 5, dodge: 2, regen: 1 }
+                name: "Guerrier",
+                desc: "Maître du combat rapproché. Fort en défense et dégâts constants.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M6.92 5L5 6.92l7.06 7.06-1.41 1.42 2.83 2.83 1.41-1.42 2.83 2.83 1.92-1.92-2.83-2.83 1.41-1.41-2.83-2.83-1.42 1.41L6.92 5z"/></svg>',
+                baseHp: 120, baseAtk: 12, baseDef: 8,
+                finisher: "Exécution Dévastatrice",
+                branches: ["Armes", "Fureur", "Protection"]
             },
             voleur: {
-                id: 'voleur', name: 'Voleur', icon: 'fa-user-ninja', color: '#10b981',
-                desc: 'Maître de l\'esquive et des coups critiques mortels.',
-                comboName: 'Flambée d\'Ombres', maxCombo: 5,
-                comboDesc: 'Accumule des points de combo furtifs. À 5 stacks, exécute un Éviscérer critique garanti.',
-                baseStats: { atk: 20, armor: 4, hp: 95, crit: 18, dodge: 12, regen: 0.5 }
+                name: "Voleur",
+                desc: "Attaques rapides et critiques mortels. Maître de l'esquive.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2L4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-5.45 8-12V5l-8-3z"/></svg>',
+                baseHp: 90, baseAtk: 16, baseDef: 3,
+                finisher: "Avis de Décès",
+                branches: ["Assassinat", "Combat", "Finesse"]
             },
             mage: {
-                id: 'mage', name: 'Mage', icon: 'fa-wand-magic-sparkles', color: '#3b82f6',
-                desc: 'Érudit de la magie arcanique élémentaire.',
-                comboName: 'Résonance Arcanique', maxCombo: 4,
-                comboDesc: 'Tisse des charges de mana elemental. À 4 stacks, invoque un Météore instantané sur le monstre.',
-                baseStats: { atk: 24, armor: 3, hp: 85, crit: 12, dodge: 4, regen: 0.8 }
+                name: "Mage",
+                desc: "Puissance magique pure. Dégâts dévastateurs au détriment de l'armure.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+                baseHp: 80, baseAtk: 20, baseDef: 2,
+                finisher: "Déflagration Arcanique",
+                branches: ["Arcane", "Feu", "Givre"]
             },
             necromancien: {
-                id: 'necromancien', name: 'Nécromancien', icon: 'fa-skull', color: '#a855f7',
-                desc: 'Invocateur manipulant la mort et le sang.',
-                comboName: 'Moisson d\'Âmes', maxCombo: 6,
-                comboDesc: 'Aspire l\'essence vitale. À 6 stacks, déchaîne l\'Armée des Morts (Vol de vie massif).',
-                baseStats: { atk: 18, armor: 5, hp: 110, crit: 8, dodge: 3, regen: 2 }
+                name: "Nécromancien",
+                desc: "Manipule le sang et les malédictions. Vol de vie d'une grande efficacité.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 0-9 9v7h18v-7a9 9 0 0 0-9-9zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>',
+                baseHp: 95, baseAtk: 14, baseDef: 4,
+                finisher: "Faucheur d'Âmes",
+                branches: ["Sang", "Os", "Infection"]
             },
             druide: {
-                id: 'druide', name: 'Druide', icon: 'fa-tree', color: '#84cc16',
-                desc: 'Gardien de la nature alternant les formes féroces.',
-                comboName: 'Harmonie Sauvage', maxCombo: 5,
-                comboDesc: 'Alterne griffes et soins. À 5 stacks, déclenche une Colère de la Nature (Dégâts + Soin total).',
-                baseStats: { atk: 16, armor: 8, hp: 125, crit: 7, dodge: 6, regen: 2.5 }
+                name: "Druide",
+                desc: "Polyvalent et résilient. Équilibre parfait entre attaque et soin.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2L8 8h8l-4-6zm0 8a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>',
+                baseHp: 110, baseAtk: 11, baseDef: 6,
+                finisher: "Colère de la Nature",
+                branches: ["Équilibre", "Férocité", "Restauration"]
             },
             pretre: {
-                id: 'pretre', name: 'Prêtre', icon: 'fa-cross', color: '#facc15',
-                desc: 'Canaliseur de lumière divine et de boucliers sacrés.',
-                comboName: 'Ferveur Divine', maxCombo: 4,
-                comboDesc: 'Accumule la lumière céleste. À 4 stacks, lance un Châtiment Sacré divin et vous soigne.',
-                baseStats: { atk: 14, armor: 6, hp: 115, crit: 6, dodge: 3, regen: 3 }
+                name: "Prêtre",
+                desc: "Protections divines et régénération rapide de points de vie.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M10 2h4v6h6v4h-6v10h-4V12H4V8h6V2z"/></svg>',
+                baseHp: 100, baseAtk: 10, baseDef: 5,
+                finisher: "Nova Sacrée",
+                branches: ["Discipline", "Sacré", "Ombre"]
             },
             paladin: {
-                id: 'paladin', name: 'Paladin', icon: 'fa-ankh', color: '#eab308',
-                desc: 'Champion en armure sacrée au marteau foudroyant.',
-                comboName: 'Jugement Sacré', maxCombo: 5,
-                comboDesc: 'Emmagasine le Courroux Divin. À 5 stacks, assène un Jugement Purificateur lourd.',
-                baseStats: { atk: 17, armor: 12, hp: 135, crit: 6, dodge: 2, regen: 1.2 }
+                name: "Paladin",
+                desc: "Guerrier sacré inébranlable. Protection lourde et châtiments.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2l9 4-9 16L3 6l9-4z"/></svg>',
+                baseHp: 130, baseAtk: 10, baseDef: 10,
+                finisher: "Verdict Divin",
+                branches: ["Sacré", "Protection", "Rétribution"]
             },
             archer: {
-                id: 'archer', name: 'Archer', icon: 'fa-bow-arrow', color: '#06b6d4',
-                desc: 'Tireur d\'élite perçant les armures à distance.',
-                comboName: 'Tir de Précision', maxCombo: 5,
-                comboDesc: 'Marque les points faibles de la cible. À 5 stacks, décoche une Flèche Perçante multiple.',
-                baseStats: { atk: 22, armor: 4, hp: 90, crit: 15, dodge: 10, regen: 0.5 }
+                name: "Archer",
+                desc: "Tirs à distance précis et percée d'armure exceptionnelle.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4l6 12H6l6-12z"/></svg>',
+                baseHp: 85, baseAtk: 17, baseDef: 3,
+                finisher: "Tir Tueur de Dragons",
+                branches: ["Précision", "Bêtes", "Survie"]
             },
             moine: {
-                id: 'moine', name: 'Moine', icon: 'fa-hand-fist', color: '#f97316',
-                desc: 'Maître des arts martiaux et de l\'énergie du Qi.',
-                comboName: 'Enchaînement du Qi', maxCombo: 6,
-                comboDesc: 'Maintient le fluide du Qi. À 6 stacks, canalise la Paume Explosive du Dragon.',
-                baseStats: { atk: 19, armor: 7, hp: 105, crit: 10, dodge: 14, regen: 1.5 }
-            }
-        };
-
-        /* ==========================================================================
-           COMPLEX TALENT TREES DATA (Branching Nodes with Prerequisites)
-           ========================================================================== */
-        const TALENT_TREES = {
-            guerrier: [
-                { id: 'g1', name: 'Fureur Initiale', branch: 'Combattant', row: 0, col: 1, prereq: [], max: 3, desc: '+10% Dégâts d\'attaque par rang.', effect: (lvl) => ({ atkPct: lvl * 10 }) },
-                { id: 'g2', name: 'Cuirassé', branch: 'Défense', row: 0, col: 3, prereq: [], max: 3, desc: '+15% Armure globale par rang.', effect: (lvl) => ({ armorPct: lvl * 15 }) },
-                { id: 'g3', name: 'Rage Naissante', branch: 'Combo', row: 0, col: 5, prereq: [], max: 3, desc: '+10% chance de doubler les stacks de Rage.', effect: (lvl) => ({ comboDoubleChance: lvl * 10 }) },
-                
-                { id: 'g4', name: 'Enchaînement Brutal', branch: 'Combattant', row: 1, col: 1, prereq: ['g1'], max: 2, desc: '+5% Chance de coup critique.', effect: (lvl) => ({ crit: lvl * 5 }) },
-                { id: 'g5', name: 'Peau de Fer', branch: 'Défense', row: 1, col: 3, prereq: ['g2'], max: 2, desc: '+20% PV Max.', effect: (lvl) => ({ hpPct: lvl * 20 }) },
-                { id: 'g6', name: 'Frénésie du Finisher', branch: 'Combo', row: 1, col: 5, prereq: ['g3'], max: 2, desc: 'L\'Exécuter augmente l\'attaque de +25% pendant 5s.', effect: (lvl) => ({ finisherBuffAtk: lvl * 25 }) },
-                
-                { id: 'g7', name: 'Exécuteur Suprême', branch: 'Combo Ultime', row: 2, col: 3, prereq: ['g4', 'g6'], max: 1, desc: 'Dégâts du Finisher Rage augmentés à +500% !', effect: (lvl) => ({ finisherBonusDmg: 200 }) }
-            ],
-            voleur: [
-                { id: 'v1', name: 'Lames Aiguisées', branch: 'Assassinat', row: 0, col: 1, prereq: [], max: 3, desc: '+8% Dégâts critiques par rang.', effect: (lvl) => ({ critDmgPct: lvl * 8 }) },
-                { id: 'v2', name: 'Pas Furtif', branch: 'Furtivité', row: 0, col: 3, prereq: [], max: 3, desc: '+5% Chance d\'esquive par rang.', effect: (lvl) => ({ dodge: lvl * 5 }) },
-                { id: 'v3', name: 'Ombres Cumulatives', branch: 'Combo', row: 0, col: 5, prereq: [], max: 3, desc: 'Chaque stack d\'Ombre donne +2% Esquive.', effect: (lvl) => ({ comboDodgeBonus: lvl * 2 }) },
-                
-                { id: 'v4', name: 'Poisons Mortels', branch: 'Assassinat', row: 1, col: 1, prereq: ['v1'], max: 2, desc: '+15% Attaque.', effect: (lvl) => ({ atkPct: lvl * 15 }) },
-                { id: 'v5', name: 'Éviscération Profonde', branch: 'Combo', row: 1, col: 5, prereq: ['v3'], max: 2, desc: 'Le Finisher d\'Ombre vole 20% des PV infligés.', effect: (lvl) => ({ finisherLifesteal: lvl * 20 }) },
-                
-                { id: 'v6', name: 'Danse des Ombres', branch: 'Combo Ultime', row: 2, col: 3, prereq: ['v4', 'v5'], max: 1, desc: 'Le Finisher réduit le combo max requis à 4 !', effect: (lvl) => ({ reduceMaxCombo: 1 }) }
-            ]
-            // Standard generic fallback generation for other classes to maintain rich trees
-        };
-
-        // Fill generic robust talent trees for classes without explicitly unique trees
-        Object.keys(CLASSES).forEach(clsId => {
-            if (!TALENTS_TREES[clsId]) {
-                TALENT_TREES[clsId] = [
-                    { id: `${clsId}_1`, name: 'Puissance Brute', branch: 'Voie 1', row: 0, col: 1, prereq: [], max: 3, desc: '+10% Attaque par rang.', effect: (l) => ({ atkPct: l * 10 }) },
-                    { id: `${clsId}_2`, name: 'Endurance de la Tour', branch: 'Voie 2', row: 0, col: 3, prereq: [], max: 3, desc: '+15% PV Max par rang.', effect: (l) => ({ hpPct: l * 15 }) },
-                    { id: `${clsId}_3`, name: 'Régénération du Qi/Mana', branch: 'Voie 3', row: 0, col: 5, prereq: [], max: 3, desc: '+2 PV/s de régénération.', effect: (l) => ({ regen: l * 2 }) },
-                    { id: `${clsId}_4`, name: 'Affinité de Combo', branch: 'Voie 1', row: 1, col: 1, prereq: [`${clsId}_1`], max: 2, desc: 'Stacks de combo augmentent l\'attaque de +3%.', effect: (l) => ({ comboAtkBonus: l * 3 }) },
-                    { id: `${clsId}_5`, name: 'Maîtrise du Finisher', branch: 'Voie 3', row: 1, col: 5, prereq: [`${clsId}_3`], max: 2, desc: 'Les Finishers soignent 15% des PV Max.', effect: (l) => ({ finisherHealPct: l * 15 }) },
-                    { id: `${clsId}_6`, name: 'Éveil Ultime', branch: 'Ultime', row: 2, col: 3, prereq: [`${clsId}_4`, `${clsId}_5`], max: 1, desc: '+30% Dégâts globaux et Finisher explosif.', effect: (l) => ({ atkPct: 30 }) }
-                ];
-            }
-        });
-
-        /* ==========================================================================
-           GAME STATE ENGINE & PERSISTENCE
-           ========================================================================== */
-        let gameState = {
-            hero: {
-                selectedClass: null,
-                level: 1,
-                xp: 0,
-                gold: 0,
-                souls: 0,
-                hpCur: 100,
-                stats: { atk: 10, armor: 0, hpMax: 100, crit: 5, dodge: 2, regen: 1 },
-                equipment: { helm: null, amulet: null, weapon: null, chest: null, offhand: null, gloves: null, ring1: null, ring2: null, boots: null },
-                inventory: [],
-                talents: {}, // { node_id: level }
-                comboStacks: 0
+                name: "Moine",
+                desc: "Vitesse d'attaque fulgurante et enchaînements rapides de combos.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>',
+                baseHp: 100, baseAtk: 13, baseDef: 5,
+                finisher: "Coup du Dragon",
+                branches: ["Brasseur", "Brume", "Marche-Vent"]
             },
-            tower: { floor: 1, subFloor: 1 },
-            sanctuary: { atkLvl: 0, hpLvl: 0, lootLvl: 0 },
-            autoCombat: false,
-            logs: []
+            barbare: {
+                name: "Barbare",
+                desc: "Rage Incontrôlable. Plus ses PV baissent, plus il frappe fort.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
+                baseHp: 140, baseAtk: 15, baseDef: 4,
+                finisher: "Marteau Dévastateur",
+                branches: ["Berserker", "Frénésie", "Totem"]
+            },
+            barde: {
+                name: "Barde",
+                desc: "Soutien mélodique apportant des bonus de combat et de l'or.",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>',
+                baseHp: 95, baseAtk: 12, baseDef: 4,
+                finisher: "Final Discordant",
+                branches: ["Mélodie", "Harmonie", "Symphonie"]
+            },
+            mendiant: {
+                name: "Mendiant",
+                desc: "Départ très faible mais potentiel de chance et de loot absurde !",
+                icon: '<svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v3H9V7z"/></svg>',
+                baseHp: 70, baseAtk: 8, baseDef: 1,
+                finisher: "Lancer de Savate Épique",
+                branches: ["Ténacité", "Récupération", "Chance"]
+            }
+        };
+
+        // Game State
+        let player = {
+            classKey: null,
+            level: 1,
+            xp: 0,
+            xpMax: 100,
+            hp: 100,
+            hpMax: 100,
+            gold: 0,
+            souls: 0,
+            floor: 1,
+            subFloor: 1,
+            comboPoints: 0,
+            talentPoints: 0,
+            talents: {},
+            equipped: {
+                head: null, amulet: null, chest: null,
+                mainhand: null, offhand: null, gloves: null,
+                ring1: null, ring2: null, boots: null
+            },
+            inventory: []
         };
 
         let currentMonster = null;
-        let monsterAttackTimer = null;
-        let monsterTimerVal = 0;
-        let combatLoopInterval = null;
+        let combatInterval = null;
+        let monsterAttackProgress = 0;
+        let autoCombatActive = true;
+        let currentTab = "tab-combat";
+        let selectedInvItemIndex = null;
 
-        /* ==========================================================================
-           INIT & CORE LIFECYCLE
-           ========================================================================== */
+        // Start Game Init
         window.onload = function() {
             loadGame();
-            if (!gameState.hero.selectedClass) {
-                renderClassSelectionModal();
-            } else {
-                initGameUI();
-                startCombatLoop();
-            }
+            initClassSelectionUI();
+            setupEventListeners();
+            updateUI();
+            startCombatLoop();
         };
 
-        function initGameUI() {
-            updateHeader();
-            updateHeroStats();
-            renderEquipmentSilhouette();
-            renderInventoryGrid();
-            renderTalentTree();
-            renderSanctuaire();
-            spawnMonster();
-            updateComboHUD();
-        }
+        function initClassSelectionUI() {
+            const container = document.getElementById('class-selection-container');
+            container.innerHTML = '';
 
-        /* ==========================================================================
-           CLASS SELECTION ENGINE
-           ========================================================================== */
-        function renderClassSelectionModal() {
-            const grid = document.getElementById('class-selection-grid');
-            grid.innerHTML = '';
-
-            Object.values(CLASSES).forEach(cls => {
+            Object.keys(CLASSES).forEach(key => {
+                const c = CLASSES[key];
                 const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 hover:border-amber-500/80 rounded-xl p-4 flex flex-col justify-between cursor-pointer transition transform hover:-translate-y-1 shadow-lg";
-                card.onclick = () => selectClass(cls.id);
-
+                card.className = 'class-select-card';
                 card.innerHTML = `
-                    <div>
-                        <div class="flex items-center space-x-3 mb-2">
-                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style="background-color: ${cls.color}20; color: ${cls.color}">
-                                <i class="fa-solid ${cls.icon}"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm font-cinzel text-slate-200">${cls.name}</h3>
-                                <span class="text-[10px] text-amber-400 font-semibold">${cls.comboName}</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">${cls.desc}</p>
-                        <div class="bg-slate-950 p-2 rounded text-[11px] text-slate-300 border border-slate-800">
-                            <i class="fa-solid fa-bolt text-amber-400"></i> <span class="font-bold">Maniement Combo :</span> ${cls.comboDesc}
-                        </div>
-                    </div>
-                    <button class="mt-4 w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs py-2 rounded-lg transition font-cinzel">
-                        INCARNER CETTE CLASSE
-                    </button>
+                    <div class="class-card-icon">${c.icon}</div>
+                    <div class="class-card-title">${c.name}</div>
+                    <div class="class-card-desc">${c.desc}</div>
                 `;
-                grid.appendChild(card);
+                card.onclick = () => selectClass(key);
+                container.appendChild(card);
             });
-
-            document.getElementById('modal-class-select').classList.remove('hidden');
         }
 
-        function selectClass(classId) {
-            gameState.hero.selectedClass = classId;
-            const cls = CLASSES[classId];
-            gameState.hero.stats = { ...cls.baseStats, hpMax: cls.baseStats.hp };
-            gameState.hero.hpCur = cls.baseStats.hp;
-
-            document.getElementById('modal-class-select').classList.add('hidden');
-            addLog(`Vous avez débuté votre périlleuse ascension en tant que <strong>${cls.name}</strong> !`);
+        function selectClass(key) {
+            player.classKey = key;
+            const classData = CLASSES[key];
+            player.hpMax = classData.baseHp;
+            player.hp = player.hpMax;
+            
+            document.getElementById('class-select-modal').style.display = 'none';
+            renderTalentTrees();
+            spawnMonster();
+            updateUI();
             saveGame();
-            initGameUI();
-            startCombatLoop();
         }
 
-        /* ==========================================================================
-           DYNAMIC STATS & COMBO HUD COMPUTATION
-           ========================================================================== */
-        function updateHeroStats() {
-            if (!gameState.hero.selectedClass) return;
-            const cls = CLASSES[gameState.hero.selectedClass];
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.currentTarget.dataset.tab;
+                    switchTab(tab);
+                });
+            });
 
-            // Base stats + level scaling
-            let atk = cls.baseStats.atk + (gameState.hero.level - 1) * 3;
-            let armor = cls.baseStats.armor + (gameState.hero.level - 1) * 1.5;
-            let hpMax = cls.baseStats.hp + (gameState.hero.level - 1) * 12;
-            let crit = cls.baseStats.crit;
-            let dodge = cls.baseStats.dodge;
-            let regen = cls.baseStats.regen;
-
-            // Equipment bonuses
-            Object.values(gameState.hero.equipment).forEach(item => {
-                if (item) {
-                    atk += item.stats.atk || 0;
-                    armor += item.stats.armor || 0;
-                    hpMax += item.stats.hp || 0;
-                    crit += item.stats.crit || 0;
-                    dodge += item.stats.dodge || 0;
-                    regen += item.stats.regen || 0;
+            // Combat Click
+            document.getElementById('monster-click-zone').addEventListener('click', () => {
+                if (currentTab === 'tab-combat' && currentMonster && currentMonster.hp > 0) {
+                    playerAttack(true);
                 }
             });
 
-            // Talent tree effects
-            const talentList = TALENT_TREES[gameState.hero.selectedClass] || [];
-            talentList.forEach(t => {
-                const lvl = gameState.hero.talents[t.id] || 0;
-                if (lvl > 0 && t.effect) {
-                    const eff = t.effect(lvl);
-                    if (eff.atkPct) atk *= (1 + eff.atkPct / 100);
-                    if (eff.armorPct) armor *= (1 + eff.armorPct / 100);
-                    if (eff.hpPct) hpMax *= (1 + eff.hpPct / 100);
-                    if (eff.crit) crit += eff.crit;
-                    if (eff.dodge) dodge += eff.dodge;
-                    if (eff.regen) regen += eff.regen;
+            // Auto Combat Toggle
+            document.getElementById('btn-auto-toggle').addEventListener('click', () => {
+                autoCombatActive = !autoCombatActive;
+                const btn = document.getElementById('btn-auto-toggle');
+                if (autoCombatActive) {
+                    btn.textContent = "▶️ COMBAT AUTO : ACTIF";
+                    btn.classList.remove('paused');
+                } else {
+                    btn.textContent = "⏸️ COMBAT AUTO : PAUSE";
+                    btn.classList.add('paused');
                 }
             });
 
-            // Sanctuary upgrades
-            atk *= (1 + gameState.sanctuary.atkLvl * 0.10);
-            hpMax *= (1 + gameState.sanctuary.hpLvl * 0.15);
+            // Finisher
+            document.getElementById('finisher-btn').addEventListener('click', executeFinisher);
 
-            gameState.hero.stats.atk = Math.round(atk);
-            gameState.hero.stats.armor = Math.round(armor);
-            gameState.hero.stats.hpMax = Math.round(hpMax);
-            gameState.hero.stats.crit = Math.min(75, Math.round(crit));
-            gameState.hero.stats.dodge = Math.min(50, Math.round(dodge));
-            gameState.hero.stats.regen = Math.round(regen * 10) / 10;
+            // Reincarnation
+            document.getElementById('btn-reincarnate').addEventListener('click', reincarnate);
 
-            if (gameState.hero.hpCur > gameState.hero.stats.hpMax) {
-                gameState.hero.hpCur = gameState.hero.stats.hpMax;
-            }
+            // Close Compare Modal
+            document.getElementById('close-item-modal').addEventListener('click', () => {
+                document.getElementById('item-compare-modal').style.display = 'none';
+            });
 
-            // Update UI elements
-            const cp = Math.round(gameState.hero.stats.atk * 2 + gameState.hero.stats.armor * 1.5 + gameState.hero.stats.hpMax * 0.5);
-            document.getElementById('stat-cp').innerText = cp;
-            document.getElementById('hero-cp').innerText = cp;
-            document.getElementById('stat-atk').innerText = gameState.hero.stats.atk;
-            document.getElementById('stat-armor').innerText = gameState.hero.stats.armor;
-            document.getElementById('stat-hp').innerText = gameState.hero.stats.hpMax;
-            document.getElementById('stat-crit').innerText = gameState.hero.stats.crit + '%';
-            document.getElementById('stat-dodge').innerText = gameState.hero.stats.dodge + '%';
-            document.getElementById('stat-regen').innerText = gameState.hero.stats.regen + '/s';
-
-            // Armor mitigation formula: Armor / (Armor + 100)
-            const armorMitigation = Math.round((gameState.hero.stats.armor / (gameState.hero.stats.armor + 100)) * 100);
-            document.getElementById('hero-armor-pct').innerText = armorMitigation + '%';
-
-            updateHeroHealthBar();
+            document.getElementById('btn-equip-selected').addEventListener('click', equipSelectedItem);
         }
 
-        function updateHeroHealthBar() {
-            document.getElementById('hero-hp-cur').innerText = Math.max(0, Math.round(gameState.hero.hpCur));
-            document.getElementById('hero-hp-max').innerText = gameState.hero.stats.hpMax;
-            const pct = Math.max(0, Math.min(100, (gameState.hero.hpCur / gameState.hero.stats.hpMax) * 100));
-            document.getElementById('hero-hp-bar').style.width = pct + '%';
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
         }
 
-        function updateComboHUD() {
-            const cls = CLASSES[gameState.hero.selectedClass];
-            if (!cls) return;
+        /* COMBAT & MONSTER ENGINE */
+        function startCombatLoop() {
+            if (combatInterval) clearInterval(combatInterval);
+            combatInterval = setInterval(() => {
+                // Pause combat if player is on equipment tab or game modal is open
+                if (currentTab === 'tab-equipement' || !player.classKey) return;
 
-            document.getElementById('combo-name-label').innerHTML = `<i class="fa-solid fa-bolt"></i> ${cls.comboName.toUpperCase()}`;
-            document.getElementById('combo-stacks-text').innerText = `${gameState.hero.comboStacks} / ${cls.maxCombo}`;
+                if (autoCombatActive && currentMonster && currentMonster.hp > 0 && player.hp > 0) {
+                    playerAttack(false);
+                }
 
-            const pct = (gameState.hero.comboStacks / cls.maxCombo) * 100;
-            document.getElementById('combo-bar-fill').style.width = pct + '%';
-
-            const finisherBanner = document.getElementById('combo-finisher-banner');
-            if (gameState.hero.comboStacks >= cls.maxCombo) {
-                finisherBanner.classList.remove('hidden');
-            } else {
-                finisherBanner.classList.add('hidden');
-            }
+                // Monster Attack Cycle
+                if (currentMonster && currentMonster.hp > 0 && player.hp > 0) {
+                    monsterAttackProgress += 10;
+                    if (monsterAttackProgress >= 100) {
+                        monsterAttackProgress = 0;
+                        monsterAttack();
+                    }
+                    document.getElementById('monster-atk-fill').style.width = monsterAttackProgress + '%';
+                }
+            }, 600);
         }
 
-        /* ==========================================================================
-           MONSTER COMBAT ENGINE & TIMER-BASED ACTIVE ATTACKS
-           ========================================================================== */
         function spawnMonster() {
-            const floor = gameState.tower.floor;
-            const subFloor = gameState.tower.subFloor;
-            const isBoss = (subFloor === 50);
-
-            // Brutal x100 scaling multiplier per floor boss
-            const floorMultiplier = Math.pow(100, floor - 1);
-            const subMultiplier = 1 + (subFloor - 1) * 0.15;
-
-            const baseHp = (40 + subFloor * 25) * floorMultiplier * subMultiplier * (isBoss ? 5 : 1);
-            const baseAtk = (8 + subFloor * 3) * floorMultiplier * subMultiplier * (isBoss ? 2.5 : 1);
-
-            const monsterNames = ["Gobelin Guerrier", "Ombre Renégate", "Squelette Maudit", "Gargouille de Pierre", "Démon Inférieur", "Bête de la Tour"];
-            const bossNames = ["SEIGNEUR DU DÉSENCHANTEMENT", "GARDIEEN DE RUNE MYTHIQUE", "COLOSSE INFERNAL"];
-
-            const name = isBoss ? bossNames[(floor - 1) % bossNames.length] : monsterNames[Math.floor(Math.random() * monsterNames.length)];
+            const isBoss = (player.subFloor === 50);
+            const difficultyMult = Math.pow(100, player.floor - 1);
+            
+            const baseHp = (player.floor * 50 + player.subFloor * 10) * (isBoss ? 5 : 1) * difficultyMult;
+            const baseAtk = (player.floor * 5 + player.subFloor * 2) * (isBoss ? 2 : 1) * difficultyMult;
 
             currentMonster = {
-                name: name,
-                subFloor: `${floor}.${subFloor}`,
-                hpMax: Math.round(baseHp),
-                hpCur: Math.round(baseHp),
-                atk: Math.round(baseAtk),
-                attackSpeedSec: isBoss ? 2.0 : 2.5,
-                isBoss: isBoss
+                name: isBoss ? `BOSS - ÉTAGE ${player.floor}` : `Monstre ${player.floor}.${player.subFloor}`,
+                hp: baseHp,
+                hpMax: baseHp,
+                atk: baseAtk,
+                gold: Math.floor((10 + player.subFloor * 2) * difficultyMult),
+                xp: Math.floor((20 + player.subFloor * 5) * difficultyMult)
             };
 
-            monsterTimerVal = 0;
+            monsterAttackProgress = 0;
             updateMonsterUI();
+        }
+
+        function playerAttack(isManual = false) {
+            if (!currentMonster) return;
+
+            let stats = calculatePlayerStats();
+            let dmg = stats.atk * (isManual ? 1.3 : 1.0);
+            
+            // Critical Strike
+            let isCrit = Math.random() < stats.critChance;
+            if (isCrit) dmg *= 2.0;
+
+            dmg = Math.floor(dmg);
+            currentMonster.hp = Math.max(0, currentMonster.hp - dmg);
+
+            showFloatingText(`-${dmg}${isCrit ? '!' : ''}`, isCrit ? '#f1c40f' : '#e74c3c');
+
+            // Add Combo
+            if (player.comboPoints < 5) {
+                player.comboPoints++;
+                updateComboUI();
+            }
+
+            if (currentMonster.hp <= 0) {
+                onMonsterDefeated();
+            }
+
+            updateMonsterUI();
+        }
+
+        function monsterAttack() {
+            let stats = calculatePlayerStats();
+            let rawDmg = currentMonster.atk;
+            let finalDmg = Math.max(1, Math.floor(rawDmg * (100 / (100 + stats.def))));
+
+            player.hp = Math.max(0, player.hp - finalDmg);
+            showFloatingText(`-${finalDmg}`, '#e74c3c', true);
+
+            if (player.hp <= 0) {
+                onPlayerDeath();
+            }
+
+            updateUI();
+        }
+
+        function executeFinisher() {
+            if (player.comboPoints < 5 || !currentMonster) return;
+
+            let stats = calculatePlayerStats();
+            let finisherDmg = stats.atk * 6.0;
+
+            currentMonster.hp = Math.max(0, currentMonster.hp - finisherDmg);
+            showFloatingText(`💥 ${Math.floor(finisherDmg)}`, '#9b59b6');
+
+            player.comboPoints = 0;
+            updateComboUI();
+
+            if (currentMonster.hp <= 0) {
+                onMonsterDefeated();
+            }
+            updateMonsterUI();
+        }
+
+        function onMonsterDefeated() {
+            player.gold += currentMonster.gold;
+            gainXP(currentMonster.xp);
+            rollLoot();
+
+            // Subfloor Progression
+            if (player.subFloor < 50) {
+                player.subFloor++;
+            } else {
+                player.floor++;
+                player.subFloor = 1;
+            }
+
+            spawnMonster();
+        }
+
+        function onPlayerDeath() {
+            showFloatingText("MORT EN COMBAT...", "#e74c3c");
+            player.hp = player.hpMax; // Resurrect
+            if (player.subFloor > 1) player.subFloor--; // Fall back 1 subfloor
+            spawnMonster();
+        }
+
+        function gainXP(amount) {
+            player.xp += amount;
+            if (player.xp >= player.xpMax) {
+                player.xp -= player.xpMax;
+                player.level++;
+                player.xpMax = Math.floor(player.xpMax * 1.5);
+                player.talentPoints++;
+                
+                // CRITICAL REQUIREMENT: FULL HEAL ON LEVEL UP
+                player.hp = calculatePlayerStats().hpMax;
+                showFloatingText("SOIN TOTAL ! LEVEL UP !", "#2ecc71");
+            }
+        }
+
+        /* STATS & LOOT CALCULATIONS */
+        function calculatePlayerStats() {
+            if (!player.classKey) return { hpMax: 100, atk: 10, def: 5, critChance: 0.05 };
+
+            let c = CLASSES[player.classKey];
+            let stats = {
+                hpMax: c.baseHp + (player.level - 1) * 20,
+                atk: c.baseAtk + (player.level - 1) * 3,
+                def: c.baseDef + (player.level - 1) * 2,
+                critChance: 0.05
+            };
+
+            // Add Equipped Item Stats
+            Object.values(player.equipped).forEach(item => {
+                if (item) {
+                    stats.hpMax += item.hp || 0;
+                    stats.atk += item.atk || 0;
+                    stats.def += item.def || 0;
+                }
+            });
+
+            player.hpMax = stats.hpMax;
+            return stats;
+        }
+
+        function rollLoot() {
+            if (Math.random() > 0.4) return; // 40% Drop Chance
+
+            const slots = ['head', 'amulet', 'chest', 'mainhand', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
+            const rarities = ['Commun', 'Rare', 'Épique', 'Légendaire', 'Mythique'];
+            
+            let slot = slots[Math.floor(Math.random() * slots.length)];
+            let rarity = rarities[0];
+            let rand = Math.random();
+            if (rand < 0.05) rarity = 'Mythique';
+            else if (rand < 0.15) rarity = 'Légendaire';
+            else if (rand < 0.35) rarity = 'Épique';
+            else if (rand < 0.60) rarity = 'Rare';
+
+            let item = {
+                name: `${rarity} ${slot.toUpperCase()}`,
+                slot: slot,
+                rarity: rarity,
+                atk: Math.floor(player.floor * 2 * (rarities.indexOf(rarity) + 1)),
+                def: Math.floor(player.floor * 1.5 * (rarities.indexOf(rarity) + 1)),
+                hp: Math.floor(player.floor * 10 * (rarities.indexOf(rarity) + 1))
+            };
+
+            if (player.inventory.length < 20) {
+                player.inventory.push(item);
+                renderInventory();
+            }
+        }
+
+        /* UI RENDERING & MODALS */
+        function updateUI() {
+            if (!player.classKey) return;
+
+            let stats = calculatePlayerStats();
+            document.getElementById('hero-name').textContent = CLASSES[player.classKey].name;
+            document.getElementById('hero-avatar').innerHTML = CLASSES[player.classKey].icon;
+            document.getElementById('hero-level').textContent = player.level;
+
+            // HP Bar
+            document.getElementById('hp-bar-fill').style.width = (player.hp / stats.hpMax * 100) + '%';
+            document.getElementById('hp-bar-text').textContent = `PV: ${Math.floor(player.hp)} / ${stats.hpMax}`;
+
+            // XP Bar
+            document.getElementById('xp-bar-fill').style.width = (player.xp / player.xpMax * 100) + '%';
+            document.getElementById('xp-bar-text').textContent = `XP: ${player.xp} / ${player.xpMax}`;
+
+            // Resources
+            document.getElementById('res-gold').textContent = player.gold;
+            document.getElementById('res-souls').textContent = player.souls;
+            document.getElementById('res-cp').textContent = Math.floor(stats.atk + stats.def + stats.hpMax / 10);
+
+            // Floor UI
+            document.getElementById('floor-num').textContent = player.floor;
+            document.getElementById('subfloor-num').textContent = player.subFloor;
+
+            renderEquippedSlots();
+            renderInventory();
         }
 
         function updateMonsterUI() {
             if (!currentMonster) return;
-            document.getElementById('monster-name').innerText = currentMonster.name;
-            document.getElementById('monster-sublevel').innerText = currentMonster.subFloor;
-            document.getElementById('monster-atk-val').innerText = currentMonster.atk;
-            document.getElementById('monster-hp-cur').innerText = Math.max(0, Math.round(currentMonster.hpCur));
-            document.getElementById('monster-hp-max').innerText = currentMonster.hpMax;
-
-            const pct = Math.max(0, Math.min(100, (currentMonster.hpCur / currentMonster.hpMax) * 100));
-            document.getElementById('monster-hp-bar').style.width = pct + '%';
-
-            document.getElementById('boss-badge').classList.toggle('hidden', !currentMonster.isBoss);
+            document.getElementById('monster-name').textContent = currentMonster.name;
+            document.getElementById('monster-hp-fill').style.width = (currentMonster.hp / currentMonster.hpMax * 100) + '%';
+            document.getElementById('monster-hp-text').textContent = `${Math.floor(currentMonster.hp)} / ${currentMonster.hpMax}`;
         }
 
-        function startCombatLoop() {
-            if (combatLoopInterval) clearInterval(combatLoopInterval);
-            combatLoopInterval = setInterval(() => {
-                const tickSec = 0.1;
-                
-                // 1. Hero Regeneration
-                if (gameState.hero.hpCur > 0 && gameState.hero.hpCur < gameState.hero.stats.hpMax) {
-                    gameState.hero.hpCur = Math.min(gameState.hero.stats.hpMax, gameState.hero.hpCur + gameState.hero.stats.regen * tickSec);
-                    updateHeroHealthBar();
-                }
+        function updateComboUI() {
+            document.getElementById('combo-count').textContent = player.comboPoints;
+            const pips = document.querySelectorAll('.combo-pip');
+            pips.forEach((pip, index) => {
+                if (index < player.comboPoints) pip.classList.add('active');
+                else pip.classList.remove('active');
+            });
 
-                // 2. Active Monster Attack Timer Progress
-                if (currentMonster && currentMonster.hpCur > 0 && gameState.hero.hpCur > 0) {
-                    monsterTimerVal += tickSec;
-                    const timerPct = Math.min(100, (monsterTimerVal / currentMonster.attackSpeedSec) * 100);
-                    document.getElementById('monster-attack-bar').style.width = timerPct + '%';
-                    document.getElementById('monster-timer-text').innerText = (Math.max(0, currentMonster.attackSpeedSec - monsterTimerVal)).toFixed(1) + 's';
-
-                    if (monsterTimerVal >= currentMonster.attackSpeedSec) {
-                        monsterTimerVal = 0;
-                        monsterAttackHero();
-                    }
-                }
-
-                // 3. Auto Combat Strikes
-                if (gameState.autoCombat && currentMonster && currentMonster.hpCur > 0 && gameState.hero.hpCur > 0) {
-                    heroStrikeMonster(false);
-                }
-            }, 100);
+            document.getElementById('finisher-btn').disabled = (player.comboPoints < 5);
         }
 
-        function monsterAttackHero() {
-            // Check hero dodge
-            if (Math.random() * 100 < gameState.hero.stats.dodge) {
-                spawnFloatingText("ESQUIVÉ !", "#2dd4bf", false);
-                return;
-            }
-
-            // Calculate damage with armor mitigation
-            const mitigation = gameState.hero.stats.armor / (gameState.hero.stats.armor + 100);
-            const dmgTaken = Math.max(1, Math.round(currentMonster.atk * (1 - mitigation)));
-
-            gameState.hero.hpCur -= dmgTaken;
-            updateHeroHealthBar();
-            spawnFloatingText(`-${dmgTaken}`, "#ef4444", false);
-
-            // Check Hero Death
-            if (gameState.hero.hpCur <= 0) {
-                gameState.hero.hpCur = 0;
-                handleHeroDeath();
-            }
-        }
-
-        function manualTapMonster(e) {
-            heroStrikeMonster(true, e);
-        }
-
-        function heroStrikeMonster(isManual = false, event = null) {
-            if (!currentMonster || currentMonster.hpCur <= 0 || gameState.hero.hpCur <= 0) return;
-
-            const cls = CLASSES[gameState.hero.selectedClass];
-            let isCrit = Math.random() * 100 < gameState.hero.stats.crit;
-            let baseDmg = gameState.hero.stats.atk;
-
-            // Check Combo Finisher
-            let isFinisher = false;
-            if (gameState.hero.comboStacks >= cls.maxCombo) {
-                isFinisher = true;
-                baseDmg *= 3.0; // 300% Finisher multiplier
-                gameState.hero.comboStacks = 0;
-                spawnFloatingText("🔥 FINISHER EXÉCUTÉ !", "#f59e0b", true, event);
-            } else {
-                gameState.hero.comboStacks++;
-            }
-
-            updateComboHUD();
-
-            let finalDmg = isCrit ? Math.round(baseDmg * 1.8) : Math.round(baseDmg);
-            currentMonster.hpCur -= finalDmg;
-
-            spawnFloatingText(isCrit ? `⚡ ${finalDmg}!` : `-${finalDmg}`, isCrit ? "#f59e0b" : "#ffffff", true, event);
-            updateMonsterUI();
-
-            // Monster Defeated
-            if (currentMonster.hpCur <= 0) {
-                handleMonsterDefeated();
-            }
-        }
-
-        function handleMonsterDefeated() {
-            // Gold & XP gains
-            const goldGain = Math.round((10 + gameState.tower.subFloor * 5) * Math.pow(2, gameState.tower.floor - 1));
-            const xpGain = Math.round(15 + gameState.tower.subFloor * 8);
-
-            gameState.hero.gold += goldGain;
-            gameState.hero.xp += xpGain;
-
-            checkLevelUp();
-            rollLootDrop();
-
-            // Tower sub-floor advancement
-            if (gameState.tower.subFloor < 50) {
-                gameState.tower.subFloor++;
-            } else {
-                gameState.tower.floor++;
-                gameState.tower.subFloor = 1;
-                addLog(`🎉 FELICITATIONS ! Vous avez surmonté l'Étage ${gameState.tower.floor - 1} ! Difficulty scaling x100 activé !`);
-            }
-
-            updateHeader();
-            spawnMonster();
-        }
-
-        function handleHeroDeath() {
-            gameState.autoCombat = false;
-            updateAutoButtonUI();
-
-            // Retreat 1 subfloor
-            if (gameState.tower.subFloor > 1) {
-                gameState.tower.subFloor--;
-            }
-
-            document.getElementById('modal-death').classList.remove('hidden');
-        }
-
-        function closeDeathModal() {
-            gameState.hero.hpCur = gameState.hero.stats.hpMax;
-            updateHeroHealthBar();
-            document.getElementById('modal-death').classList.add('hidden');
-            spawnMonster();
-        }
-
-        /* ==========================================================================
-           TAB EQUIPMENT SILHOUETTE & INVENTORY SYSTEM
-           ========================================================================== */
-        function renderEquipmentSilhouette() {
-            const slots = ['helm', 'amulet', 'weapon', 'chest', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
-            const icons = {
-                helm: 'fa-helmet-safety', amulet: 'fa-gem', weapon: 'fa-sword', chest: 'fa-vest',
-                offhand: 'fa-shield', gloves: 'fa-mitten', ring1: 'fa-ring', ring2: 'fa-ring', boots: 'fa-socks'
-            };
-
-            slots.forEach(slot => {
-                const container = document.getElementById(`eslot-${slot}`);
-                const item = gameState.hero.equipment[slot];
+        function renderEquippedSlots() {
+            Object.keys(player.equipped).forEach(slotKey => {
+                const slotEl = document.querySelector(`.equip-slot[data-slot="${slotKey}"]`);
+                const item = player.equipped[slotKey];
 
                 if (item) {
-                    container.className = `w-14 h-14 rounded-xl border-2 bg-slate-900 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group rarity-${item.rarity}`;
-                    container.innerHTML = `
-                        <i class="fa-solid ${item.icon} text-lg text-slate-200"></i>
-                        <span class="text-[8px] font-bold text-amber-300 mt-0.5 truncate max-w-[50px]">${item.name}</span>
-                    `;
+                    slotEl.classList.add('has-item', `rarity-${item.rarity}`);
                 } else {
-                    container.className = "w-14 h-14 rounded-xl border-2 border-slate-700/60 bg-slate-900/60 flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition relative group";
-                    container.innerHTML = `
-                        <i class="fa-solid ${icons[slot]} text-slate-600 text-xl"></i>
-                        <span class="text-[8px] text-slate-500 mt-0.5 capitalize">${slot}</span>
-                    `;
+                    slotEl.className = `equip-slot slot-${slotKey}`;
                 }
             });
         }
 
-        function rollLootDrop() {
-            if (Math.random() > 0.45) return; // 45% drop rate
-
-            const rarities = ['Commun', 'Rare', 'Épique', 'Légendaire', 'Mythique'];
-            const rarityWeights = [60, 25, 10, 4, 1];
-            
-            // Weighted random selection
-            let rand = Math.random() * 100;
-            let chosenRarity = 'Commun';
-            let cumulative = 0;
-
-            for (let i = 0; i < rarities.length; i++) {
-                cumulative += rarityWeights[i];
-                if (rand <= cumulative) {
-                    chosenRarity = rarities[i];
-                    break;
-                }
-            }
-
-            const slotKeys = ['helm', 'amulet', 'weapon', 'chest', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
-            const slot = slotKeys[Math.floor(Math.random() * slotKeys.length)];
-            
-            const mult = (rarities.indexOf(chosenRarity) + 1) * gameState.tower.floor;
-            const item = {
-                id: 'item_' + Date.now() + '_' + Math.floor(Math.random()*1000),
-                name: `${chosenRarity} ${slot}`,
-                slot: slot,
-                rarity: chosenRarity,
-                icon: 'fa-shield-halved',
-                stats: {
-                    atk: Math.round(5 * mult),
-                    hp: Math.round(20 * mult),
-                    armor: Math.round(3 * mult)
-                }
-            };
-
-            if (gameState.hero.inventory.length < 30) {
-                gameState.hero.inventory.push(item);
-                addLog(`Butin trouvé : <span class="text-amber-400 font-bold">${item.name}</span> (${item.rarity})`);
-                renderInventoryGrid();
-            }
-        }
-
-        function renderInventoryGrid() {
+        function renderInventory() {
             const grid = document.getElementById('inventory-grid');
-            document.getElementById('inv-count').innerText = gameState.hero.inventory.length;
             grid.innerHTML = '';
+            document.getElementById('inv-capacity').textContent = `${player.inventory.length} / 20`;
 
-            for (let i = 0; i < 30; i++) {
-                const item = gameState.hero.inventory[i];
-                const cell = document.createElement('div');
-
-                if (item) {
-                    cell.className = `h-14 rounded-xl border-2 bg-slate-900 p-1 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 transition rarity-${item.rarity}`;
-                    cell.onclick = () => selectInventoryItem(item);
-                    cell.innerHTML = `
-                        <i class="fa-solid fa-shield-halved text-xs text-slate-300"></i>
-                        <span class="text-[8px] text-slate-300 font-bold truncate max-w-[45px] mt-1">${item.name}</span>
-                    `;
-                } else {
-                    cell.className = "h-14 rounded-xl border border-slate-800/60 bg-slate-950/40";
-                }
-                grid.appendChild(cell);
+            player.inventory.forEach((item, index) => {
+                const el = document.createElement('div');
+                el.className = `inv-item rarity-${item.rarity}`;
+                el.innerHTML = `⚔️`;
+                el.onclick = () => openCompareModal(index);
+                grid.appendChild(el);
             });
         }
 
-        function selectInventoryItem(item) {
-            const comp = document.getElementById('comparator-container');
-            const equipped = gameState.hero.equipment[item.slot];
+        function openCompareModal(index) {
+            selectedInvItemIndex = index;
+            const newItem = player.inventory[index];
+            const equippedItem = player.equipped[newItem.slot];
 
-            const itemAtk = item.stats.atk || 0;
-            const eqAtk = equipped ? (equipped.stats.atk || 0) : 0;
-            const diffAtk = itemAtk - eqAtk;
-
-            comp.innerHTML = `
-                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-1">
-                        <span class="font-bold text-amber-400">${item.name}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded border rarity-${item.rarity}">${item.rarity}</span>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Attaque :</span>
-                            <span>${itemAtk} <strong class="${diffAtk >= 0 ? 'text-emerald-400' : 'text-red-400'}">(${diffAtk >= 0 ? '+' : ''}${diffAtk})</strong></span>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 mt-3">
-                        <button onclick="equipItem('${item.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 rounded text-xs transition">Équiper</button>
-                        <button onclick="sellItem('${item.id}')" class="bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 px-3 py-1.5 rounded text-xs transition">Vendre</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function equipItem(itemId) {
-            const idx = gameState.hero.inventory.findIndex(i => i.id === itemId);
-            if (idx === -1) return;
-
-            const item = gameState.hero.inventory[idx];
-            const currentEquipped = gameState.hero.equipment[item.slot];
-
-            gameState.hero.inventory.splice(idx, 1);
-            if (currentEquipped) {
-                gameState.hero.inventory.push(currentEquipped);
-            }
-
-            gameState.hero.equipment[item.slot] = item;
-            updateHeroStats();
-            renderEquipmentSilhouette();
-            renderInventoryGrid();
-            document.getElementById('comparator-container').innerHTML = `<p class="text-xs text-slate-500 italic text-center py-8">Cliquez sur un objet pour comparer.</p>`;
-        }
-
-        /* ==========================================================================
-           COMPLEX BRANCHING TALENT TREES ENGINE WITH PREREQUISITES
-           ========================================================================== */
-        function renderTalentTree() {
-            if (!gameState.hero.selectedClass) return;
-
-            const cls = CLASSES[gameState.hero.selectedClass];
-            const tree = TALENT_TREES[gameState.hero.selectedClass] || [];
-            
-            document.getElementById('talent-class-name').innerText = cls.name;
-            document.getElementById('talent-points-count').innerText = getAvailableTalentPoints();
-
-            // Spec Banner
-            document.getElementById('talent-combo-spec-desc').innerHTML = `
-                <div class="font-bold font-cinzel text-amber-300 mb-1"><i class="fa-solid fa-bolt"></i> SPÉCIALISATION COMBO : ${cls.comboName}</div>
-                <div>${cls.comboDesc}</div>
+            document.getElementById('comp-new-name').textContent = newItem.name;
+            document.getElementById('comp-new-stats').innerHTML = `
+                <div>ATK: +${newItem.atk}</div>
+                <div>DEF: +${newItem.def}</div>
+                <div>PV: +${newItem.hp}</div>
             `;
 
-            const grid = document.getElementById('talent-tree-grid');
-            grid.innerHTML = '';
-
-            // Render Nodes
-            tree.forEach(node => {
-                const nodeLvl = gameState.hero.talents[node.id] || 0;
-                const isUnlocked = checkPrerequisites(node, tree);
-                const isMax = nodeLvl >= node.max;
-
-                const card = document.createElement('div');
-                card.className = `p-3 rounded-xl border transition flex flex-col justify-between mb-3 ${
-                    isMax ? 'bg-amber-950/40 border-amber-500' :
-                    nodeLvl > 0 ? 'bg-slate-900 border-amber-500/60' :
-                    isUnlocked ? 'bg-slate-900 border-slate-700 hover:border-slate-500' :
-                    'bg-slate-950/60 border-slate-800/40 opacity-50'
-                }`;
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">${node.branch}</span>
-                            <h4 class="font-bold text-xs text-slate-200 font-cinzel">${node.name}</h4>
-                        </div>
-                        <span class="text-xs font-bold ${nodeLvl > 0 ? 'text-amber-400' : 'text-slate-500'}">${nodeLvl} / ${node.max}</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 my-2">${node.desc}</p>
-                    <button onclick="upgradeTalent('${node.id}')" ${(!isUnlocked || isMax || getAvailableTalentPoints() <= 0) ? 'disabled' : ''} 
-                            class="mt-1 w-full text-xs font-bold py-1 rounded transition ${
-                                isMax ? 'bg-amber-500/20 text-amber-400 cursor-default' :
-                                (isUnlocked && getAvailableTalentPoints() > 0) ? 'bg-amber-500 hover:bg-amber-400 text-black' :
-                                'bg-slate-800 text-slate-600 cursor-not-allowed'
-                            }">
-                        ${isMax ? 'MAX' : 'AMÉLIORER (+1 PT)'}
-                    </button>
+            if (equippedItem) {
+                document.getElementById('comp-eq-name').textContent = equippedItem.name;
+                document.getElementById('comp-eq-stats').innerHTML = `
+                    <div>ATK: +${equippedItem.atk}</div>
+                    <div>DEF: +${equippedItem.def}</div>
+                    <div>PV: +${equippedItem.hp}</div>
                 `;
-                grid.appendChild(card);
-            });
-        }
-
-        function checkPrerequisites(node, tree) {
-            if (!node.prereq || node.prereq.length === 0) return true;
-            return node.prereq.every(reqId => (gameState.hero.talents[reqId] || 0) > 0);
-        }
-
-        function getAvailableTalentPoints() {
-            const spent = Object.values(gameState.hero.talents).reduce((a, b) => a + b, 0);
-            return Math.max(0, (gameState.hero.level - 1) - spent);
-        }
-
-        function upgradeTalent(nodeId) {
-            if (getAvailableTalentPoints() <= 0) return;
-            const tree = TALENT_TREES[gameState.hero.selectedClass] || [];
-            const node = tree.find(n => n.id === nodeId);
-            if (!node) return;
-
-            const curLvl = gameState.hero.talents[nodeId] || 0;
-            if (curLvl < node.max && checkPrerequisites(node, tree)) {
-                gameState.hero.talents[nodeId] = curLvl + 1;
-                updateHeroStats();
-                renderTalentTree();
-                saveGame();
-            }
-        }
-
-        /* ==========================================================================
-           HELPERS & UI CONTROLS
-           ========================================================================== */
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-slate-800', 'text-amber-400', 'border-amber-500');
-                btn.classList.add('bg-cardBg', 'text-slate-400', 'border-transparent');
-            });
-
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-            activeBtn.classList.add('bg-slate-800', 'text-amber-400', 'border-amber-500');
-            activeBtn.classList.remove('bg-cardBg', 'text-slate-400', 'border-transparent');
-        }
-
-        function toggleAutoCombat() {
-            gameState.autoCombat = !gameState.autoCombat;
-            updateAutoButtonUI();
-        }
-
-        function updateAutoButtonUI() {
-            const btnText = document.getElementById('auto-status-text');
-            const icon = document.getElementById('auto-icon');
-            if (gameState.autoCombat) {
-                btnText.innerText = 'ON';
-                btnText.className = 'text-emerald-400 font-black';
-                icon.className = 'fa-solid fa-robot text-emerald-400 animate-pulse';
             } else {
-                btnText.innerText = 'OFF';
-                btnText.className = 'text-slate-400';
-                icon.className = 'fa-solid fa-robot text-slate-500';
+                document.getElementById('comp-eq-name').textContent = "Aucun";
+                document.getElementById('comp-eq-stats').innerHTML = "-";
             }
+
+            document.getElementById('item-compare-modal').style.display = 'flex';
         }
 
-        function spawnFloatingText(text, color, isMonsterHit = true, event = null) {
-            const container = document.getElementById('floating-damage-container');
-            if (!container) return;
+        function equipSelectedItem() {
+            if (selectedInvItemIndex === null) return;
+            const newItem = player.inventory[selectedInvItemIndex];
+            const currentEquipped = player.equipped[newItem.slot];
 
-            const el = document.createElement('div');
-            el.className = 'damage-float text-sm md:text-base';
-            el.innerText = text;
-            el.style.color = color;
+            player.equipped[newItem.slot] = newItem;
+            player.inventory.splice(selectedInvItemIndex, 1);
+            if (currentEquipped) player.inventory.push(currentEquipped);
 
-            let left = event ? (event.offsetX || 50) : Math.random() * 80 + 10;
-            let top = event ? (event.offsetY || 50) : Math.random() * 60 + 20;
-
-            el.style.left = left + 'px';
-            el.style.top = top + 'px';
-
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 800);
+            document.getElementById('item-compare-modal').style.display = 'none';
+            selectedInvItemIndex = null;
+            updateUI();
         }
 
-        function checkLevelUp() {
-            const reqXp = gameState.hero.level * 50;
-            if (gameState.hero.xp >= reqXp) {
-                gameState.hero.xp -= reqXp;
-                gameState.hero.level++;
-                addLog(`🌟 NIVAU SUPÉRIEUR ! Vous avez atteint le niveau ${gameState.hero.level} ! (+1 Point de Talent)`);
-                updateHeroStats();
-                renderTalentTree();
-            }
-        }
+        function renderTalentTrees() {
+            const container = document.getElementById('talent-tree-render');
+            container.innerHTML = '';
 
-        function updateHeader() {
-            document.getElementById('hero-level').innerText = gameState.hero.level;
-            document.getElementById('res-gold').innerText = gameState.hero.gold;
-            document.getElementById('res-souls').innerText = gameState.hero.souls;
-            document.getElementById('floor-num').innerText = gameState.tower.floor;
-            document.getElementById('subfloor-num').innerText = gameState.tower.subFloor;
+            if (!player.classKey) return;
+            const branches = CLASSES[player.classKey].branches;
 
-            if (gameState.hero.selectedClass) {
-                document.getElementById('hero-class-title').innerText = CLASSES[gameState.hero.selectedClass].name;
-                document.getElementById('combat-hero-name').innerText = CLASSES[gameState.hero.selectedClass].name;
-            }
-        }
+            branches.forEach((branchName, bIdx) => {
+                const branchEl = document.createElement('div');
+                branchEl.className = 'talent-branch';
+                branchEl.innerHTML = `<div class="branch-title">Spécialisation: ${branchName}</div>`;
+                
+                const nodesEl = document.createElement('div');
+                nodesEl.className = 'branch-nodes';
 
-        function addLog(msg) {
-            gameState.logs.unshift({ date: new Date().toLocaleTimeString(), msg: msg });
-            if (gameState.logs.length > 20) gameState.logs.pop();
+                for (let i = 1; i <= 4; i++) {
+                    const node = document.createElement('div');
+                    node.className = 'talent-node unlocked';
+                    node.innerHTML = `<div>Nœud ${i}</div><div class="talent-node-rank">1/1</div>`;
+                    nodesEl.appendChild(node);
+                }
 
-            const container = document.getElementById('story-log-container');
-            if (container) {
-                container.innerHTML = gameState.logs.map(l => `
-                    <div class="bg-slate-900/80 p-2 rounded border border-slate-800 text-xs">
-                        <span class="text-slate-500 font-mono">[${l.date}]</span> <span class="text-slate-300">${l.msg}</span>
-                    </div>
-                `).join('');
-            }
-        }
+                branchEl.appendChild(nodesEl);
+                container.appendChild(branchEl);
+            });
 
-        /* ==========================================================================
-           SANCTUAIRE & SAVE MANAGEMENT
-           ========================================================================== */
-        function renderSanctuaire() {
-            document.getElementById('soul-atk-lvl').innerText = gameState.sanctuary.atkLvl;
-            document.getElementById('soul-hp-lvl').innerText = gameState.sanctuary.hpLvl;
-            document.getElementById('soul-loot-lvl').innerText = gameState.sanctuary.lootLvl;
-
-            document.getElementById('soul-atk-cost').innerText = (gameState.sanctuary.atkLvl + 1) * 10;
-            document.getElementById('soul-hp-cost').innerText = (gameState.sanctuary.hpLvl + 1) * 10;
-            document.getElementById('soul-loot-cost').innerText = (gameState.sanctuary.lootLvl + 1) * 10;
-
-            const soulsGain = Math.floor(gameState.tower.floor * 5 + gameState.hero.level * 2);
-            document.getElementById('reincarnate-souls-gain').innerText = soulsGain;
+            document.getElementById('talent-pts').textContent = player.talentPoints;
         }
 
         function reincarnate() {
-            const soulsGain = Math.floor(gameState.tower.floor * 5 + gameState.hero.level * 2);
-            gameState.hero.souls += soulsGain;
-
-            // Reset progression
-            gameState.tower.floor = 1;
-            gameState.tower.subFloor = 1;
-            gameState.hero.level = 1;
-            gameState.hero.xp = 0;
-            gameState.hero.selectedClass = null;
-            gameState.hero.talents = {};
-
-            saveGame();
-            renderClassSelectionModal();
+            player.souls += player.floor * 10;
+            player.floor = 1;
+            player.subFloor = 1;
+            player.classKey = null;
+            
+            document.getElementById('class-select-modal').style.display = 'flex';
+            updateUI();
         }
 
-        function saveGame(showNotice = false) {
-            localStorage.setItem('la_tour_save_v3', JSON.stringify(gameState));
-            if (showNotice) addLog("Partie sauvegardée dans le navigateur.");
+        function showFloatingText(text, color, isPlayer = false) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.textContent = text;
+            el.style.color = color;
+            
+            const arena = document.getElementById('arena-container');
+            el.style.left = (isPlayer ? '30%' : '50%');
+            el.style.top = (isPlayer ? '70%' : '30%');
+
+            arena.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function saveGame() {
+            localStorage.setItem('la_tour_100_save', JSON.stringify(player));
         }
 
         function loadGame() {
-            const data = localStorage.getItem('la_tour_save_v3');
+            const data = localStorage.getItem('la_tour_100_save');
             if (data) {
                 try {
-                    gameState = JSON.parse(data);
-                } catch(e) { console.error("Save loading error", e); }
-            }
-        }
-
-        function exportSave() {
-            const str = btoa(JSON.stringify(gameState));
-            navigator.clipboard.writeText(str);
-            alert("Sauvegarde copiée dans le presse-papier !");
-        }
-
-        function importSavePrompt() {
-            const str = prompt("Collez le code de sauvegarde :");
-            if (str) {
-                try {
-                    gameState = JSON.parse(atob(str));
-                    saveGame();
-                    location.reload();
-                } catch(e) { alert("Code invalide !"); }
-            }
-        }
-
-        function resetGamePrompt() {
-            if (confirm("Réinitialiser totalement votre partie ?")) {
-                localStorage.removeItem('la_tour_save_v3');
-                location.reload();
+                    player = JSON.parse(data);
+                    if (!player.classKey) {
+                        document.getElementById('class-select-modal').style.display = 'flex';
+                    } else {
+                        document.getElementById('class-select-modal').style.display = 'none';
+                        renderTalentTrees();
+                        spawnMonster();
+                    }
+                } catch(e) {
+                    console.error("Save load failed", e);
+                }
             }
         }
     </script>
