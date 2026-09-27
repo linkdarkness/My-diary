@@ -913,7 +913,8 @@
 
         function selectClass(key) {
             player.classKey = key;
-            player.hpMax = calculatePlayerStats().hpMax;
+            const stats = calculatePlayerStats();
+            player.hpMax = stats.hpMax;
             player.hp = player.hpMax;
             document.getElementById('class-select-modal').style.display = 'none';
             spawnMonster();
@@ -964,7 +965,7 @@
         function startCombatLoop() {
             if (combatInterval) clearInterval(combatInterval);
             combatInterval = setInterval(() => {
-                if (currentTab !== 'tab-combat' || !player.classKey) return;
+                if (!player.classKey) return;
                 if (autoCombatActive && currentMonster && currentMonster.hp > 0 && player.hp > 0) {
                     playerAttack();
                 }
@@ -973,9 +974,9 @@
 
         function spawnMonster() {
             const isBoss = (player.subFloor === 50);
-            const difficultyMult = Math.pow(10, player.floor - 1);
-            const baseHp = (player.floor * 40 + player.subFloor * 8) * (isBoss ? 4 : 1) * difficultyMult;
-            const baseAtk = (player.floor * 4 + player.subFloor * 2) * (isBoss ? 1.8 : 1) * difficultyMult;
+            const difficultyMult = Math.pow(1.5, player.floor - 1);
+            const baseHp = Math.floor((player.floor * 40 + player.subFloor * 8) * (isBoss ? 4 : 1) * difficultyMult);
+            const baseAtk = Math.floor((player.floor * 4 + player.subFloor * 2) * (isBoss ? 1.8 : 1) * difficultyMult);
             const monsterKey = isBoss ? `Boss Étage ${player.floor}` : `Garde Étage ${player.floor}`;
 
             currentMonster = {
@@ -991,7 +992,7 @@
         function playerAttack() {
             if (!currentMonster) return;
             let stats = calculatePlayerStats();
-            let dmg = Math.floor(stats.atk);
+            let dmg = Math.max(1, Math.floor(stats.atk));
 
             currentMonster.hp = Math.max(0, currentMonster.hp - dmg);
             showFloatingText(`-${dmg}`, '#e74c3c');
@@ -1004,13 +1005,18 @@
                 }
             }
 
-            if (currentMonster.hp <= 0) onMonsterDefeated();
-            else monsterAttack();
+            if (currentMonster.hp <= 0) {
+                onMonsterDefeated();
+            } else {
+                monsterAttack();
+            }
 
             updateMonsterUI();
+            updateUI();
         }
 
         function monsterAttack() {
+            if (!currentMonster || currentMonster.hp <= 0) return;
             let stats = calculatePlayerStats();
 
             if (Math.random() * 100 < stats.dodge) {
@@ -1023,7 +1029,6 @@
             showFloatingText(`-${finalDmg}`, '#e74c3c', true);
 
             if (player.hp <= 0) onPlayerDeath();
-            updateUI();
         }
 
         function onMonsterDefeated() {
@@ -1067,8 +1072,10 @@
                 player.xpMax = Math.floor(player.xpMax * 1.5);
                 player.statPoints += 3;
 
-                player.hp = calculatePlayerStats().hpMax;
-                showFloatingText("LEVEL UP ! +3 STATS !", "#2ecc71");
+                let stats = calculatePlayerStats();
+                player.hpMax = stats.hpMax;
+                player.hp = player.hpMax;
+                showFloatingText("LEVEL UP ! +3 STATS !", "#2ecc71", true);
             }
         }
 
@@ -1076,6 +1083,8 @@
             if (player.statPoints <= 0) return;
             player.statPoints--;
             player.stats[statKey]++;
+            let stats = calculatePlayerStats();
+            player.hpMax = stats.hpMax;
             updateStatsUI();
             updateUI();
             saveGame();
@@ -1102,7 +1111,6 @@
                 }
             });
 
-            player.hpMax = stats.hpMax;
             return stats;
         }
 
@@ -1207,10 +1215,10 @@
             document.getElementById('hero-avatar').innerHTML = CLASSES[player.classKey].icon;
             document.getElementById('hero-level').textContent = player.level;
 
-            document.getElementById('hp-bar-fill').style.width = (player.hp / stats.hpMax * 100) + '%';
+            document.getElementById('hp-bar-fill').style.width = Math.max(0, Math.min(100, (player.hp / stats.hpMax * 100))) + '%';
             document.getElementById('hp-bar-text').textContent = `PV: ${Math.floor(player.hp)} / ${stats.hpMax}`;
 
-            document.getElementById('xp-bar-fill').style.width = (player.xp / player.xpMax * 100) + '%';
+            document.getElementById('xp-bar-fill').style.width = Math.max(0, Math.min(100, (player.xp / player.xpMax * 100))) + '%';
             document.getElementById('xp-bar-text').textContent = `XP: ${player.xp} / ${player.xpMax}`;
 
             document.getElementById('res-gold').textContent = player.gold;
@@ -1229,7 +1237,7 @@
         function updateMonsterUI() {
             if (!currentMonster) return;
             document.getElementById('monster-name').textContent = currentMonster.name;
-            document.getElementById('monster-hp-fill').style.width = (currentMonster.hp / currentMonster.hpMax * 100) + '%';
+            document.getElementById('monster-hp-fill').style.width = Math.max(0, Math.min(100, (currentMonster.hp / currentMonster.hpMax * 100))) + '%';
             document.getElementById('monster-hp-text').textContent = `${Math.floor(currentMonster.hp)} / ${currentMonster.hpMax}`;
         }
 
@@ -1339,6 +1347,10 @@
             player.inventory.splice(selectedInvItemIndex, 1);
             if (currentEquipped) player.inventory.push(currentEquipped);
 
+            let stats = calculatePlayerStats();
+            player.hpMax = stats.hpMax;
+            if (player.hp > player.hpMax) player.hp = player.hpMax;
+
             document.getElementById('item-compare-modal').style.display = 'none';
             selectedInvItemIndex = null;
             updateUI();
@@ -1393,6 +1405,10 @@
             if (!item || player.ore < 10) return;
             player.ore -= 10;
             item.upgradeLevel = (item.upgradeLevel || 0) + 1;
+            
+            let stats = calculatePlayerStats();
+            player.hpMax = stats.hpMax;
+
             renderForgeUI();
             updateUI();
             saveGame();
@@ -1439,7 +1455,6 @@
                 } catch(e) { console.error(e); }
             }
             
-            // Forcer l'affichage de la modale de sélection si aucune classe n'est active
             if (!player.classKey) {
                 document.getElementById('class-select-modal').style.display = 'flex';
             } else {
