@@ -159,13 +159,13 @@
 
         .nav-btn {
             flex: 1;
-            min-width: 70px;
-            padding: 8px 4px;
+            min-width: 65px;
+            padding: 8px 2px;
             background: none;
             border: none;
             color: var(--text-muted);
             font-weight: 800;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -239,7 +239,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 10px;
+            padding: 20px 10px;
             position: relative;
             overflow: hidden;
             min-height: 250px;
@@ -251,7 +251,6 @@
             align-items: center;
             width: 100%;
             gap: 8px;
-            cursor: pointer;
         }
 
         .monster-sprite-container {
@@ -267,7 +266,6 @@
             width: 85px;
             height: 85px;
             filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.6));
-            transition: transform 0.1s ease;
         }
 
         .monster-name {
@@ -292,49 +290,6 @@
             100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
         }
 
-        .combo-container {
-            width: 100%;
-            background: rgba(10, 13, 20, 0.8);
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid var(--border-color);
-        }
-
-        .combo-pips { display: flex; gap: 8px; }
-
-        .combo-pip {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #151a26;
-            border: 2px solid #2d384e;
-        }
-
-        .combo-pip.active {
-            background: var(--accent-gold);
-            box-shadow: 0 0 10px var(--accent-gold);
-            border-color: #fff;
-        }
-
-        .finisher-btn {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(135deg, #e67e22, #d35400);
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-weight: 900;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .finisher-btn:disabled { background: #1f2736; color: #4a586e; cursor: not-allowed; }
-
         .btn-action {
             width: 100%;
             padding: 10px;
@@ -349,7 +304,7 @@
         .btn-auto { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
         .btn-auto.paused { background: linear-gradient(135deg, #c0392b, #e74c3c); }
 
-        /* ÉQUIPEMENT REDESSINÉ (PANNEAU PARFAITEMENT ALIGNÉ) */
+        /* ÉQUIPEMENT & INVENTAIRE */
         .equipment-layout-container {
             display: flex;
             flex-direction: column;
@@ -375,7 +330,6 @@
             pointer-events: none;
         }
 
-        /* 9 EMPLACEMENTS ANATOMIQUES RECTIFIÉS ET PROPRES */
         .equip-slot {
             position: absolute;
             width: 52px;
@@ -398,10 +352,8 @@
         .slot-amulet { top: 70px; left: calc(50% - 26px); }
         .slot-chest { top: 130px; left: calc(50% - 26px); }
         .slot-boots { bottom: 10px; left: calc(50% - 26px); }
-
         .slot-mainhand { top: 100px; left: 15px; }
         .slot-gloves { top: 165px; left: 15px; }
-
         .slot-offhand { top: 100px; right: 15px; }
         .slot-ring1 { top: 165px; right: 15px; }
         .slot-ring2 { bottom: 25px; right: 15px; }
@@ -418,7 +370,6 @@
             border-radius: 4px;
         }
 
-        /* RARITÉS ET GAINS LUMINEUX */
         .rarity-Commun { border-color: var(--rarity-commun) !important; }
         .rarity-Rare { border-color: var(--rarity-rare) !important; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
         .rarity-Épique { border-color: var(--rarity-epique) !important; box-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
@@ -440,7 +391,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 6px;
-            max-height: 160px;
+            max-height: 150px;
             overflow-y: auto;
             padding: 2px;
         }
@@ -471,8 +422,8 @@
             border-radius: 3px;
         }
 
-        /* FORGE & ARTISANAT */
-        .forge-panel {
+        /* PANNEAU STATISTIQUES & ATTRIBUTS */
+        .stats-panel, .forge-panel, .codex-panel, .mission-panel {
             background: var(--bg-card);
             border-radius: 10px;
             padding: 12px;
@@ -482,6 +433,30 @@
             gap: 10px;
         }
 
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #090b10;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        .btn-stat-plus {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .btn-stat-plus:disabled { background: #232b3e; color: #58667e; cursor: not-allowed; }
+
+        /* FORGE */
         .materials-counter {
             display: flex;
             justify-content: space-around;
@@ -492,7 +467,7 @@
             font-weight: 800;
         }
 
-        .forge-action-card {
+        .forge-action-card, .mission-card, .bestiary-card {
             background: #090b10;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -500,9 +475,10 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            font-size: 0.75rem;
         }
 
-        /* MODALS & OVERLAYS */
+        /* MODALS */
         .modal-overlay {
             position: absolute;
             top: 0;
@@ -579,7 +555,6 @@
 
         .class-card-icon svg { width: 22px; height: 22px; fill: var(--accent-gold); }
 
-        /* COMPARATEUR D'ÉQUIPEMENT AMÉLIORÉ AVEC CHOIX D'ACTIONS */
         .item-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
         .item-card-detail {
@@ -594,27 +569,12 @@
         }
 
         .item-name { font-weight: 800; font-size: 0.8rem; }
-        .set-title-tag { color: var(--accent-cyan); font-weight: bold; font-size: 0.65rem; }
-
-        .stat-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-
+        .stat-line { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .stat-gain { color: var(--accent-green); font-weight: 800; }
         .stat-loss { color: var(--accent-red); font-weight: 800; }
         .stat-neutral { color: var(--text-muted); }
 
-        .compare-actions-container {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 6px;
-        }
-
+        .compare-actions-container { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
         .btn-action-group { display: flex; gap: 6px; }
 
         .btn-prime {
@@ -631,23 +591,8 @@
         }
 
         .btn-prime:disabled { background: #232b3e; color: #58667e; cursor: not-allowed; }
-
         .btn-sell { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
         .btn-recycle { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; }
-
-        /* SUCCÈS & BESTIAIRE */
-        .quest-card, .bestiary-card {
-            background: #090b10;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-        }
-
-        .quest-completed { border-color: var(--accent-green); background: rgba(46, 204, 113, 0.08); }
     </style>
 </head>
 <body>
@@ -680,13 +625,14 @@
             </div>
         </header>
 
-        <!-- NAVIGATION DE L'APPLICATION -->
+        <!-- NAVIGATION -->
         <nav>
             <button class="nav-btn active" data-tab="tab-combat">⚔️ Combat</button>
-            <button class="nav-btn" data-tab="tab-equipement">🛡️ Équipement</button>
+            <button class="nav-btn" data-tab="tab-stats">📊 Stats</button>
+            <button class="nav-btn" data-tab="tab-equipement">🛡️ Stuff</button>
+            <button class="nav-btn" data-tab="tab-missions">📜 Missions</button>
             <button class="nav-btn" data-tab="tab-forge">⚒️ Forge</button>
-            <button class="nav-btn" data-tab="tab-succes">🏆 Succès</button>
-            <button class="nav-btn" data-tab="tab-sanctuaire">⛩️ Sanctuaire</button>
+            <button class="nav-btn" data-tab="tab-codex">📖 Codex</button>
         </nav>
 
         <!-- CONTENU PRINCIPAL -->
@@ -716,26 +662,52 @@
                             <div class="bar-text" id="monster-hp-text">100 / 100</div>
                         </div>
                     </div>
-
-                    <div class="combo-container">
-                        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800;">
-                            COMBOS DE CLASSE (<span id="combo-count">0</span>/5)
-                        </div>
-                        <div class="combo-pips">
-                            <div class="combo-pip"></div>
-                            <div class="combo-pip"></div>
-                            <div class="combo-pip"></div>
-                            <div class="combo-pip"></div>
-                            <div class="combo-pip"></div>
-                        </div>
-                        <button class="finisher-btn" id="finisher-btn" disabled>⚡ COUP DE GRÂCE ⚡</button>
-                    </div>
                 </div>
 
                 <button class="btn-action btn-auto" id="btn-auto-toggle">▶️ COMBAT AUTO : ACTIF</button>
             </div>
 
-            <!-- ÉQUIPEMENT & INVENTAIRE (PANNEAU PARFAITEMENT ALIGNÉ) -->
+            <!-- STATISTIQUES & ATTRIBUTS -->
+            <div class="tab-content" id="tab-stats">
+                <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
+                <div class="stats-panel">
+                    <div style="font-weight: 800; color: var(--accent-gold); display: flex; justify-content: space-between;">
+                        <span>ATTRIBUTS DU HÉROS</span>
+                        <span>Points Dispo : <b id="stat-points-val" style="color:var(--accent-cyan);">0</b></span>
+                    </div>
+
+                    <div class="stat-row">
+                        <div>⚔️ Force (+2 ATK, +0.2% Vol de vie)<br><b id="stat-val-str">0</b></div>
+                        <button class="btn-stat-plus" onclick="allocateStat('str')">+</button>
+                    </div>
+                    <div class="stat-row">
+                        <div>🛡️ Endurance (+3 PV max)<br><b id="stat-val-end">0</b></div>
+                        <button class="btn-stat-plus" onclick="allocateStat('end')">+</button>
+                    </div>
+                    <div class="stat-row">
+                        <div>🧱 Résistance (+1.5 DEF)<br><b id="stat-val-res">0</b></div>
+                        <button class="btn-stat-plus" onclick="allocateStat('res')">+</button>
+                    </div>
+                    <div class="stat-row">
+                        <div>⚡ Agilité (+0.5% Esquive)<br><b id="stat-val-agi">0</b></div>
+                        <button class="btn-stat-plus" onclick="allocateStat('agi')">+</button>
+                    </div>
+                    <div class="stat-row">
+                        <div>🩸 Vigueur (+0.5% Vol de vie)<br><b id="stat-val-vig">0</b></div>
+                        <button class="btn-stat-plus" onclick="allocateStat('vig')">+</button>
+                    </div>
+
+                    <div style="margin-top: 6px; font-size:0.75rem; color:var(--text-muted); background:#090b10; padding:8px; border-radius:8px;">
+                        <div>Statistiques Actives Totales :</div>
+                        <div>• Attaque : <b id="total-atk" style="color:#fff;">10</b></div>
+                        <div>• Défense : <b id="total-def" style="color:#fff;">5</b></div>
+                        <div>• Esquive : <b id="total-dodge" style="color:var(--accent-green);">0%</b></div>
+                        <div>• Vol de vie : <b id="total-lifesteal" style="color:var(--accent-cyan);">0%</b></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÉQUIPEMENT & INVENTAIRE -->
             <div class="tab-content" id="tab-equipement">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
 
@@ -746,7 +718,6 @@
                                      M 30 50 L 70 50 L 80 90 L 70 140 L 60 140 L 60 190 L 40 190 L 40 140 L 30 140 L 20 90 Z" fill="#ffffff" />
                         </svg>
 
-                        <!-- 9 EMPLACEMENTS ANATOMIQUES UNIQUES -->
                         <div class="equip-slot slot-head" data-slot="head"></div>
                         <div class="equip-slot slot-amulet" data-slot="amulet"></div>
                         <div class="equip-slot slot-chest" data-slot="chest"></div>
@@ -768,7 +739,15 @@
                 </div>
             </div>
 
-            <!-- FORGE & ARTISANAT (OPTION 1) -->
+            <!-- MISSIONS EN BOUCLE INFINIE -->
+            <div class="tab-content" id="tab-missions">
+                <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
+                <div style="font-weight: 800; color: var(--accent-gold);">📜 Contrats & Missions de la Tour</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Terminez une mission pour lancer immédiatement la suivante avec des objectifs et récompenses doublés !</div>
+                <div id="missions-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+
+            <!-- FORGE -->
             <div class="tab-content" id="tab-forge">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
                 <div class="forge-panel">
@@ -779,36 +758,18 @@
 
                     <div class="forge-action-card">
                         <div style="font-weight: 800; color: var(--accent-gold);">🔨 Améliorer un équipement (+1 à +10)</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">
-                            Sélectionnez un objet équipé pour augmenter ses caractéristiques de +15% par niveau d'amélioration.
-                        </div>
-                        <div id="forge-equipped-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto;"></div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">Augmente les statistiques de l'objet équipé de +15% par niveau.</div>
+                        <div id="forge-equipped-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- SUCCÈS & BESTIAIRE (OPTION 4) -->
-            <div class="tab-content" id="tab-succes">
+            <!-- CODEX & BESTIAIRE -->
+            <div class="tab-content" id="tab-codex">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
-                <div style="font-weight: 800; color: var(--accent-gold); margin-bottom: 4px;">🏆 Trophées & Quêtes</div>
-                <div id="quests-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
-
-                <div style="font-weight: 800; color: var(--accent-red); margin-top: 10px; margin-bottom: 4px;">📖 Bestiaire de la Tour</div>
-                <div id="bestiary-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
-            </div>
-
-            <!-- SANCTUAIRE -->
-            <div class="tab-content" id="tab-sanctuaire">
-                <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
-                <div style="text-align: center; padding: 20px;" class="forge-action-card">
-                    <h3 style="color: var(--accent-purple);">Sanctuaire des Âmes</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: 10px 0;">
-                        Réincarnez-vous pour acquérir des Âmes Célestes.
-                    </p>
-                    <button class="btn-prime" id="btn-reincarnate" style="background: var(--accent-purple); color: #fff;">
-                        🌀 Réincarnation (+<span id="souls-gained">0</span> Âmes)
-                    </button>
-                </div>
+                <div style="font-weight: 800; color: var(--accent-gold);">📖 Codex & Bestiaire de la Tour</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Éliminez des monstres pour débloquer des paliers de maîtrise et des bonus permanents.</div>
+                <div id="bestiary-container" style="display: flex; flex-direction: column; gap: 6px; max-height: 380px; overflow-y: auto;"></div>
             </div>
         </main>
     </div>
@@ -821,7 +782,7 @@
             </div>
             <div class="modal-body">
                 <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">
-                    En cas de mort, vous gardez tout votre équipement mais repartirez du niveau 1.
+                    En cas de mort, vous conservez votre équipement et votre sac à dos.
                 </p>
                 <div class="class-selection-grid" id="class-selection-container"></div>
             </div>
@@ -837,29 +798,16 @@
             <div class="modal-body" style="text-align: center;">
                 <p style="font-size: 0.9rem; color: #fff; font-weight: 800;">Votre héros est tombé au combat...</p>
                 <p style="font-size: 0.75rem; color: var(--accent-green); background: rgba(46, 204, 113, 0.12); padding: 8px; border-radius: 6px;">
-                    🛡️ <b>ÉQUIPEMENT 100% CONSERVÉ !</b><br>Tout le stuff équipé et dans le sac est préservé.
+                    🛡️ <b>ÉQUIPEMENT INTÉGRALEMENT CONSERVÉ !</b>
                 </p>
                 <button class="btn-prime" id="btn-respawn-continue" style="background: var(--accent-red); color: #fff; margin-top: 8px;">
-                    Choisir une nouvelle Classe & Repartir
+                    Choisir une Classe & Repartir
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL EVENEMENT DE LA TOUR (OPTION 2) -->
-    <div class="modal-overlay" id="event-modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="event-title">Salle Spéciale</div>
-            </div>
-            <div class="modal-body" style="text-align: center;">
-                <p id="event-desc" style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 10px;"></p>
-                <div id="event-choices" style="display: flex; flex-direction: column; gap: 8px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL COMPARATEUR D'ÉQUIPEMENT AMÉLIORÉ AVEC ACTIONS -->
+    <!-- MODAL COMPARATEUR D'ÉQUIPEMENT -->
     <div class="modal-overlay" id="item-compare-modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -874,7 +822,7 @@
                         <div id="comp-eq-stats"></div>
                     </div>
                     <div class="item-card-detail" id="compare-new-card">
-                        <div style="color: var(--accent-gold); font-weight: bold;">OBJET SELECTIONNÉ</div>
+                        <div style="color: var(--accent-gold); font-weight: bold;">OBJET SÉLECTIONNÉ</div>
                         <div id="comp-new-name" class="item-name">-</div>
                         <div id="comp-new-stats"></div>
                     </div>
@@ -894,7 +842,6 @@
     </div>
 
     <script>
-        /* ICÔNES SVG POUR EMPLACEMENTS ET LOOT */
         const ITEM_ICONS = {
             head: '<svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 0-9 9v7h18v-7a9 9 0 0 0-9-9zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>',
             amulet: '<svg viewBox="0 0 24 24"><path d="M12 2L8 8h8l-4-6zm0 8a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>',
@@ -917,7 +864,7 @@
             paladin: { name: "Paladin", desc: "Guerrier sacré.", icon: ITEM_ICONS.chest, baseHp: 130, baseAtk: 10, baseDef: 10, setName: "Égide de la Lumière" },
             archer: { name: "Archer", desc: "Attaque rapide.", icon: ITEM_ICONS.mainhand, baseHp: 85, baseAtk: 17, baseDef: 3, setName: "Scribe des Vents" },
             moine: { name: "Moine", desc: "Esquive constante.", icon: ITEM_ICONS.ring1, baseHp: 100, baseAtk: 13, baseDef: 5, setName: "Poings de la Tempête" },
-            barbare: { name: "Barbare", desc: "Degats bruts.", icon: ITEM_ICONS.gloves, baseHp: 140, baseAtk: 15, baseDef: 4, setName: "Sanguinaire du Nord" },
+            barbare: { name: "Barbare", desc: "Dégâts bruts.", icon: ITEM_ICONS.gloves, baseHp: 140, baseAtk: 15, baseDef: 4, setName: "Sanguinaire du Nord" },
             barde: { name: "Barde", desc: "Bonus Or et XP.", icon: ITEM_ICONS.amulet, baseHp: 95, baseAtk: 12, baseDef: 4, setName: "Sonate d'Harmonie" },
             mendiant: { name: "Mendiant", desc: "Chance de loot ultime !", icon: ITEM_ICONS.boots, baseHp: 70, baseAtk: 8, baseDef: 1, setName: "Guenilles de Fortune" }
         };
@@ -926,10 +873,15 @@
             classKey: null,
             level: 1, xp: 0, xpMax: 100, hp: 100, hpMax: 100,
             gold: 0, ore: 0, essence: 0, souls: 0,
-            floor: 1, subFloor: 1, comboPoints: 0,
+            floor: 1, subFloor: 1,
+            statPoints: 0,
+            stats: { str: 0, end: 0, res: 0, agi: 0, vig: 0 },
             equipped: { head: null, amulet: null, chest: null, mainhand: null, offhand: null, gloves: null, ring1: null, ring2: null, boots: null },
             inventory: [],
-            quests: { kills: 0, bosses: 0, upgrades: 0 },
+            missions: [
+                { id: 'm1', title: 'Chasse aux Monstres', type: 'kills', current: 0, target: 20, rewardGold: 100, rewardOre: 5, tier: 1 },
+                { id: 'm2', title: 'Exploration de la Tour', type: 'floors', current: 0, target: 10, rewardGold: 150, rewardEssence: 3, tier: 1 }
+            ],
             bestiary: {}
         };
 
@@ -945,8 +897,6 @@
             setupEventListeners();
             updateUI();
             startCombatLoop();
-
-            // TIMER DE SAUVEGARDE AUTOMATIQUE
             setInterval(saveGame, 2000);
         };
 
@@ -959,7 +909,7 @@
                 card.className = 'class-select-card';
                 card.innerHTML = `
                     <div class="class-card-icon">${c.icon}</div>
-                    <div class="class-card-title">${c.name}</div>
+                    <div style="font-weight:800; font-size:0.8rem;">${c.name}</div>
                     <div style="font-size:0.6rem; color:var(--text-muted);">${c.desc}</div>
                 `;
                 card.onclick = () => selectClass(key);
@@ -969,9 +919,8 @@
 
         function selectClass(key) {
             player.classKey = key;
-            player.hpMax = CLASSES[key].baseHp;
+            player.hpMax = calculatePlayerStats().hpMax;
             player.hp = player.hpMax;
-            
             document.getElementById('class-select-modal').style.display = 'none';
             spawnMonster();
             updateUI();
@@ -990,8 +939,6 @@
                 btn.classList.toggle('paused', !autoCombatActive);
             });
 
-            document.getElementById('finisher-btn').addEventListener('click', executeFinisher);
-            document.getElementById('btn-reincarnate').addEventListener('click', reincarnate);
             document.getElementById('close-item-modal').addEventListener('click', () => {
                 document.getElementById('item-compare-modal').style.display = 'none';
             });
@@ -1014,16 +961,16 @@
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
             document.getElementById(tabId).classList.add('active');
 
+            if (tabId === 'tab-stats') renderStatsUI();
+            if (tabId === 'tab-missions') renderMissionsUI();
             if (tabId === 'tab-forge') renderForgeUI();
-            if (tabId === 'tab-succes') renderQuestsAndBestiary();
+            if (tabId === 'tab-codex') renderCodexUI();
         }
 
-        /* ENGINE DE COMBAT ET PAUSE AUTO */
         function startCombatLoop() {
             if (combatInterval) clearInterval(combatInterval);
             combatInterval = setInterval(() => {
                 if (currentTab !== 'tab-combat' || !player.classKey) return;
-
                 if (autoCombatActive && currentMonster && currentMonster.hp > 0 && player.hp > 0) {
                     playerAttack();
                 }
@@ -1033,10 +980,8 @@
         function spawnMonster() {
             const isBoss = (player.subFloor === 50);
             const difficultyMult = Math.pow(10, player.floor - 1);
-            
             const baseHp = (player.floor * 40 + player.subFloor * 8) * (isBoss ? 4 : 1) * difficultyMult;
             const baseAtk = (player.floor * 4 + player.subFloor * 2) * (isBoss ? 1.8 : 1) * difficultyMult;
-
             const monsterKey = isBoss ? `Boss Étage ${player.floor}` : `Garde Étage ${player.floor}`;
 
             currentMonster = {
@@ -1046,7 +991,6 @@
                 gold: Math.floor((12 + player.subFloor * 3) * difficultyMult),
                 xp: Math.floor((25 + player.subFloor * 6) * difficultyMult)
             };
-
             updateMonsterUI();
         }
 
@@ -1058,9 +1002,13 @@
             currentMonster.hp = Math.max(0, currentMonster.hp - dmg);
             showFloatingText(`-${dmg}`, '#e74c3c');
 
-            if (player.comboPoints < 5) {
-                player.comboPoints++;
-                updateComboUI();
+            // Vol de vie
+            if (stats.lifesteal > 0) {
+                let heal = Math.floor(dmg * (stats.lifesteal / 100));
+                if (heal > 0) {
+                    player.hp = Math.min(stats.hpMax, player.hp + heal);
+                    showFloatingText(`+${heal} PV`, '#2ecc71', true);
+                }
             }
 
             if (currentMonster.hp <= 0) onMonsterDefeated();
@@ -1071,8 +1019,14 @@
 
         function monsterAttack() {
             let stats = calculatePlayerStats();
-            let finalDmg = Math.max(1, Math.floor(currentMonster.atk * (100 / (100 + stats.def))));
 
+            // Test Esquive
+            if (Math.random() * 100 < stats.dodge) {
+                showFloatingText(`💨 ESQUIVE !`, '#3498db', true);
+                return;
+            }
+
+            let finalDmg = Math.max(1, Math.floor(currentMonster.atk * (100 / (100 + stats.def))));
             player.hp = Math.max(0, player.hp - finalDmg);
             showFloatingText(`-${finalDmg}`, '#e74c3c', true);
 
@@ -1080,44 +1034,27 @@
             updateUI();
         }
 
-        function executeFinisher() {
-            if (player.comboPoints < 5 || !currentMonster) return;
-            let stats = calculatePlayerStats();
-            let finisherDmg = stats.atk * 6.0;
-
-            currentMonster.hp = Math.max(0, currentMonster.hp - finisherDmg);
-            showFloatingText(`💥 ${Math.floor(finisherDmg)}`, '#9b59b6');
-
-            player.comboPoints = 0;
-            updateComboUI();
-
-            if (currentMonster.hp <= 0) onMonsterDefeated();
-            updateMonsterUI();
-        }
-
         function onMonsterDefeated() {
             player.gold += currentMonster.gold;
-            player.quests.kills++;
-            if (player.subFloor === 50) player.quests.bosses++;
-
-            // Mise à jour du Bestiaire
-            if (!player.bestiary[currentMonster.key]) player.bestiary[currentMonster.key] = 0;
-            player.bestiary[currentMonster.key]++;
-
             gainXP(currentMonster.xp);
             rollLoot();
 
-            // SALLES DE LA TOUR (ÉVÉNEMENT ALEATOIRE - OPTION 2)
-            if (Math.random() < 0.15) {
-                triggerTowerEvent();
+            // MAJ Bestiaire & Missions
+            if (!player.bestiary[currentMonster.key]) player.bestiary[currentMonster.key] = 0;
+            player.bestiary[currentMonster.key]++;
+
+            updateMissionProgress('kills', 1);
+
+            if (player.subFloor < 50) {
+                player.subFloor++;
             } else {
-                if (player.subFloor < 50) player.subFloor++;
-                else { player.floor++; player.subFloor = 1; }
-                spawnMonster();
+                player.floor++;
+                player.subFloor = 1;
             }
+            updateMissionProgress('floors', 1);
+            spawnMonster();
         }
 
-        /* MORT PERMANENTE AVEC CONSERVATION D'ÉQUIPEMENT */
         function onPlayerDeath() {
             player.level = 1;
             player.xp = 0;
@@ -1125,7 +1062,6 @@
             player.gold = 0;
             player.floor = 1;
             player.subFloor = 1;
-            player.comboPoints = 0;
             player.classKey = null;
 
             document.getElementById('death-modal').style.display = 'flex';
@@ -1138,20 +1074,32 @@
                 player.xp -= player.xpMax;
                 player.level++;
                 player.xpMax = Math.floor(player.xpMax * 1.5);
-                
-                // SOIN INTÉGRAL EN LEVEL UP
+                player.statPoints += 3; // +3 Points de Stat par niveau
+
                 player.hp = calculatePlayerStats().hpMax;
-                showFloatingText("LEVEL UP ! SOIN TOTAL !", "#2ecc71");
+                showFloatingText("LEVEL UP ! +3 STATS !", "#2ecc71");
             }
         }
 
+        function allocateStat(statKey) {
+            if (player.statPoints <= 0) return;
+            player.statPoints--;
+            player.stats[statKey]++;
+            updateStatsUI();
+            updateUI();
+            saveGame();
+        }
+
         function calculatePlayerStats() {
-            if (!player.classKey) return { hpMax: 100, atk: 10, def: 5 };
+            if (!player.classKey) return { hpMax: 100, atk: 10, def: 5, dodge: 0, lifesteal: 0 };
             let c = CLASSES[player.classKey];
+
             let stats = {
-                hpMax: c.baseHp + (player.level - 1) * 20,
-                atk: c.baseAtk + (player.level - 1) * 3,
-                def: c.baseDef + (player.level - 1) * 2
+                hpMax: c.baseHp + (player.level - 1) * 20 + (player.stats.end * 3),
+                atk: c.baseAtk + (player.level - 1) * 3 + (player.stats.str * 2),
+                def: c.baseDef + (player.level - 1) * 2 + (player.stats.res * 1.5),
+                dodge: player.stats.agi * 0.5,
+                lifesteal: (player.stats.str * 0.2) + (player.stats.vig * 0.5)
             };
 
             Object.values(player.equipped).forEach(item => {
@@ -1171,11 +1119,9 @@
             if (Math.random() > 0.45) return;
             const slots = ['head', 'amulet', 'chest', 'mainhand', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
             const classKeys = Object.keys(CLASSES);
-            
             let randomClassKey = classKeys[Math.floor(Math.random() * classKeys.length)];
             let classInfo = CLASSES[randomClassKey];
             let slot = slots[Math.floor(Math.random() * slots.length)];
-
             let isSetItem = Math.random() < 0.30;
 
             let item = {
@@ -1183,7 +1129,6 @@
                 slot: slot,
                 rarity: isSetItem ? 'Set' : 'Rare',
                 reqClass: randomClassKey,
-                setName: isSetItem ? classInfo.setName : null,
                 upgradeLevel: 0,
                 atk: Math.floor(player.floor * 3),
                 def: Math.floor(player.floor * 2),
@@ -1196,45 +1141,78 @@
             }
         }
 
-        /* SALLES DE LA TOUR (OPTION 2) */
-        function triggerTowerEvent() {
-            const modal = document.getElementById('event-modal');
-            const title = document.getElementById('event-title');
-            const desc = document.getElementById('event-desc');
-            const choices = document.getElementById('event-choices');
-
-            title.textContent = "🎁 Coffre Mystérieux de la Tour";
-            desc.textContent = "Vous découvrez un coffre ouvragé dans la pénombre de la tour...";
-            choices.innerHTML = '';
-
-            const btnOpen = document.createElement('button');
-            btnOpen.className = 'btn-prime';
-            btnOpen.textContent = "🔓 Ouvrir le Coffre";
-            btnOpen.onclick = () => {
-                if (Math.random() < 0.7) {
-                    player.gold += player.floor * 50;
-                    rollLoot();
-                    showFloatingText("+50 Or & Loot !", "#f1c40f");
-                } else {
-                    player.hp = Math.floor(player.hp * 0.7);
-                    showFloatingText("MIMIQUE ! Piège -30% PV", "#e74c3c");
+        /* SYSTÈME DE MISSIONS EN BOUCLE INFINIE */
+        function updateMissionProgress(type, amount) {
+            player.missions.forEach(m => {
+                if (m.type === type) {
+                    m.current += amount;
                 }
-                modal.style.display = 'none';
-                spawnMonster();
-            };
+            });
+            if (currentTab === 'tab-missions') renderMissionsUI();
+        }
 
-            const btnIgnore = document.createElement('button');
-            btnIgnore.className = 'btn-prime';
-            btnIgnore.style.background = "#7f8c8d";
-            btnIgnore.textContent = "🚶 Ignorer et Continuer";
-            btnIgnore.onclick = () => {
-                modal.style.display = 'none';
-                spawnMonster();
-            };
+        function renderMissionsUI() {
+            const container = document.getElementById('missions-container');
+            container.innerHTML = '';
 
-            choices.appendChild(btnOpen);
-            choices.appendChild(btnIgnore);
-            modal.style.display = 'flex';
+            player.missions.forEach((m, idx) => {
+                const isComplete = m.current >= m.target;
+                const card = document.createElement('div');
+                card.className = 'mission-card';
+                card.innerHTML = `
+                    <div style="font-weight:800; display:flex; justify-content:space-between;">
+                        <span>${m.title} (Rang ${m.tier})</span>
+                        <span>${m.current} / ${m.target}</span>
+                    </div>
+                    <div style="color:var(--text-muted);">Récompense : 🪙 ${m.rewardGold} Or ${m.rewardOre ? `| ⛏️ ${m.rewardOre} Minerai` : ''} ${m.rewardEssence ? `| ✨ ${m.rewardEssence} Essence` : ''}</div>
+                    <button class="btn-prime" ${isComplete ? '' : 'disabled'} style="padding:6px; font-size:0.7rem;">
+                        ${isComplete ? 'Récupérer & Doubler' : 'En cours...'}
+                    </button>
+                `;
+                if (isComplete) {
+                    card.querySelector('button').onclick = () => claimMission(idx);
+                }
+                container.appendChild(card);
+            });
+        }
+
+        function claimMission(index) {
+            let m = player.missions[index];
+            player.gold += m.rewardGold;
+            if (m.rewardOre) player.ore += m.rewardOre;
+            if (m.rewardEssence) player.essence += m.rewardEssence;
+
+            // Doubler les exigences et récompenses pour le cycle suivant
+            m.target *= 2;
+            m.current = 0;
+            m.rewardGold *= 2;
+            if (m.rewardOre) m.rewardOre *= 2;
+            if (m.rewardEssence) m.rewardEssence *= 2;
+            m.tier++;
+
+            renderMissionsUI();
+            updateUI();
+            saveGame();
+        }
+
+        /* UI STATS & GESTION */
+        function updateStatsUI() {
+            document.getElementById('stat-points-val').textContent = player.statPoints;
+            document.getElementById('stat-val-str').textContent = player.stats.str;
+            document.getElementById('stat-val-end').textContent = player.stats.end;
+            document.getElementById('stat-val-res').textContent = player.stats.res;
+            document.getElementById('stat-val-agi').textContent = player.stats.agi;
+            document.getElementById('stat-val-vig').textContent = player.stats.vig;
+
+            let stats = calculatePlayerStats();
+            document.getElementById('total-atk').textContent = Math.floor(stats.atk);
+            document.getElementById('total-def').textContent = Math.floor(stats.def);
+            document.getElementById('total-dodge').textContent = stats.dodge.toFixed(1) + '%';
+            document.getElementById('total-lifesteal').textContent = stats.lifesteal.toFixed(1) + '%';
+        }
+
+        function renderStatsUI() {
+            updateStatsUI();
         }
 
         /* RENDU UI & INVENTAIRE */
@@ -1262,6 +1240,7 @@
 
             renderEquippedSlots();
             renderInventory();
+            if (currentTab === 'tab-stats') updateStatsUI();
         }
 
         function updateMonsterUI() {
@@ -1269,13 +1248,6 @@
             document.getElementById('monster-name').textContent = currentMonster.name;
             document.getElementById('monster-hp-fill').style.width = (currentMonster.hp / currentMonster.hpMax * 100) + '%';
             document.getElementById('monster-hp-text').textContent = `${Math.floor(currentMonster.hp)} / ${currentMonster.hpMax}`;
-        }
-
-        function updateComboUI() {
-            document.getElementById('combo-count').textContent = player.comboPoints;
-            const pips = document.querySelectorAll('.combo-pip');
-            pips.forEach((pip, idx) => pip.classList.toggle('active', idx < player.comboPoints));
-            document.getElementById('finisher-btn').disabled = (player.comboPoints < 5);
         }
 
         function renderEquippedSlots() {
@@ -1315,13 +1287,11 @@
                     lock.textContent = '🔒';
                     el.appendChild(lock);
                 }
-
                 el.onclick = () => openCompareModal(index);
                 grid.appendChild(el);
             });
         }
 
-        /* MODAL DE COMPARISON & ACTIONS D'INVENTAIRE */
         function openCompareModal(index) {
             selectedInvItemIndex = index;
             const newItem = player.inventory[index];
@@ -1329,12 +1299,12 @@
 
             document.getElementById('comp-new-name').textContent = newItem.name + (newItem.upgradeLevel ? ` (+${newItem.upgradeLevel})` : '');
             renderStatComparisonCard('comp-new-stats', newItem, equippedItem);
-            
+
             if (equippedItem) {
                 document.getElementById('comp-eq-name').textContent = equippedItem.name + (equippedItem.upgradeLevel ? ` (+${equippedItem.upgradeLevel})` : '');
                 renderStatComparisonCard('comp-eq-stats', equippedItem, null);
             } else {
-                document.getElementById('comp-eq-name').textContent = "Aucun (Vide)";
+                document.getElementById('comp-eq-name').textContent = "Vide";
                 document.getElementById('comp-eq-stats').innerHTML = "<div class='stat-neutral'>Emplacement vide</div>";
             }
 
@@ -1356,23 +1326,19 @@
         function renderStatComparisonCard(containerId, item, compareAgainstItem) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-
             const stats = ['atk', 'def', 'hp'];
             const labels = { atk: 'ATK', def: 'DEF', hp: 'PV' };
 
             stats.forEach(st => {
                 const val = item[st] || 0;
                 let diffHtml = '';
-
                 if (compareAgainstItem) {
                     const compVal = compareAgainstItem[st] || 0;
                     const diff = val - compVal;
-
                     if (diff > 0) diffHtml = `<span class="stat-gain">(+${diff})</span>`;
                     else if (diff < 0) diffHtml = `<span class="stat-loss">(${diff})</span>`;
                     else diffHtml = `<span class="stat-neutral">(=)</span>`;
                 }
-
                 const line = document.createElement('div');
                 line.className = 'stat-line';
                 line.innerHTML = `<span>${labels[st]}: +${val}</span> ${diffHtml}`;
@@ -1383,11 +1349,9 @@
         function equipSelectedItem() {
             if (selectedInvItemIndex === null) return;
             const newItem = player.inventory[selectedInvItemIndex];
-
             if (newItem.reqClass && newItem.reqClass !== player.classKey) return;
 
             const currentEquipped = player.equipped[newItem.slot];
-
             player.equipped[newItem.slot] = newItem;
             player.inventory.splice(selectedInvItemIndex, 1);
             if (currentEquipped) player.inventory.push(currentEquipped);
@@ -1419,11 +1383,9 @@
             saveGame();
         }
 
-        /* UI FORGE (OPTION 1) */
         function renderForgeUI() {
             document.getElementById('forge-ore-text').textContent = player.ore;
             document.getElementById('forge-essence-text').textContent = player.essence;
-
             const container = document.getElementById('forge-equipped-list');
             container.innerHTML = '';
 
@@ -1431,16 +1393,11 @@
                 const item = player.equipped[slotKey];
                 if (item) {
                     const row = document.createElement('div');
-                    row.className = 'quest-card';
+                    row.className = 'mission-card';
                     const upLvl = item.upgradeLevel || 0;
                     row.innerHTML = `
-                        <div>
-                            <b>${item.name}</b> (${slotKey.toUpperCase()})<br>
-                            <span style="color:var(--accent-gold);">Niveau +${upLvl}</span>
-                        </div>
-                        <button class="btn-prime" style="padding:4px 8px; font-size:0.65rem;" ${upLvl >= 10 ? 'disabled' : ''}>
-                            Améliorer (10 ⛏️)
-                        </button>
+                        <div><b>${item.name}</b> (${slotKey.toUpperCase()})<br><span style="color:var(--accent-gold);">Niveau +${upLvl}</span></div>
+                        <button class="btn-prime" style="padding:4px 8px; font-size:0.65rem;" ${upLvl >= 10 ? 'disabled' : ''}>Améliorer (10 ⛏️)</button>
                     `;
                     row.querySelector('button').onclick = () => upgradeItem(slotKey);
                     container.appendChild(row);
@@ -1451,48 +1408,29 @@
         function upgradeItem(slotKey) {
             const item = player.equipped[slotKey];
             if (!item || player.ore < 10) return;
-
             player.ore -= 10;
             item.upgradeLevel = (item.upgradeLevel || 0) + 1;
-            player.quests.upgrades++;
-
             renderForgeUI();
             updateUI();
             saveGame();
         }
 
-        /* SUCCÈS & BESTIAIRE (OPTION 4) */
-        function renderQuestsAndBestiary() {
-            const qContainer = document.getElementById('quests-container');
-            qContainer.innerHTML = `
-                <div class="quest-card ${player.quests.kills >= 50 ? 'quest-completed' : ''}">
-                    <div>Chasseur: Tuer 50 Monstres (${player.quests.kills}/50)</div>
-                    <div style="color:var(--accent-gold);">+10% Or</div>
-                </div>
-                <div class="quest-card ${player.quests.upgrades >= 5 ? 'quest-completed' : ''}">
-                    <div>Maniement de Forge: 5 Améliorations (${player.quests.upgrades}/5)</div>
-                    <div style="color:var(--accent-gold);">+5% Dégâts</div>
-                </div>
-            `;
+        function renderCodexUI() {
+            const container = document.getElementById('bestiary-container');
+            container.innerHTML = '';
+            const monstersList = ["Garde Étage 1", "Boss Étage 1", "Garde Étage 2", "Boss Étage 2", "Garde Étage 3", "Boss Étage 3"];
 
-            const bContainer = document.getElementById('bestiary-container');
-            bContainer.innerHTML = '';
-            Object.keys(player.bestiary).forEach(k => {
+            monstersList.forEach(mName => {
+                let kills = player.bestiary[mName] || 0;
+                let masteryTier = kills >= 50 ? 'Maîtrise Maximale (Bonus Actif)' : (kills >= 20 ? 'Palier II (10% ATK)' : (kills >= 5 ? 'Palier I (5% PV)' : 'Non maîtrisé'));
                 const row = document.createElement('div');
                 row.className = 'bestiary-card';
-                row.innerHTML = `<span>${k}</span> <span>Vaincus: <b>${player.bestiary[k]}</b></span>`;
-                bContainer.appendChild(row);
+                row.innerHTML = `
+                    <div style="font-weight:800; color:var(--accent-gold);">${mName}</div>
+                    <div style="color:var(--text-muted);">Vaincus : ${kills} | Maîtrise : ${masteryTier}</div>
+                `;
+                container.appendChild(row);
             });
-        }
-
-        function reincarnate() {
-            player.souls += player.floor * 10;
-            player.floor = 1;
-            player.subFloor = 1;
-            player.classKey = null;
-            document.getElementById('class-select-modal').style.display = 'flex';
-            updateUI();
-            saveGame();
         }
 
         function showFloatingText(text, color, isPlayer = false) {
@@ -1502,12 +1440,10 @@
             el.style.color = color;
             el.style.left = isPlayer ? '25%' : '50%';
             el.style.top = isPlayer ? '65%' : '30%';
-
             document.getElementById('arena-container').appendChild(el);
             setTimeout(() => el.remove(), 800);
         }
 
-        /* SAUVEGARDE & CHARGEMENT AUTOMATIQUE */
         function saveGame() {
             localStorage.setItem('la_tour_100_save', JSON.stringify(player));
         }
@@ -1522,7 +1458,7 @@
                         document.getElementById('class-select-modal').style.display = 'none';
                         spawnMonster();
                     }
-                } catch(e) { console.error("Échec du chargement", e); }
+                } catch(e) { console.error("Erreur chargement sauvegarde", e); }
             }
         }
     </script>
