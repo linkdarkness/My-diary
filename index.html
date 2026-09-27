@@ -7,14 +7,15 @@
     <style>
         :root {
             --bg-main: #05070b;
-            --bg-card: rgba(18, 22, 34, 0.85);
-            --bg-card-hover: rgba(28, 34, 52, 0.9);
+            --bg-card: rgba(18, 22, 34, 0.88);
+            --bg-card-hover: rgba(28, 34, 52, 0.95);
             --accent-gold: #f1c40f;
             --accent-gold-glow: rgba(241, 196, 15, 0.4);
             --accent-red: #e74c3c;
             --accent-green: #2ecc71;
             --accent-purple: #9b59b6;
             --accent-cyan: #00f2fe;
+            --accent-orange: #e67e22;
             --text-main: #f0f4f8;
             --text-muted: #7f8c8d;
             --border-color: #232b3e;
@@ -33,13 +34,12 @@
             margin: 0;
             padding: 0;
             user-select: none;
-            -webkit-user-select: none;
             font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
             background-color: var(--bg-main);
-            background-image: radial-gradient(circle at 50% 20%, #151a28 0%, #05070b 80%);
+            background-image: radial-gradient(circle at 50% 20%, #151a28 0%, #05070b 85%);
             color: var(--text-main);
             display: flex;
             justify-content: center;
@@ -50,10 +50,10 @@
 
         #app-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             height: 100vh;
-            max-height: 920px;
-            background: rgba(10, 12, 18, 0.95);
+            max-height: 940px;
+            background: rgba(10, 12, 18, 0.96);
             backdrop-filter: blur(16px);
             display: flex;
             flex-direction: column;
@@ -63,26 +63,23 @@
             border-right: 1px solid var(--border-color);
         }
 
-        /* HEADER & BARRES DE STATS */
+        /* HEADER */
         header {
-            background: linear-gradient(180deg, rgba(20, 25, 40, 0.95) 0%, rgba(12, 15, 24, 0.95) 100%);
-            padding: 12px 16px;
+            background: linear-gradient(180deg, rgba(20, 25, 40, 0.98) 0%, rgba(12, 15, 24, 0.98) 100%);
+            padding: 10px 14px;
             border-bottom: 2px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 10;
         }
 
-        .hero-banner {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .hero-banner { display: flex; align-items: center; gap: 10px; }
 
         .class-avatar-small {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: radial-gradient(circle, #222b3e 0%, #0d111a 100%);
             border: 2px solid var(--accent-gold);
@@ -90,15 +87,10 @@
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
-            box-shadow: 0 0 15px var(--accent-gold-glow);
+            box-shadow: 0 0 12px var(--accent-gold-glow);
         }
 
-        .class-avatar-small svg {
-            width: 32px;
-            height: 32px;
-            fill: var(--accent-gold);
-            filter: drop-shadow(0 0 4px rgba(241, 196, 15, 0.6));
-        }
+        .class-avatar-small svg { width: 28px; height: 28px; fill: var(--accent-gold); }
 
         .hero-info { flex-grow: 1; }
 
@@ -107,36 +99,30 @@
             justify-content: space-between;
             align-items: center;
             font-weight: 800;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
+            font-size: 1rem;
         }
 
         .level-badge {
             background: linear-gradient(135deg, #f1c40f, #d4ac0d);
             color: #000;
-            font-size: 0.75rem;
-            padding: 2px 8px;
+            font-size: 0.7rem;
+            padding: 2px 7px;
             border-radius: 12px;
             font-weight: 900;
-            box-shadow: 0 2px 6px rgba(241, 196, 15, 0.3);
         }
 
         .bar-container {
             width: 100%;
-            height: 12px;
+            height: 11px;
             background-color: #090b10;
             border-radius: 6px;
             overflow: hidden;
-            margin-top: 4px;
+            margin-top: 3px;
             position: relative;
             border: 1px solid rgba(255,255,255,0.08);
         }
 
-        .bar-fill {
-            height: 100%;
-            transition: width 0.25s ease-out;
-        }
-
+        .bar-fill { height: 100%; transition: width 0.25s ease-out; }
         .hp-fill { background: linear-gradient(90deg, #c0392b, #e74c3c, #ff6b6b); }
         .xp-fill { background: linear-gradient(90deg, #27ae60, #2ecc71, #1abc9c); }
 
@@ -145,54 +131,55 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 800;
             text-shadow: 1px 1px 3px #000;
-            letter-spacing: 0.5px;
         }
 
         .resources-bar {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             background: rgba(0, 0, 0, 0.4);
-            padding: 8px;
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-weight: 800;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .res-item { display: flex; align-items: center; gap: 6px; }
+        .res-item { display: flex; align-items: center; gap: 4px; }
 
         /* NAVIGATION */
         nav {
             display: flex;
             background-color: #080a0f;
             border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
         }
 
         .nav-btn {
             flex: 1;
-            padding: 12px 4px;
+            min-width: 70px;
+            padding: 8px 4px;
             background: none;
             border: none;
             color: var(--text-muted);
             font-weight: 800;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
+            white-space: nowrap;
         }
 
         .nav-btn.active {
             color: var(--accent-gold);
             border-bottom-color: var(--accent-gold);
             background: linear-gradient(180deg, rgba(241, 196, 15, 0.08) 0%, transparent 100%);
-            text-shadow: 0 0 10px var(--accent-gold-glow);
         }
 
         /* CONTENU DES ONGLETS */
@@ -208,69 +195,54 @@
             display: none;
             flex-direction: column;
             height: 100%;
-            padding: 12px;
-            gap: 12px;
+            padding: 10px;
+            gap: 10px;
             overflow-y: auto;
         }
 
         .tab-content.active { display: flex; }
 
-        /* PAUSE BANNER */
         .pause-banner {
             background: rgba(231, 76, 60, 0.15);
             border: 1px solid var(--accent-red);
             color: var(--accent-red);
             text-align: center;
-            padding: 8px;
-            font-size: 0.75rem;
+            padding: 6px;
+            font-size: 0.7rem;
             font-weight: 800;
-            border-radius: 8px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
-            animation: pulseBanner 2s infinite alternate;
+            border-radius: 6px;
         }
 
-        @keyframes pulseBanner {
-            0% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
-
-        /* ONGLET COMBAT */
+        /* COMBAT & ARENE */
         .floor-header {
             text-align: center;
             background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.12), transparent);
-            padding: 8px;
-            border-radius: 8px;
+            padding: 6px;
+            border-radius: 6px;
         }
 
         .floor-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: var(--accent-gold);
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px var(--accent-gold-glow);
         }
 
-        .subfloor-badge {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 700;
-        }
+        .subfloor-badge { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; }
 
         .combat-arena {
             flex-grow: 1;
             background: radial-gradient(circle at center, #182030 0%, #080a0f 100%);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 10px;
+            padding: 15px 10px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            min-height: 250px;
         }
 
         .monster-card {
@@ -278,170 +250,139 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            gap: 12px;
+            gap: 8px;
             cursor: pointer;
         }
 
         .monster-sprite-container {
             position: relative;
-            width: 130px;
-            height: 130px;
+            width: 100px;
+            height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .monster-sprite {
-            width: 100px;
-            height: 100px;
-            filter: drop-shadow(0 0 20px rgba(231, 76, 60, 0.6));
+            width: 85px;
+            height: 85px;
+            filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.6));
             transition: transform 0.1s ease;
         }
 
-        .monster-card:active .monster-sprite { transform: scale(0.92); }
-
         .monster-name {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 900;
             color: var(--accent-red);
-            text-shadow: 0 0 12px rgba(231, 76, 60, 0.6);
-            letter-spacing: 0.5px;
-        }
-
-        .monster-attack-bar {
-            width: 80%;
-            height: 6px;
-            background-color: #0b0d14;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 4px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .monster-attack-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #f39c12, #e67e22);
-            width: 0%;
         }
 
         .floating-text {
             position: absolute;
             font-weight: 900;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             pointer-events: none;
             animation: floatUp 0.8s ease-out forwards;
-            text-shadow: 2px 2px 6px #000, 0 0 10px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 6px #000;
             z-index: 100;
         }
 
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            50% { opacity: 1; transform: translateY(-35px) scale(1.25); }
-            100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
         }
 
         .combo-container {
             width: 100%;
             background: rgba(10, 13, 20, 0.8);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        .combo-pips { display: flex; gap: 10px; }
+        .combo-pips { display: flex; gap: 8px; }
 
         .combo-pip {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #151a26;
             border: 2px solid #2d384e;
-            transition: all 0.25s ease;
         }
 
         .combo-pip.active {
             background: var(--accent-gold);
-            box-shadow: 0 0 12px var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-gold);
             border-color: #fff;
         }
 
         .finisher-btn {
             width: 100%;
-            padding: 12px;
+            padding: 8px;
             background: linear-gradient(135deg, #e67e22, #d35400);
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             color: #fff;
             font-weight: 900;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.5);
-            transition: all 0.2s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .finisher-btn:disabled {
-            background: #1f2736;
-            color: #4a586e;
-            box-shadow: none;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
+        .finisher-btn:disabled { background: #1f2736; color: #4a586e; cursor: not-allowed; }
 
         .btn-action {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 800;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.1s ease, background 0.2s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
-        .btn-action:active { transform: scale(0.98); }
         .btn-auto { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
         .btn-auto.paused { background: linear-gradient(135deg, #c0392b, #e74c3c); }
 
-        /* ONGLET ÉQUIPEMENT & SILHOUETTE */
+        /* ÉQUIPEMENT REDESSINÉ (PANNEAU PARFAITEMENT ALIGNÉ) */
+        .equipment-layout-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .equip-grid-container {
             position: relative;
             width: 100%;
-            height: 390px;
+            height: 320px;
             background: radial-gradient(circle, #161c2a 0%, #080a0f 100%);
-            border-radius: 14px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
         }
 
         .silhouette-bg {
             position: absolute;
-            height: 85%;
-            opacity: 0.15;
+            height: 80%;
+            opacity: 0.12;
             pointer-events: none;
         }
 
+        /* 9 EMPLACEMENTS ANATOMIQUES RECTIFIÉS ET PROPRES */
         .equip-slot {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(15, 18, 28, 0.9);
+            width: 52px;
+            height: 52px;
+            background: rgba(15, 18, 28, 0.95);
             border: 2px dashed #2d384e;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -449,56 +390,59 @@
             transition: all 0.2s ease;
         }
 
-        .equip-slot.has-item {
-            border-style: solid;
-            background: rgba(22, 28, 44, 0.95);
-        }
-
-        .equip-slot svg { width: 32px; height: 32px; fill: #4a586e; }
+        .equip-slot.has-item { border-style: solid; background: rgba(22, 28, 44, 0.95); }
+        .equip-slot svg { width: 26px; height: 26px; fill: #4a586e; }
         .equip-slot.has-item svg { fill: #fff; }
 
-        /* Ancrages sur Silhouette */
-        .slot-head { top: 15px; left: calc(50% - 30px); }
-        .slot-amulet { top: 88px; left: calc(50% - 30px); }
-        .slot-chest { top: 160px; left: calc(50% - 30px); }
-        .slot-mainhand { top: 125px; left: 18px; }
-        .slot-offhand { top: 125px; right: 18px; }
-        .slot-gloves { top: 200px; left: 18px; }
-        .slot-ring1 { top: 200px; right: 18px; }
-        .slot-ring2 { bottom: 68px; right: 18px; }
-        .slot-boots { bottom: 15px; left: calc(50% - 30px); }
+        .slot-head { top: 10px; left: calc(50% - 26px); }
+        .slot-amulet { top: 70px; left: calc(50% - 26px); }
+        .slot-chest { top: 130px; left: calc(50% - 26px); }
+        .slot-boots { bottom: 10px; left: calc(50% - 26px); }
 
-        /* RARITÉS ET EFFETS LUMINEUX */
-        .rarity-Commun { border-color: var(--rarity-commun) !important; }
-        .rarity-Rare { border-color: var(--rarity-rare) !important; box-shadow: 0 0 10px rgba(52, 152, 219, 0.4); }
-        .rarity-Épique { border-color: var(--rarity-epique) !important; box-shadow: 0 0 12px rgba(155, 89, 182, 0.5); }
-        .rarity-Légendaire { border-color: var(--rarity-legendaire) !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.6); }
-        .rarity-Mythique { border-color: var(--rarity-mythique) !important; box-shadow: 0 0 18px rgba(231, 76, 60, 0.8); animation: pulseMythic 1.5s infinite alternate; }
-        .rarity-Set { border-color: var(--rarity-set) !important; box-shadow: 0 0 15px rgba(0, 242, 254, 0.7); }
+        .slot-mainhand { top: 100px; left: 15px; }
+        .slot-gloves { top: 165px; left: 15px; }
 
-        @keyframes pulseMythic {
-            0% { box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); }
-            100% { box-shadow: 0 0 22px rgba(231, 76, 60, 1); }
+        .slot-offhand { top: 100px; right: 15px; }
+        .slot-ring1 { top: 165px; right: 15px; }
+        .slot-ring2 { bottom: 25px; right: 15px; }
+
+        .item-upgrade-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 1px 4px;
+            border-radius: 4px;
         }
+
+        /* RARITÉS ET GAINS LUMINEUX */
+        .rarity-Commun { border-color: var(--rarity-commun) !important; }
+        .rarity-Rare { border-color: var(--rarity-rare) !important; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
+        .rarity-Épique { border-color: var(--rarity-epique) !important; box-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
+        .rarity-Légendaire { border-color: var(--rarity-legendaire) !important; box-shadow: 0 0 12px rgba(241, 196, 15, 0.6); }
+        .rarity-Mythique { border-color: var(--rarity-mythique) !important; box-shadow: 0 0 14px rgba(231, 76, 60, 0.8); }
+        .rarity-Set { border-color: var(--rarity-set) !important; box-shadow: 0 0 12px rgba(0, 242, 254, 0.7); }
 
         .inventory-section {
             background: var(--bg-card);
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 10px;
+            padding: 10px;
             border: 1px solid var(--border-color);
-            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            max-height: 170px;
+            gap: 6px;
+            max-height: 160px;
             overflow-y: auto;
-            padding: 4px;
+            padding: 2px;
         }
 
         .inv-item {
@@ -506,28 +450,56 @@
             aspect-ratio: 1;
             background: #0d1017;
             border: 2px solid #232b3e;
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             position: relative;
-            transition: transform 0.15s ease;
         }
 
-        .inv-item:hover { transform: scale(1.05); }
-        .inv-item svg { width: 28px; height: 28px; fill: #fff; }
+        .inv-item svg { width: 24px; height: 24px; fill: #fff; }
 
         .lock-badge {
             position: absolute;
-            top: 2px;
-            right: 2px;
+            top: 1px;
+            left: 1px;
             background: rgba(231, 76, 60, 0.9);
             color: #fff;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             padding: 1px 3px;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        /* FORGE & ARTISANAT */
+        .forge-panel {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .materials-counter {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .forge-action-card {
+            background: #090b10;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         /* MODALS & OVERLAYS */
@@ -543,23 +515,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 12px;
         }
 
         .modal-content {
             background: rgba(16, 20, 30, 0.98);
             border: 2px solid var(--accent-gold);
-            border-radius: 14px;
+            border-radius: 12px;
             width: 100%;
             max-height: 90vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.95), 0 0 15px var(--accent-gold-glow);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
         }
 
         .modal-header {
-            padding: 14px 18px;
+            padding: 12px 14px;
             background: linear-gradient(180deg, rgba(28, 35, 52, 0.95) 0%, rgba(18, 22, 34, 0.95) 100%);
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -567,50 +539,36 @@
             align-items: center;
         }
 
-        .modal-title {
-            font-size: 1.15rem;
-            color: var(--accent-gold);
-            font-weight: 900;
-            letter-spacing: 0.5px;
-        }
+        .modal-title { font-size: 1rem; color: var(--accent-gold); font-weight: 900; }
 
         .modal-body {
-            padding: 16px;
+            padding: 12px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-
-        .class-selection-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
+
+        .class-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
         .class-select-card {
             background: #0b0d14;
             border: 2px solid #232b3e;
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-align: center;
         }
 
-        .class-select-card:hover {
-            border-color: var(--accent-gold);
-            background: rgba(241, 196, 15, 0.08);
-            transform: translateY(-2px);
-        }
+        .class-select-card:hover { border-color: var(--accent-gold); background: rgba(241, 196, 15, 0.08); }
 
         .class-card-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: #182030;
             display: flex;
@@ -619,37 +577,30 @@
             border: 1px solid var(--accent-gold);
         }
 
-        .class-card-icon svg { width: 28px; height: 28px; fill: var(--accent-gold); }
+        .class-card-icon svg { width: 22px; height: 22px; fill: var(--accent-gold); }
 
-        .class-card-title { font-weight: 800; font-size: 0.9rem; color: #fff; }
-        .class-card-desc { font-size: 0.65rem; color: var(--text-muted); line-height: 1.2; }
-
-        /* COMPARATEUR D'ÉQUIPEMENT DYNAMIQUE */
-        .item-compare-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        /* COMPARATEUR D'ÉQUIPEMENT AMÉLIORÉ AVEC CHOIX D'ACTIONS */
+        .item-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
         .item-card-detail {
             background: #090b10;
-            border: 2px solid #232b3e;
-            border-radius: 10px;
-            padding: 12px;
+            border: 1px solid #232b3e;
+            border-radius: 8px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            font-size: 0.75rem;
+            gap: 6px;
+            font-size: 0.72rem;
         }
 
-        .item-name { font-weight: 800; font-size: 0.85rem; line-height: 1.2; }
-        .set-title-tag { color: var(--accent-cyan); font-weight: bold; font-size: 0.7rem; }
+        .item-name { font-weight: 800; font-size: 0.8rem; }
+        .set-title-tag { color: var(--accent-cyan); font-weight: bold; font-size: 0.65rem; }
 
         .stat-line {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 3px 0;
+            padding: 2px 0;
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
 
@@ -657,78 +608,46 @@
         .stat-loss { color: var(--accent-red); font-weight: 800; }
         .stat-neutral { color: var(--text-muted); }
 
-        .class-req-banner {
-            background: rgba(231, 76, 60, 0.15);
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-align: center;
+        .compare-actions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
         }
 
+        .btn-action-group { display: flex; gap: 6px; }
+
         .btn-prime {
-            padding: 12px;
+            flex: 1;
+            padding: 10px;
             background: linear-gradient(135deg, #f1c40f, #d4ac0d);
             color: #000;
             font-weight: 900;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 0.78rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
-            transition: all 0.2s ease;
         }
 
-        .btn-prime:disabled {
-            background: #232b3e;
-            color: #58667e;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+        .btn-prime:disabled { background: #232b3e; color: #58667e; cursor: not-allowed; }
 
-        /* TALENTS & SANCTUAIRE */
-        .talents-header {
+        .btn-sell { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
+        .btn-recycle { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; }
+
+        /* SUCCÈS & BESTIAIRE */
+        .quest-card, .bestiary-card {
+            background: #090b10;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-card);
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            font-size: 0.75rem;
         }
 
-        .talent-branch {
-            background: rgba(16, 20, 30, 0.85);
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .branch-title { font-size: 0.9rem; color: var(--accent-gold); font-weight: 800; }
-        .branch-nodes { display: flex; gap: 10px; }
-
-        .talent-node {
-            flex: 1;
-            height: 70px;
-            background: #090b10;
-            border: 2px solid #232b3e;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            font-size: 0.65rem;
-            text-align: center;
-        }
-
-        .talent-node.unlocked { border-color: var(--accent-green); background: rgba(46, 204, 113, 0.1); }
+        .quest-completed { border-color: var(--accent-green); background: rgba(46, 204, 113, 0.08); }
     </style>
 </head>
 <body>
@@ -755,16 +674,18 @@
             </div>
             <div class="resources-bar">
                 <div class="res-item">🪙 <span id="res-gold">0</span></div>
+                <div class="res-item">⛏️ <span id="res-ore">0</span></div>
+                <div class="res-item">✨ <span id="res-essence">0</span></div>
                 <div class="res-item">🔮 <span id="res-souls">0</span></div>
-                <div class="res-item">⚔️ CP: <span id="res-cp">0</span></div>
             </div>
         </header>
 
-        <!-- ONGLETS DE NAVIGATION -->
+        <!-- NAVIGATION DE L'APPLICATION -->
         <nav>
             <button class="nav-btn active" data-tab="tab-combat">⚔️ Combat</button>
             <button class="nav-btn" data-tab="tab-equipement">🛡️ Équipement</button>
-            <button class="nav-btn" data-tab="tab-talents">📜 Talents</button>
+            <button class="nav-btn" data-tab="tab-forge">⚒️ Forge</button>
+            <button class="nav-btn" data-tab="tab-succes">🏆 Succès</button>
             <button class="nav-btn" data-tab="tab-sanctuaire">⛩️ Sanctuaire</button>
         </nav>
 
@@ -779,12 +700,12 @@
 
                 <div class="combat-arena" id="arena-container">
                     <div class="monster-card" id="monster-click-zone">
-                        <div class="monster-name" id="monster-name">Gobelin Malingre</div>
+                        <div class="monster-name" id="monster-name">Monstre</div>
                         <div class="monster-sprite-container">
                             <svg class="monster-sprite" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="40" fill="#2ecc71" />
-                                <circle cx="35" cy="40" r="8" fill="#fff" />
-                                <circle cx="65" cy="40" r="8" fill="#fff" />
+                                <circle cx="35" cy="40" r="7" fill="#fff" />
+                                <circle cx="65" cy="40" r="7" fill="#fff" />
                                 <circle cx="35" cy="40" r="3" fill="#000" />
                                 <circle cx="65" cy="40" r="3" fill="#000" />
                                 <path d="M 30 70 Q 50 80 70 70" stroke="#000" stroke-width="4" fill="none" />
@@ -794,13 +715,10 @@
                             <div class="bar-fill hp-fill" id="monster-hp-fill" style="width: 100%;"></div>
                             <div class="bar-text" id="monster-hp-text">100 / 100</div>
                         </div>
-                        <div class="monster-attack-bar">
-                            <div class="monster-attack-fill" id="monster-atk-fill"></div>
-                        </div>
                     </div>
 
                     <div class="combo-container">
-                        <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">
+                        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800;">
                             COMBOS DE CLASSE (<span id="combo-count">0</span>/5)
                         </div>
                         <div class="combo-pips">
@@ -814,60 +732,80 @@
                     </div>
                 </div>
 
-                <div class="combat-controls">
-                    <button class="btn-action btn-auto" id="btn-auto-toggle">▶️ COMBAT AUTO : ACTIF</button>
-                </div>
+                <button class="btn-action btn-auto" id="btn-auto-toggle">▶️ COMBAT AUTO : ACTIF</button>
             </div>
 
-            <!-- ÉQUIPEMENT & INVENTAIRE -->
+            <!-- ÉQUIPEMENT & INVENTAIRE (PANNEAU PARFAITEMENT ALIGNÉ) -->
             <div class="tab-content" id="tab-equipement">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
 
-                <div class="equip-grid-container">
-                    <svg class="silhouette-bg" viewBox="0 0 100 200">
-                        <path d="M 50 10 C 60 10 65 20 65 30 C 65 40 60 45 50 45 C 40 45 35 40 35 30 C 35 20 40 10 50 10 Z
-                                 M 30 50 L 70 50 L 80 90 L 70 140 L 60 140 L 60 190 L 40 190 L 40 140 L 30 140 L 20 90 Z" fill="#ffffff" />
-                    </svg>
+                <div class="equipment-layout-container">
+                    <div class="equip-grid-container">
+                        <svg class="silhouette-bg" viewBox="0 0 100 200">
+                            <path d="M 50 10 C 60 10 65 20 65 30 C 65 40 60 45 50 45 C 40 45 35 40 35 30 C 35 20 40 10 50 10 Z
+                                     M 30 50 L 70 50 L 80 90 L 70 140 L 60 140 L 60 190 L 40 190 L 40 140 L 30 140 L 20 90 Z" fill="#ffffff" />
+                        </svg>
 
-                    <div class="equip-slot slot-head" data-slot="head"></div>
-                    <div class="equip-slot slot-amulet" data-slot="amulet"></div>
-                    <div class="equip-slot slot-chest" data-slot="chest"></div>
-                    <div class="equip-slot slot-mainhand" data-slot="mainhand"></div>
-                    <div class="equip-slot slot-offhand" data-slot="offhand"></div>
-                    <div class="equip-slot slot-gloves" data-slot="gloves"></div>
-                    <div class="equip-slot slot-ring1" data-slot="ring1"></div>
-                    <div class="equip-slot slot-ring2" data-slot="ring2"></div>
-                    <div class="equip-slot slot-boots" data-slot="boots"></div>
-                </div>
-
-                <div class="inventory-section">
-                    <div style="font-weight: 800; font-size: 0.85rem; display: flex; justify-content: space-between;">
-                        <span>SAC À DOS</span>
-                        <span id="inv-capacity">0 / 20</span>
+                        <!-- 9 EMPLACEMENTS ANATOMIQUES UNIQUES -->
+                        <div class="equip-slot slot-head" data-slot="head"></div>
+                        <div class="equip-slot slot-amulet" data-slot="amulet"></div>
+                        <div class="equip-slot slot-chest" data-slot="chest"></div>
+                        <div class="equip-slot slot-mainhand" data-slot="mainhand"></div>
+                        <div class="equip-slot slot-offhand" data-slot="offhand"></div>
+                        <div class="equip-slot slot-gloves" data-slot="gloves"></div>
+                        <div class="equip-slot slot-ring1" data-slot="ring1"></div>
+                        <div class="equip-slot slot-ring2" data-slot="ring2"></div>
+                        <div class="equip-slot slot-boots" data-slot="boots"></div>
                     </div>
-                    <div class="inventory-grid" id="inventory-grid"></div>
+
+                    <div class="inventory-section">
+                        <div style="font-weight: 800; font-size: 0.8rem; display: flex; justify-content: space-between;">
+                            <span>SAC À DOS</span>
+                            <span id="inv-capacity">0 / 20</span>
+                        </div>
+                        <div class="inventory-grid" id="inventory-grid"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- TALENTS -->
-            <div class="tab-content" id="tab-talents">
+            <!-- FORGE & ARTISANAT (OPTION 1) -->
+            <div class="tab-content" id="tab-forge">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
-                <div class="talents-header">
-                    <div>Points de Talents: <b id="talent-pts" style="color: var(--accent-gold);">0</b></div>
-                    <button class="btn-prime" id="btn-reset-talents" style="padding: 6px 12px; font-size: 0.75rem;">Réinitialiser</button>
+                <div class="forge-panel">
+                    <div class="materials-counter">
+                        <div>⛏️ Minerai: <b id="forge-ore-text">0</b></div>
+                        <div>✨ Essence: <b id="forge-essence-text">0</b></div>
+                    </div>
+
+                    <div class="forge-action-card">
+                        <div style="font-weight: 800; color: var(--accent-gold);">🔨 Améliorer un équipement (+1 à +10)</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">
+                            Sélectionnez un objet équipé pour augmenter ses caractéristiques de +15% par niveau d'amélioration.
+                        </div>
+                        <div id="forge-equipped-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
                 </div>
-                <div class="talent-tree-container" id="talent-tree-render"></div>
+            </div>
+
+            <!-- SUCCÈS & BESTIAIRE (OPTION 4) -->
+            <div class="tab-content" id="tab-succes">
+                <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
+                <div style="font-weight: 800; color: var(--accent-gold); margin-bottom: 4px;">🏆 Trophées & Quêtes</div>
+                <div id="quests-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
+
+                <div style="font-weight: 800; color: var(--accent-red); margin-top: 10px; margin-bottom: 4px;">📖 Bestiaire de la Tour</div>
+                <div id="bestiary-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
 
             <!-- SANCTUAIRE -->
             <div class="tab-content" id="tab-sanctuaire">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
-                <div class="talent-branch" style="text-align: center; padding: 20px;">
-                    <h3 style="color: var(--accent-purple); margin-bottom: 10px;">Sanctuaire des Âmes</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
-                        Réincarnez-vous pour obtenir des Âmes Célestes permanentes.
+                <div style="text-align: center; padding: 20px;" class="forge-action-card">
+                    <h3 style="color: var(--accent-purple);">Sanctuaire des Âmes</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: 10px 0;">
+                        Réincarnez-vous pour acquérir des Âmes Célestes.
                     </p>
-                    <button class="btn-prime" id="btn-reincarnate" style="background: var(--accent-purple); color: #fff; width: 100%;">
+                    <button class="btn-prime" id="btn-reincarnate" style="background: var(--accent-purple); color: #fff;">
                         🌀 Réincarnation (+<span id="souls-gained">0</span> Âmes)
                     </button>
                 </div>
@@ -879,11 +817,11 @@
     <div class="modal-overlay" id="class-select-modal" style="display: flex;">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">⚔️ Sélectionnez votre Classe</div>
+                <div class="modal-title">⚔️ Choisissez votre Classe</div>
             </div>
             <div class="modal-body">
-                <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-                    En cas de mort, vous gardez tout votre équipement mais devez repartir du niveau 1.
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                    En cas de mort, vous gardez tout votre équipement mais repartirez du niveau 1.
                 </p>
                 <div class="class-selection-grid" id="class-selection-container"></div>
             </div>
@@ -897,26 +835,36 @@
                 <div class="modal-title" style="color: var(--accent-red);">💀 MORT DU HÉROS</div>
             </div>
             <div class="modal-body" style="text-align: center;">
-                <p style="font-size: 0.95rem; color: #fff; font-weight: 800;">Votre héros est tombé au combat...</p>
-                <p style="font-size: 0.8rem; color: var(--accent-green); background: rgba(46, 204, 113, 0.12); padding: 10px; border-radius: 8px; border: 1px solid var(--accent-green);">
-                    🛡️ <b>ÉQUIPEMENT INTÉGRALEMENT CONSERVÉ !</b><br>Tout le stuff porté et dans le sac à dos reste intact.
+                <p style="font-size: 0.9rem; color: #fff; font-weight: 800;">Votre héros est tombé au combat...</p>
+                <p style="font-size: 0.75rem; color: var(--accent-green); background: rgba(46, 204, 113, 0.12); padding: 8px; border-radius: 6px;">
+                    🛡️ <b>ÉQUIPEMENT 100% CONSERVÉ !</b><br>Tout le stuff équipé et dans le sac est préservé.
                 </p>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">
-                    Niveau réinitialisé à 1 - Retour à l'Étage 1.1
-                </p>
-                <button class="btn-prime" id="btn-respawn-continue" style="background: var(--accent-red); color: #fff;">
-                    Choisir une nouvelle Classe & Continuer
+                <button class="btn-prime" id="btn-respawn-continue" style="background: var(--accent-red); color: #fff; margin-top: 8px;">
+                    Choisir une nouvelle Classe & Repartir
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL COMPARATEUR D'ÉQUIPEMENT AVEC COULEURS (+ VERT / - ROUGE) -->
+    <!-- MODAL EVENEMENT DE LA TOUR (OPTION 2) -->
+    <div class="modal-overlay" id="event-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="event-title">Salle Spéciale</div>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <p id="event-desc" style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 10px;"></p>
+                <div id="event-choices" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL COMPARATEUR D'ÉQUIPEMENT AMÉLIORÉ AVEC ACTIONS -->
     <div class="modal-overlay" id="item-compare-modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Comparatif d'Équipement</div>
-                <button id="close-item-modal" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
+                <div class="modal-title">Comparatif & Actions Objet</div>
+                <button id="close-item-modal" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
             </div>
             <div class="modal-body">
                 <div class="item-compare-grid">
@@ -926,19 +874,27 @@
                         <div id="comp-eq-stats"></div>
                     </div>
                     <div class="item-card-detail" id="compare-new-card">
-                        <div style="color: var(--accent-gold); font-weight: bold;">NOUVEAU LOOT</div>
+                        <div style="color: var(--accent-gold); font-weight: bold;">OBJET SELECTIONNÉ</div>
                         <div id="comp-new-name" class="item-name">-</div>
                         <div id="comp-new-stats"></div>
                     </div>
                 </div>
+
                 <div id="comp-class-warning"></div>
-                <button class="btn-prime" id="btn-equip-selected" style="width: 100%; margin-top: 6px;">Équiper l'Objet</button>
+
+                <div class="compare-actions-container">
+                    <button class="btn-prime" id="btn-equip-selected">🛡️ Équiper l'Objet</button>
+                    <div class="btn-action-group">
+                        <button class="btn-prime btn-sell" id="btn-sell-selected">🪙 Vendre (+<span id="sell-gold-val">0</span> Or)</button>
+                        <button class="btn-prime btn-recycle" id="btn-recycle-selected">⚒️ Recycler</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        /* ICÔNES SVG DÉDIÉES PAR EMPLACEMENT D'ÉQUIPEMENT */
+        /* ICÔNES SVG POUR EMPLACEMENTS ET LOOT */
         const ITEM_ICONS = {
             head: '<svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 0-9 9v7h18v-7a9 9 0 0 0-9-9zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>',
             amulet: '<svg viewBox="0 0 24 24"><path d="M12 2L8 8h8l-4-6zm0 8a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>',
@@ -951,33 +907,34 @@
             boots: '<svg viewBox="0 0 24 24"><path d="M19 18h-4v-8a2 2 0 0 0-2-2H5v12h14a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z"/></svg>'
         };
 
-        /* 12 CLASSES JOUABLES ET LEURS SETS D'ÉQUIPEMENT EXCLUSIFS */
         const CLASSES = {
-            guerrier: { name: "Guerrier", desc: "Tank puissant avec grosse armure.", icon: ITEM_ICONS.mainhand, baseHp: 120, baseAtk: 12, baseDef: 8, setName: "Ensemble de l'Inflexible", branches: ["Armes", "Fureur", "Protection"] },
-            voleur: { name: "Voleur", desc: "Attaques critiques et grande esquive.", icon: ITEM_ICONS.offhand, baseHp: 90, baseAtk: 16, baseDef: 3, setName: "Pâture de l'Ombre", branches: ["Assassinat", "Combat", "Finesse"] },
-            mage: { name: "Mage", desc: "Puissance magique élémentaire pure.", icon: ITEM_ICONS.amulet, baseHp: 80, baseAtk: 20, baseDef: 2, setName: "Éclipse d'Arcane", branches: ["Arcane", "Feu", "Givre"] },
-            necromancien: { name: "Nécromancien", desc: "Vol de vie et malédictions.", icon: ITEM_ICONS.head, baseHp: 95, baseAtk: 14, baseDef: 4, setName: "Restes du Liche", branches: ["Sang", "Os", "Infection"] },
-            druide: { name: "Druide", desc: "Polyvalent, soins et dégâts sauvages.", icon: ITEM_ICONS.boots, baseHp: 110, baseAtk: 11, baseDef: 6, setName: "Rituels du Sylvan", branches: ["Équilibre", "Férocité", "Restauration"] },
-            pretre: { name: "Prêtre", desc: "Boucliers sacrés et forte régen.", icon: '<svg viewBox="0 0 24 24"><path d="M10 2h4v6h6v4h-6v10h-4V12H4V8h6V2z"/></svg>', baseHp: 100, baseAtk: 10, baseDef: 5, setName: "Bénédiction Solaire", branches: ["Discipline", "Sacré", "Ombre"] },
-            paladin: { name: "Paladin", desc: "Guerrier sacré inébranlable.", icon: ITEM_ICONS.chest, baseHp: 130, baseAtk: 10, baseDef: 10, setName: "Égide de la Lumière", branches: ["Sacré", "Protection", "Rétribution"] },
-            archer: { name: "Archer", desc: "Tirs à distance et percée d'armure.", icon: '<svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4l6 12H6l6-12z"/></svg>', baseHp: 85, baseAtk: 17, baseDef: 3, setName: "Scribe des Vents", branches: ["Précision", "Bêtes", "Survie"] },
-            moine: { name: "Moine", desc: "Frappes ultra-rapides et esquive.", icon: ITEM_ICONS.ring1, baseHp: 100, baseAtk: 13, baseDef: 5, setName: "Poings de la Tempête", branches: ["Brasseur", "Brume", "Marche-Vent"] },
-            barbare: { name: "Barbare", desc: "Rage dévastatrice à bas PV.", icon: ITEM_ICONS.gloves, baseHp: 140, baseAtk: 15, baseDef: 4, setName: "Sanguinaire du Nord", branches: ["Berserker", "Frénésie", "Totem"] },
-            barde: { name: "Barde", desc: "Soutien mélodique et bonus d'or.", icon: '<svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>', baseHp: 95, baseAtk: 12, baseDef: 4, setName: "Sonate d'Harmonie", branches: ["Mélodie", "Harmonie", "Symphonie"] },
-            mendiant: { name: "Mendiant", desc: "Faible départ mais chance et loot absurde !", icon: '<svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v3H9V7z"/></svg>', baseHp: 70, baseAtk: 8, baseDef: 1, setName: "Guenilles de Fortune", branches: ["Ténacité", "Récupération", "Chance"] }
+            guerrier: { name: "Guerrier", desc: "Tank puissant.", icon: ITEM_ICONS.mainhand, baseHp: 120, baseAtk: 12, baseDef: 8, setName: "Ensemble de l'Inflexible" },
+            voleur: { name: "Voleur", desc: "Critiques et vitesse.", icon: ITEM_ICONS.offhand, baseHp: 90, baseAtk: 16, baseDef: 3, setName: "Pâture de l'Ombre" },
+            mage: { name: "Mage", desc: "Puissance magique.", icon: ITEM_ICONS.amulet, baseHp: 80, baseAtk: 20, baseDef: 2, setName: "Éclipse d'Arcane" },
+            necromancien: { name: "Nécromancien", desc: "Vol de vie.", icon: ITEM_ICONS.head, baseHp: 95, baseAtk: 14, baseDef: 4, setName: "Restes du Liche" },
+            druide: { name: "Druide", desc: "Polyvalent.", icon: ITEM_ICONS.boots, baseHp: 110, baseAtk: 11, baseDef: 6, setName: "Rituels du Sylvan" },
+            pretre: { name: "Prêtre", desc: "Soin et bouclier.", icon: ITEM_ICONS.chest, baseHp: 100, baseAtk: 10, baseDef: 5, setName: "Bénédiction Solaire" },
+            paladin: { name: "Paladin", desc: "Guerrier sacré.", icon: ITEM_ICONS.chest, baseHp: 130, baseAtk: 10, baseDef: 10, setName: "Égide de la Lumière" },
+            archer: { name: "Archer", desc: "Attaque rapide.", icon: ITEM_ICONS.mainhand, baseHp: 85, baseAtk: 17, baseDef: 3, setName: "Scribe des Vents" },
+            moine: { name: "Moine", desc: "Esquive constante.", icon: ITEM_ICONS.ring1, baseHp: 100, baseAtk: 13, baseDef: 5, setName: "Poings de la Tempête" },
+            barbare: { name: "Barbare", desc: "Degats bruts.", icon: ITEM_ICONS.gloves, baseHp: 140, baseAtk: 15, baseDef: 4, setName: "Sanguinaire du Nord" },
+            barde: { name: "Barde", desc: "Bonus Or et XP.", icon: ITEM_ICONS.amulet, baseHp: 95, baseAtk: 12, baseDef: 4, setName: "Sonate d'Harmonie" },
+            mendiant: { name: "Mendiant", desc: "Chance de loot ultime !", icon: ITEM_ICONS.boots, baseHp: 70, baseAtk: 8, baseDef: 1, setName: "Guenilles de Fortune" }
         };
 
         let player = {
             classKey: null,
             level: 1, xp: 0, xpMax: 100, hp: 100, hpMax: 100,
-            gold: 0, souls: 0, floor: 1, subFloor: 1, comboPoints: 0, talentPoints: 0,
+            gold: 0, ore: 0, essence: 0, souls: 0,
+            floor: 1, subFloor: 1, comboPoints: 0,
             equipped: { head: null, amulet: null, chest: null, mainhand: null, offhand: null, gloves: null, ring1: null, ring2: null, boots: null },
-            inventory: []
+            inventory: [],
+            quests: { kills: 0, bosses: 0, upgrades: 0 },
+            bestiary: {}
         };
 
         let currentMonster = null;
         let combatInterval = null;
-        let monsterAttackProgress = 0;
         let autoCombatActive = true;
         let currentTab = "tab-combat";
         let selectedInvItemIndex = null;
@@ -988,6 +945,9 @@
             setupEventListeners();
             updateUI();
             startCombatLoop();
+
+            // TIMER DE SAUVEGARDE AUTOMATIQUE
+            setInterval(saveGame, 2000);
         };
 
         function initClassSelectionUI() {
@@ -1000,7 +960,7 @@
                 card.innerHTML = `
                     <div class="class-card-icon">${c.icon}</div>
                     <div class="class-card-title">${c.name}</div>
-                    <div class="class-card-desc">${c.desc}</div>
+                    <div style="font-size:0.6rem; color:var(--text-muted);">${c.desc}</div>
                 `;
                 card.onclick = () => selectClass(key);
                 container.appendChild(card);
@@ -1009,12 +969,10 @@
 
         function selectClass(key) {
             player.classKey = key;
-            const cData = CLASSES[key];
-            player.hpMax = cData.baseHp;
+            player.hpMax = CLASSES[key].baseHp;
             player.hp = player.hpMax;
             
             document.getElementById('class-select-modal').style.display = 'none';
-            renderTalentTrees();
             spawnMonster();
             updateUI();
             saveGame();
@@ -1023,10 +981,6 @@
         function setupEventListeners() {
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => switchTab(e.currentTarget.dataset.tab));
-            });
-
-            document.getElementById('monster-click-zone').addEventListener('click', () => {
-                if (currentTab === 'tab-combat' && currentMonster && currentMonster.hp > 0) playerAttack(true);
             });
 
             document.getElementById('btn-auto-toggle').addEventListener('click', () => {
@@ -1041,7 +995,11 @@
             document.getElementById('close-item-modal').addEventListener('click', () => {
                 document.getElementById('item-compare-modal').style.display = 'none';
             });
+
             document.getElementById('btn-equip-selected').addEventListener('click', equipSelectedItem);
+            document.getElementById('btn-sell-selected').addEventListener('click', sellSelectedItem);
+            document.getElementById('btn-recycle-selected').addEventListener('click', recycleSelectedItem);
+
             document.getElementById('btn-respawn-continue').addEventListener('click', () => {
                 document.getElementById('death-modal').style.display = 'none';
                 document.getElementById('class-select-modal').style.display = 'flex';
@@ -1055,52 +1013,47 @@
 
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
             document.getElementById(tabId).classList.add('active');
+
+            if (tabId === 'tab-forge') renderForgeUI();
+            if (tabId === 'tab-succes') renderQuestsAndBestiary();
         }
 
-        /* COMBAT ENGINE & AUTOMATIC PAUSE */
+        /* ENGINE DE COMBAT ET PAUSE AUTO */
         function startCombatLoop() {
             if (combatInterval) clearInterval(combatInterval);
             combatInterval = setInterval(() => {
-                // RÈGLE DE PAUSE STRICTE EN DEHORS DE L'ONGLET COMBAT
                 if (currentTab !== 'tab-combat' || !player.classKey) return;
 
                 if (autoCombatActive && currentMonster && currentMonster.hp > 0 && player.hp > 0) {
-                    playerAttack(false);
+                    playerAttack();
                 }
-
-                if (currentMonster && currentMonster.hp > 0 && player.hp > 0) {
-                    monsterAttackProgress += 10;
-                    if (monsterAttackProgress >= 100) {
-                        monsterAttackProgress = 0;
-                        monsterAttack();
-                    }
-                    document.getElementById('monster-atk-fill').style.width = monsterAttackProgress + '%';
-                }
-            }, 600);
+            }, 700);
         }
 
         function spawnMonster() {
             const isBoss = (player.subFloor === 50);
-            const difficultyMult = Math.pow(100, player.floor - 1);
+            const difficultyMult = Math.pow(10, player.floor - 1);
             
-            const baseHp = (player.floor * 50 + player.subFloor * 10) * (isBoss ? 5 : 1) * difficultyMult;
-            const baseAtk = (player.floor * 5 + player.subFloor * 2) * (isBoss ? 2 : 1) * difficultyMult;
+            const baseHp = (player.floor * 40 + player.subFloor * 8) * (isBoss ? 4 : 1) * difficultyMult;
+            const baseAtk = (player.floor * 4 + player.subFloor * 2) * (isBoss ? 1.8 : 1) * difficultyMult;
+
+            const monsterKey = isBoss ? `Boss Étage ${player.floor}` : `Garde Étage ${player.floor}`;
 
             currentMonster = {
-                name: isBoss ? `BOSS - ÉTAGE ${player.floor}` : `Monstre ${player.floor}.${player.subFloor}`,
+                key: monsterKey,
+                name: monsterKey,
                 hp: baseHp, hpMax: baseHp, atk: baseAtk,
-                gold: Math.floor((10 + player.subFloor * 2) * difficultyMult),
-                xp: Math.floor((20 + player.subFloor * 5) * difficultyMult)
+                gold: Math.floor((12 + player.subFloor * 3) * difficultyMult),
+                xp: Math.floor((25 + player.subFloor * 6) * difficultyMult)
             };
 
-            monsterAttackProgress = 0;
             updateMonsterUI();
         }
 
-        function playerAttack(isManual = false) {
+        function playerAttack() {
             if (!currentMonster) return;
             let stats = calculatePlayerStats();
-            let dmg = Math.floor(stats.atk * (isManual ? 1.3 : 1.0));
+            let dmg = Math.floor(stats.atk);
 
             currentMonster.hp = Math.max(0, currentMonster.hp - dmg);
             showFloatingText(`-${dmg}`, '#e74c3c');
@@ -1111,6 +1064,8 @@
             }
 
             if (currentMonster.hp <= 0) onMonsterDefeated();
+            else monsterAttack();
+
             updateMonsterUI();
         }
 
@@ -1128,7 +1083,7 @@
         function executeFinisher() {
             if (player.comboPoints < 5 || !currentMonster) return;
             let stats = calculatePlayerStats();
-            let finisherDmg = stats.atk * 6.5;
+            let finisherDmg = stats.atk * 6.0;
 
             currentMonster.hp = Math.max(0, currentMonster.hp - finisherDmg);
             showFloatingText(`💥 ${Math.floor(finisherDmg)}`, '#9b59b6');
@@ -1142,13 +1097,24 @@
 
         function onMonsterDefeated() {
             player.gold += currentMonster.gold;
+            player.quests.kills++;
+            if (player.subFloor === 50) player.quests.bosses++;
+
+            // Mise à jour du Bestiaire
+            if (!player.bestiary[currentMonster.key]) player.bestiary[currentMonster.key] = 0;
+            player.bestiary[currentMonster.key]++;
+
             gainXP(currentMonster.xp);
             rollLoot();
 
-            if (player.subFloor < 50) player.subFloor++;
-            else { player.floor++; player.subFloor = 1; }
-
-            spawnMonster();
+            // SALLES DE LA TOUR (ÉVÉNEMENT ALEATOIRE - OPTION 2)
+            if (Math.random() < 0.15) {
+                triggerTowerEvent();
+            } else {
+                if (player.subFloor < 50) player.subFloor++;
+                else { player.floor++; player.subFloor = 1; }
+                spawnMonster();
+            }
         }
 
         /* MORT PERMANENTE AVEC CONSERVATION D'ÉQUIPEMENT */
@@ -1159,7 +1125,6 @@
             player.gold = 0;
             player.floor = 1;
             player.subFloor = 1;
-            player.talentPoints = 0;
             player.comboPoints = 0;
             player.classKey = null;
 
@@ -1173,11 +1138,10 @@
                 player.xp -= player.xpMax;
                 player.level++;
                 player.xpMax = Math.floor(player.xpMax * 1.5);
-                player.talentPoints++;
                 
-                // SOIN INTÉGRAL À 100% AU PASSAGE DE NIVEAU
+                // SOIN INTÉGRAL EN LEVEL UP
                 player.hp = calculatePlayerStats().hpMax;
-                showFloatingText("SOIN TOTAL ! LEVEL UP !", "#2ecc71");
+                showFloatingText("LEVEL UP ! SOIN TOTAL !", "#2ecc71");
             }
         }
 
@@ -1192,9 +1156,10 @@
 
             Object.values(player.equipped).forEach(item => {
                 if (item) {
-                    stats.hpMax += item.hp || 0;
-                    stats.atk += item.atk || 0;
-                    stats.def += item.def || 0;
+                    let levelMult = 1 + ((item.upgradeLevel || 0) * 0.15);
+                    stats.hpMax += Math.floor((item.hp || 0) * levelMult);
+                    stats.atk += Math.floor((item.atk || 0) * levelMult);
+                    stats.def += Math.floor((item.def || 0) * levelMult);
                 }
             });
 
@@ -1202,29 +1167,27 @@
             return stats;
         }
 
-        /* UNIVERSAL LOOT PARMI TOUTES LES CLASSES */
         function rollLoot() {
-            if (Math.random() > 0.50) return;
+            if (Math.random() > 0.45) return;
             const slots = ['head', 'amulet', 'chest', 'mainhand', 'offhand', 'gloves', 'ring1', 'ring2', 'boots'];
             const classKeys = Object.keys(CLASSES);
             
-            // Choisir une classe au hasard pour le loot
             let randomClassKey = classKeys[Math.floor(Math.random() * classKeys.length)];
             let classInfo = CLASSES[randomClassKey];
             let slot = slots[Math.floor(Math.random() * slots.length)];
 
-            let isSetItem = Math.random() < 0.35;
-            let rarity = isSetItem ? 'Set' : 'Rare';
+            let isSetItem = Math.random() < 0.30;
 
             let item = {
-                name: isSetItem ? `${classInfo.setName} (${slot.toUpperCase()})` : `Équipement de ${classInfo.name}`,
+                name: isSetItem ? `${classInfo.setName} (${slot.toUpperCase()})` : `Pointe de ${classInfo.name}`,
                 slot: slot,
-                rarity: rarity,
+                rarity: isSetItem ? 'Set' : 'Rare',
                 reqClass: randomClassKey,
                 setName: isSetItem ? classInfo.setName : null,
-                atk: Math.floor(player.floor * 2.5),
-                def: Math.floor(player.floor * 1.8),
-                hp: Math.floor(player.floor * 12)
+                upgradeLevel: 0,
+                atk: Math.floor(player.floor * 3),
+                def: Math.floor(player.floor * 2),
+                hp: Math.floor(player.floor * 15)
             };
 
             if (player.inventory.length < 20) {
@@ -1233,7 +1196,48 @@
             }
         }
 
-        /* RENDERERS & COMPARATEUR DE STATS DYNAMIQUE (+ VERT / - ROUGE) */
+        /* SALLES DE LA TOUR (OPTION 2) */
+        function triggerTowerEvent() {
+            const modal = document.getElementById('event-modal');
+            const title = document.getElementById('event-title');
+            const desc = document.getElementById('event-desc');
+            const choices = document.getElementById('event-choices');
+
+            title.textContent = "🎁 Coffre Mystérieux de la Tour";
+            desc.textContent = "Vous découvrez un coffre ouvragé dans la pénombre de la tour...";
+            choices.innerHTML = '';
+
+            const btnOpen = document.createElement('button');
+            btnOpen.className = 'btn-prime';
+            btnOpen.textContent = "🔓 Ouvrir le Coffre";
+            btnOpen.onclick = () => {
+                if (Math.random() < 0.7) {
+                    player.gold += player.floor * 50;
+                    rollLoot();
+                    showFloatingText("+50 Or & Loot !", "#f1c40f");
+                } else {
+                    player.hp = Math.floor(player.hp * 0.7);
+                    showFloatingText("MIMIQUE ! Piège -30% PV", "#e74c3c");
+                }
+                modal.style.display = 'none';
+                spawnMonster();
+            };
+
+            const btnIgnore = document.createElement('button');
+            btnIgnore.className = 'btn-prime';
+            btnIgnore.style.background = "#7f8c8d";
+            btnIgnore.textContent = "🚶 Ignorer et Continuer";
+            btnIgnore.onclick = () => {
+                modal.style.display = 'none';
+                spawnMonster();
+            };
+
+            choices.appendChild(btnOpen);
+            choices.appendChild(btnIgnore);
+            modal.style.display = 'flex';
+        }
+
+        /* RENDU UI & INVENTAIRE */
         function updateUI() {
             if (!player.classKey) return;
             let stats = calculatePlayerStats();
@@ -1249,8 +1253,9 @@
             document.getElementById('xp-bar-text').textContent = `XP: ${player.xp} / ${player.xpMax}`;
 
             document.getElementById('res-gold').textContent = player.gold;
+            document.getElementById('res-ore').textContent = player.ore;
+            document.getElementById('res-essence').textContent = player.essence;
             document.getElementById('res-souls').textContent = player.souls;
-            document.getElementById('res-cp').textContent = Math.floor(stats.atk + stats.def + stats.hpMax / 10);
 
             document.getElementById('floor-num').textContent = player.floor;
             document.getElementById('subfloor-num').textContent = player.subFloor;
@@ -1281,6 +1286,12 @@
                 if (item) {
                     slotEl.className = `equip-slot slot-${slotKey} has-item rarity-${item.rarity}`;
                     slotEl.innerHTML = ITEM_ICONS[slotKey];
+                    if (item.upgradeLevel > 0) {
+                        const badge = document.createElement('div');
+                        badge.className = 'item-upgrade-badge';
+                        badge.textContent = `+${item.upgradeLevel}`;
+                        slotEl.appendChild(badge);
+                    }
                 } else {
                     slotEl.className = `equip-slot slot-${slotKey}`;
                     slotEl.innerHTML = ITEM_ICONS[slotKey];
@@ -1298,7 +1309,6 @@
                 el.className = `inv-item rarity-${item.rarity}`;
                 el.innerHTML = ITEM_ICONS[item.slot];
 
-                // Cadenas si l'objet n'est pas pour la classe actuelle
                 if (item.reqClass && item.reqClass !== player.classKey) {
                     const lock = document.createElement('div');
                     lock.className = 'lock-badge';
@@ -1311,37 +1321,35 @@
             });
         }
 
-        /* MODAL DE COMPARISON D'OBJET DYNAMIQUE AVEC COULEURS (+ VERT / - ROUGE) */
+        /* MODAL DE COMPARISON & ACTIONS D'INVENTAIRE */
         function openCompareModal(index) {
             selectedInvItemIndex = index;
             const newItem = player.inventory[index];
             const equippedItem = player.equipped[newItem.slot];
 
-            document.getElementById('comp-new-name').textContent = newItem.name;
-            
-            // Formatage des cartes
+            document.getElementById('comp-new-name').textContent = newItem.name + (newItem.upgradeLevel ? ` (+${newItem.upgradeLevel})` : '');
             renderStatComparisonCard('comp-new-stats', newItem, equippedItem);
             
             if (equippedItem) {
-                document.getElementById('comp-eq-name').textContent = equippedItem.name;
+                document.getElementById('comp-eq-name').textContent = equippedItem.name + (equippedItem.upgradeLevel ? ` (+${equippedItem.upgradeLevel})` : '');
                 renderStatComparisonCard('comp-eq-stats', equippedItem, null);
             } else {
                 document.getElementById('comp-eq-name').textContent = "Aucun (Vide)";
                 document.getElementById('comp-eq-stats').innerHTML = "<div class='stat-neutral'>Emplacement vide</div>";
             }
 
-            // Vérification de restriction de classe
             const equipBtn = document.getElementById('btn-equip-selected');
             const classWarn = document.getElementById('comp-class-warning');
 
             if (newItem.reqClass && newItem.reqClass !== player.classKey) {
                 equipBtn.disabled = true;
-                classWarn.innerHTML = `<div class="class-req-banner">⚠️ Impossible d'équiper : Réservé aux ${CLASSES[newItem.reqClass].name}s</div>`;
+                classWarn.innerHTML = `<div style="color:var(--accent-red); font-size:0.7rem; font-weight:bold; margin-top:4px;">⚠️ Réservé aux ${CLASSES[newItem.reqClass].name}s</div>`;
             } else {
                 equipBtn.disabled = false;
                 classWarn.innerHTML = '';
             }
 
+            document.getElementById('sell-gold-val').textContent = player.floor * 20;
             document.getElementById('item-compare-modal').style.display = 'flex';
         }
 
@@ -1370,14 +1378,6 @@
                 line.innerHTML = `<span>${labels[st]}: +${val}</span> ${diffHtml}`;
                 container.appendChild(line);
             });
-
-            if (item.setName) {
-                const setTag = document.createElement('div');
-                setTag.className = 'set-title-tag';
-                setTag.style.marginTop = '6px';
-                setTag.textContent = `Set: ${item.setName}`;
-                container.appendChild(setTag);
-            }
         }
 
         function equipSelectedItem() {
@@ -1395,31 +1395,94 @@
             document.getElementById('item-compare-modal').style.display = 'none';
             selectedInvItemIndex = null;
             updateUI();
+            saveGame();
         }
 
-        function renderTalentTrees() {
-            const container = document.getElementById('talent-tree-render');
+        function sellSelectedItem() {
+            if (selectedInvItemIndex === null) return;
+            player.gold += player.floor * 20;
+            player.inventory.splice(selectedInvItemIndex, 1);
+            document.getElementById('item-compare-modal').style.display = 'none';
+            selectedInvItemIndex = null;
+            updateUI();
+            saveGame();
+        }
+
+        function recycleSelectedItem() {
+            if (selectedInvItemIndex === null) return;
+            player.ore += Math.floor(Math.random() * 3) + 1;
+            player.essence += Math.floor(Math.random() * 2) + 1;
+            player.inventory.splice(selectedInvItemIndex, 1);
+            document.getElementById('item-compare-modal').style.display = 'none';
+            selectedInvItemIndex = null;
+            updateUI();
+            saveGame();
+        }
+
+        /* UI FORGE (OPTION 1) */
+        function renderForgeUI() {
+            document.getElementById('forge-ore-text').textContent = player.ore;
+            document.getElementById('forge-essence-text').textContent = player.essence;
+
+            const container = document.getElementById('forge-equipped-list');
             container.innerHTML = '';
-            if (!player.classKey) return;
 
-            CLASSES[player.classKey].branches.forEach(branchName => {
-                const branchEl = document.createElement('div');
-                branchEl.className = 'talent-branch';
-                branchEl.innerHTML = `<div class="branch-title">Branche: ${branchName}</div>`;
-                
-                const nodesEl = document.createElement('div');
-                nodesEl.className = 'branch-nodes';
-                for (let i = 1; i <= 3; i++) {
-                    const node = document.createElement('div');
-                    node.className = 'talent-node unlocked';
-                    node.innerHTML = `<div>Talent ${i}</div><div style="color:var(--accent-gold);">1/1</div>`;
-                    nodesEl.appendChild(node);
+            Object.keys(player.equipped).forEach(slotKey => {
+                const item = player.equipped[slotKey];
+                if (item) {
+                    const row = document.createElement('div');
+                    row.className = 'quest-card';
+                    const upLvl = item.upgradeLevel || 0;
+                    row.innerHTML = `
+                        <div>
+                            <b>${item.name}</b> (${slotKey.toUpperCase()})<br>
+                            <span style="color:var(--accent-gold);">Niveau +${upLvl}</span>
+                        </div>
+                        <button class="btn-prime" style="padding:4px 8px; font-size:0.65rem;" ${upLvl >= 10 ? 'disabled' : ''}>
+                            Améliorer (10 ⛏️)
+                        </button>
+                    `;
+                    row.querySelector('button').onclick = () => upgradeItem(slotKey);
+                    container.appendChild(row);
                 }
-                branchEl.appendChild(nodesEl);
-                container.appendChild(branchEl);
             });
+        }
 
-            document.getElementById('talent-pts').textContent = player.talentPoints;
+        function upgradeItem(slotKey) {
+            const item = player.equipped[slotKey];
+            if (!item || player.ore < 10) return;
+
+            player.ore -= 10;
+            item.upgradeLevel = (item.upgradeLevel || 0) + 1;
+            player.quests.upgrades++;
+
+            renderForgeUI();
+            updateUI();
+            saveGame();
+        }
+
+        /* SUCCÈS & BESTIAIRE (OPTION 4) */
+        function renderQuestsAndBestiary() {
+            const qContainer = document.getElementById('quests-container');
+            qContainer.innerHTML = `
+                <div class="quest-card ${player.quests.kills >= 50 ? 'quest-completed' : ''}">
+                    <div>Chasseur: Tuer 50 Monstres (${player.quests.kills}/50)</div>
+                    <div style="color:var(--accent-gold);">+10% Or</div>
+                </div>
+                <div class="quest-card ${player.quests.upgrades >= 5 ? 'quest-completed' : ''}">
+                    <div>Maniement de Forge: 5 Améliorations (${player.quests.upgrades}/5)</div>
+                    <div style="color:var(--accent-gold);">+5% Dégâts</div>
+                </div>
+            `;
+
+            const bContainer = document.getElementById('bestiary-container');
+            bContainer.innerHTML = '';
+            Object.keys(player.bestiary).forEach(k => {
+                const row = document.createElement('div');
+                row.className = 'bestiary-card';
+                row.innerHTML = `<span>${k}</span> <span>Vaincus: <b>${player.bestiary[k]}</b></span>`;
+                bContainer.appendChild(row);
+            });
         }
 
         function reincarnate() {
@@ -1429,6 +1492,7 @@
             player.classKey = null;
             document.getElementById('class-select-modal').style.display = 'flex';
             updateUI();
+            saveGame();
         }
 
         function showFloatingText(text, color, isPlayer = false) {
@@ -1436,14 +1500,17 @@
             el.className = 'floating-text';
             el.textContent = text;
             el.style.color = color;
-            el.style.left = isPlayer ? '30%' : '50%';
-            el.style.top = isPlayer ? '70%' : '30%';
+            el.style.left = isPlayer ? '25%' : '50%';
+            el.style.top = isPlayer ? '65%' : '30%';
 
             document.getElementById('arena-container').appendChild(el);
             setTimeout(() => el.remove(), 800);
         }
 
-        function saveGame() { localStorage.setItem('la_tour_100_save', JSON.stringify(player)); }
+        /* SAUVEGARDE & CHARGEMENT AUTOMATIQUE */
+        function saveGame() {
+            localStorage.setItem('la_tour_100_save', JSON.stringify(player));
+        }
 
         function loadGame() {
             const data = localStorage.getItem('la_tour_100_save');
@@ -1453,10 +1520,9 @@
                     if (!player.classKey) document.getElementById('class-select-modal').style.display = 'flex';
                     else {
                         document.getElementById('class-select-modal').style.display = 'none';
-                        renderTalentTrees();
                         spawnMonster();
                     }
-                } catch(e) { console.error("Échec du chargement de la sauvegarde", e); }
+                } catch(e) { console.error("Échec du chargement", e); }
             }
         }
     </script>
