@@ -422,7 +422,7 @@
             border-radius: 3px;
         }
 
-        /* PANNEAU STATISTIQUES & ATTRIBUTS */
+        /* STATS & ATTRIBUTS */
         .stats-panel, .forge-panel, .codex-panel, .mission-panel {
             background: var(--bg-card);
             border-radius: 10px;
@@ -456,7 +456,6 @@
         }
         .btn-stat-plus:disabled { background: #232b3e; color: #58667e; cursor: not-allowed; }
 
-        /* FORGE */
         .materials-counter {
             display: flex;
             justify-content: space-around;
@@ -551,6 +550,7 @@
             justify-content: center;
             align-items: center;
             border: 1px solid var(--accent-gold);
+            pointer-events: none;
         }
 
         .class-card-icon svg { width: 22px; height: 22px; fill: var(--accent-gold); }
@@ -598,7 +598,7 @@
 <body>
 
     <div id="app-container">
-        <!-- HEADER / STATUT HÉROS -->
+        <!-- HEADER -->
         <header>
             <div class="hero-banner">
                 <div class="class-avatar-small" id="hero-avatar"></div>
@@ -667,7 +667,7 @@
                 <button class="btn-action btn-auto" id="btn-auto-toggle">▶️ COMBAT AUTO : ACTIF</button>
             </div>
 
-            <!-- STATISTIQUES & ATTRIBUTS -->
+            <!-- STATISTIQUES -->
             <div class="tab-content" id="tab-stats">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
                 <div class="stats-panel">
@@ -707,7 +707,7 @@
                 </div>
             </div>
 
-            <!-- ÉQUIPEMENT & INVENTAIRE -->
+            <!-- ÉQUIPEMENT -->
             <div class="tab-content" id="tab-equipement">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
 
@@ -739,11 +739,11 @@
                 </div>
             </div>
 
-            <!-- MISSIONS EN BOUCLE INFINIE -->
+            <!-- MISSIONS -->
             <div class="tab-content" id="tab-missions">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
                 <div style="font-weight: 800; color: var(--accent-gold);">📜 Contrats & Missions de la Tour</div>
-                <div style="font-size: 0.7rem; color: var(--text-muted);">Terminez une mission pour lancer immédiatement la suivante avec des objectifs et récompenses doublés !</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Terminez une mission pour lancer immédiatement la suivante !</div>
                 <div id="missions-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
             </div>
 
@@ -758,38 +758,36 @@
 
                     <div class="forge-action-card">
                         <div style="font-weight: 800; color: var(--accent-gold);">🔨 Améliorer un équipement (+1 à +10)</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">Augmente les statistiques de l'objet équipé de +15% par niveau.</div>
                         <div id="forge-equipped-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- CODEX & BESTIAIRE -->
+            <!-- CODEX -->
             <div class="tab-content" id="tab-codex">
                 <div class="pause-banner">⏸️ COMBAT EN PAUSE (Hors écran de combat)</div>
                 <div style="font-weight: 800; color: var(--accent-gold);">📖 Codex & Bestiaire de la Tour</div>
-                <div style="font-size: 0.7rem; color: var(--text-muted);">Éliminez des monstres pour débloquer des paliers de maîtrise et des bonus permanents.</div>
                 <div id="bestiary-container" style="display: flex; flex-direction: column; gap: 6px; max-height: 380px; overflow-y: auto;"></div>
             </div>
         </main>
     </div>
 
     <!-- MODAL SÉLECTION DE CLASSE -->
-    <div class="modal-overlay" id="class-select-modal" style="display: flex;">
+    <div class="modal-overlay" id="class-select-modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">⚔️ Choisissez votre Classe</div>
             </div>
             <div class="modal-body">
                 <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">
-                    En cas de mort, vous conservez votre équipement et votre sac à dos.
+                    Cliquez sur une classe pour démarrer l'aventure !
                 </p>
                 <div class="class-selection-grid" id="class-selection-container"></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE MORT PERMANENTE -->
+    <!-- MODAL DE MORT -->
     <div class="modal-overlay" id="death-modal" style="display: none;">
         <div class="modal-content" style="border-color: var(--accent-red);">
             <div class="modal-header" style="background: rgba(231, 76, 60, 0.2);">
@@ -797,9 +795,6 @@
             </div>
             <div class="modal-body" style="text-align: center;">
                 <p style="font-size: 0.9rem; color: #fff; font-weight: 800;">Votre héros est tombé au combat...</p>
-                <p style="font-size: 0.75rem; color: var(--accent-green); background: rgba(46, 204, 113, 0.12); padding: 8px; border-radius: 6px;">
-                    🛡️ <b>ÉQUIPEMENT INTÉGRALEMENT CONSERVÉ !</b>
-                </p>
                 <button class="btn-prime" id="btn-respawn-continue" style="background: var(--accent-red); color: #fff; margin-top: 8px;">
                     Choisir une Classe & Repartir
                 </button>
@@ -807,7 +802,7 @@
         </div>
     </div>
 
-    <!-- MODAL COMPARATEUR D'ÉQUIPEMENT -->
+    <!-- MODAL COMPARATEUR -->
     <div class="modal-overlay" id="item-compare-modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -891,14 +886,13 @@
         let currentTab = "tab-combat";
         let selectedInvItemIndex = null;
 
-        window.onload = function() {
-            loadGame();
+        window.addEventListener('DOMContentLoaded', () => {
             initClassSelectionUI();
             setupEventListeners();
-            updateUI();
+            loadGame();
             startCombatLoop();
             setInterval(saveGame, 2000);
-        };
+        });
 
         function initClassSelectionUI() {
             const container = document.getElementById('class-selection-container');
@@ -912,7 +906,7 @@
                     <div style="font-weight:800; font-size:0.8rem;">${c.name}</div>
                     <div style="font-size:0.6rem; color:var(--text-muted);">${c.desc}</div>
                 `;
-                card.onclick = () => selectClass(key);
+                card.addEventListener('click', () => selectClass(key));
                 container.appendChild(card);
             });
         }
@@ -1002,7 +996,6 @@
             currentMonster.hp = Math.max(0, currentMonster.hp - dmg);
             showFloatingText(`-${dmg}`, '#e74c3c');
 
-            // Vol de vie
             if (stats.lifesteal > 0) {
                 let heal = Math.floor(dmg * (stats.lifesteal / 100));
                 if (heal > 0) {
@@ -1020,7 +1013,6 @@
         function monsterAttack() {
             let stats = calculatePlayerStats();
 
-            // Test Esquive
             if (Math.random() * 100 < stats.dodge) {
                 showFloatingText(`💨 ESQUIVE !`, '#3498db', true);
                 return;
@@ -1039,7 +1031,6 @@
             gainXP(currentMonster.xp);
             rollLoot();
 
-            // MAJ Bestiaire & Missions
             if (!player.bestiary[currentMonster.key]) player.bestiary[currentMonster.key] = 0;
             player.bestiary[currentMonster.key]++;
 
@@ -1074,7 +1065,7 @@
                 player.xp -= player.xpMax;
                 player.level++;
                 player.xpMax = Math.floor(player.xpMax * 1.5);
-                player.statPoints += 3; // +3 Points de Stat par niveau
+                player.statPoints += 3;
 
                 player.hp = calculatePlayerStats().hpMax;
                 showFloatingText("LEVEL UP ! +3 STATS !", "#2ecc71");
@@ -1141,12 +1132,9 @@
             }
         }
 
-        /* SYSTÈME DE MISSIONS EN BOUCLE INFINIE */
         function updateMissionProgress(type, amount) {
             player.missions.forEach(m => {
-                if (m.type === type) {
-                    m.current += amount;
-                }
+                if (m.type === type) m.current += amount;
             });
             if (currentTab === 'tab-missions') renderMissionsUI();
         }
@@ -1164,13 +1152,13 @@
                         <span>${m.title} (Rang ${m.tier})</span>
                         <span>${m.current} / ${m.target}</span>
                     </div>
-                    <div style="color:var(--text-muted);">Récompense : 🪙 ${m.rewardGold} Or ${m.rewardOre ? `| ⛏️ ${m.rewardOre} Minerai` : ''} ${m.rewardEssence ? `| ✨ ${m.rewardEssence} Essence` : ''}</div>
+                    <div style="color:var(--text-muted);">Récompense : 🪙 ${m.rewardGold} Or ${m.rewardOre ? `| ⛏️ ${m.rewardOre} Minerai` : ''}</div>
                     <button class="btn-prime" ${isComplete ? '' : 'disabled'} style="padding:6px; font-size:0.7rem;">
                         ${isComplete ? 'Récupérer & Doubler' : 'En cours...'}
                     </button>
                 `;
                 if (isComplete) {
-                    card.querySelector('button').onclick = () => claimMission(idx);
+                    card.querySelector('button').addEventListener('click', () => claimMission(idx));
                 }
                 container.appendChild(card);
             });
@@ -1182,7 +1170,6 @@
             if (m.rewardOre) player.ore += m.rewardOre;
             if (m.rewardEssence) player.essence += m.rewardEssence;
 
-            // Doubler les exigences et récompenses pour le cycle suivant
             m.target *= 2;
             m.current = 0;
             m.rewardGold *= 2;
@@ -1195,7 +1182,6 @@
             saveGame();
         }
 
-        /* UI STATS & GESTION */
         function updateStatsUI() {
             document.getElementById('stat-points-val').textContent = player.statPoints;
             document.getElementById('stat-val-str').textContent = player.stats.str;
@@ -1211,11 +1197,8 @@
             document.getElementById('total-lifesteal').textContent = stats.lifesteal.toFixed(1) + '%';
         }
 
-        function renderStatsUI() {
-            updateStatsUI();
-        }
+        function renderStatsUI() { updateStatsUI(); }
 
-        /* RENDU UI & INVENTAIRE */
         function updateUI() {
             if (!player.classKey) return;
             let stats = calculatePlayerStats();
@@ -1287,7 +1270,7 @@
                     lock.textContent = '🔒';
                     el.appendChild(lock);
                 }
-                el.onclick = () => openCompareModal(index);
+                el.addEventListener('click', () => openCompareModal(index));
                 grid.appendChild(el);
             });
         }
@@ -1399,7 +1382,7 @@
                         <div><b>${item.name}</b> (${slotKey.toUpperCase()})<br><span style="color:var(--accent-gold);">Niveau +${upLvl}</span></div>
                         <button class="btn-prime" style="padding:4px 8px; font-size:0.65rem;" ${upLvl >= 10 ? 'disabled' : ''}>Améliorer (10 ⛏️)</button>
                     `;
-                    row.querySelector('button').onclick = () => upgradeItem(slotKey);
+                    row.querySelector('button').addEventListener('click', () => upgradeItem(slotKey));
                     container.appendChild(row);
                 }
             });
@@ -1418,11 +1401,11 @@
         function renderCodexUI() {
             const container = document.getElementById('bestiary-container');
             container.innerHTML = '';
-            const monstersList = ["Garde Étage 1", "Boss Étage 1", "Garde Étage 2", "Boss Étage 2", "Garde Étage 3", "Boss Étage 3"];
+            const monstersList = ["Garde Étage 1", "Boss Étage 1", "Garde Étage 2", "Boss Étage 2"];
 
             monstersList.forEach(mName => {
                 let kills = player.bestiary[mName] || 0;
-                let masteryTier = kills >= 50 ? 'Maîtrise Maximale (Bonus Actif)' : (kills >= 20 ? 'Palier II (10% ATK)' : (kills >= 5 ? 'Palier I (5% PV)' : 'Non maîtrisé'));
+                let masteryTier = kills >= 50 ? 'Maîtrise Maximale' : (kills >= 20 ? 'Palier II' : (kills >= 5 ? 'Palier I' : 'Non maîtrisé'));
                 const row = document.createElement('div');
                 row.className = 'bestiary-card';
                 row.innerHTML = `
@@ -1453,12 +1436,16 @@
             if (data) {
                 try {
                     player = JSON.parse(data);
-                    if (!player.classKey) document.getElementById('class-select-modal').style.display = 'flex';
-                    else {
-                        document.getElementById('class-select-modal').style.display = 'none';
-                        spawnMonster();
-                    }
-                } catch(e) { console.error("Erreur chargement sauvegarde", e); }
+                } catch(e) { console.error(e); }
+            }
+            
+            // Forcer l'affichage de la modale de sélection si aucune classe n'est active
+            if (!player.classKey) {
+                document.getElementById('class-select-modal').style.display = 'flex';
+            } else {
+                document.getElementById('class-select-modal').style.display = 'none';
+                spawnMonster();
+                updateUI();
             }
         }
     </script>
