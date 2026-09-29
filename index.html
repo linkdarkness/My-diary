@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aperture AI - Générateur Photo-Réaliste</title>
+    <title>Aperture Studio - Studio Photo-Réaliste 16:9 & Retouche</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,17 +14,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        photo: {
-                            50: '#f6f6f7',
-                            100: '#e1e2e5',
-                            800: '#1e2024',
-                            900: '#121316',
-                            950: '#0a0b0d',
-                            accent: '#38bdf8',
-                            amber: '#f59e0b'
-                        }
                     }
                 }
             }
@@ -54,9 +43,6 @@
             background: #272a30;
             border-radius: 3px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3b3e45;
-        }
     </style>
 </head>
 <body class="min-h-screen font-sans flex flex-col justify-between antialiased selection:bg-sky-500 selection:text-black">
@@ -69,17 +55,17 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                        <span>Aperture</span>
+                        <span>Aperture Studio</span>
                         <span class="text-sky-400 font-light text-xs px-2 py-0.5 rounded bg-sky-950/60 border border-sky-800/50 uppercase tracking-widest">16:9 PRO</span>
                     </h1>
-                    <p class="text-[11px] text-neutral-400 font-medium hidden sm:block">Générateur d'images photo-réalistes haute définition</p>
+                    <p class="text-[11px] text-neutral-400 font-medium hidden sm:block">Génération multi-propositions & Retouche photo-réaliste</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <button id="btn-show-gallery" class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-medium text-neutral-200 transition-all flex items-center gap-2">
                     <i class="fa-solid fa-images text-sky-400"></i>
-                    <span>Galerie Photo</span>
+                    <span>Galerie Studio</span>
                     <span id="gallery-badge" class="ml-1 bg-sky-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">0</span>
                 </button>
             </div>
@@ -88,119 +74,158 @@
 
     <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-        <!-- LEFT PANEL: Prompt Input Only -->
-        <section class="lg:col-span-5 flex flex-col gap-5">
+        <!-- LEFT PANEL: Controls -->
+        <section class="lg:col-span-4 flex flex-col gap-5">
             <div class="studio-card p-5 lg:p-6 rounded-2xl shadow-2xl space-y-5">
                 
-                <!-- Prompt Input Area -->
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                        <label for="prompt-input" class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-quote-left text-sky-400"></i>
-                            <span>Description de la scène</span>
+                <!-- Mode Switcher -->
+                <div class="grid grid-cols-2 gap-1 bg-neutral-900 p-1 rounded-xl border border-neutral-800 text-xs font-semibold">
+                    <button id="tab-gen" class="py-2 rounded-lg bg-sky-500 text-black transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Création</span>
+                    </button>
+                    <button id="tab-edit" class="py-2 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paintbrush"></i>
+                        <span>Retouche</span>
+                    </button>
+                </div>
+
+                <!-- MODE 1: GENERATION -->
+                <div id="panel-gen" class="space-y-4">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="prompt-input" class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-quote-left text-sky-400"></i>
+                                <span>Description de la scène</span>
+                            </label>
+                            <button id="btn-enhance-photo" class="text-[11px] font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1.5 transition-colors bg-sky-950/50 hover:bg-sky-900/50 px-2.5 py-1 rounded-lg border border-sky-800/40">
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                                <span>Booster</span>
+                            </button>
+                        </div>
+
+                        <div class="relative">
+                            <textarea id="prompt-input" rows="4" 
+                                class="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl p-3 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all resize-none shadow-inner"
+                                placeholder="Ex: Portrait d'un surfeur au coucher du soleil sur une plage sauvage, embruns dorés..."></textarea>
+                            
+                            <button id="btn-clear-prompt" title="Effacer" class="absolute bottom-2.5 right-2.5 text-neutral-500 hover:text-neutral-300 p-1.5 rounded-md hover:bg-neutral-800 transition-colors">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Variations Selector -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sky-400"></i>
+                            <span>Nombre de propositions (16:9)</span>
                         </label>
-                        <button id="btn-enhance-photo" class="text-[11px] font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1.5 transition-colors bg-sky-950/50 hover:bg-sky-900/50 px-2.5 py-1 rounded-lg border border-sky-800/40">
-                            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
-                            <span>Booster le réalisme</span>
-                        </button>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button" data-count="1" class="var-btn py-2.5 rounded-xl border border-neutral-800 bg-neutral-900 text-xs font-semibold text-neutral-300 hover:border-sky-500/50 transition-all">1</button>
+                            <button type="button" data-count="2" class="var-btn py-2.5 rounded-xl border border-neutral-800 bg-neutral-900 text-xs font-semibold text-neutral-300 hover:border-sky-500/50 transition-all">2</button>
+                            <button type="button" data-count="3" class="var-btn py-2.5 rounded-xl border border-neutral-800 bg-neutral-900 text-xs font-semibold text-neutral-300 hover:border-sky-500/50 transition-all">3</button>
+                            <button type="button" data-count="4" class="var-btn py-2.5 rounded-xl border border-neutral-800 bg-neutral-900 text-xs font-semibold text-neutral-300 hover:border-sky-500/50 transition-all active-var">4</button>
+                        </div>
                     </div>
 
-                    <div class="relative">
-                        <textarea id="prompt-input" rows="5" 
-                            class="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl p-3.5 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all resize-none shadow-inner"
-                            placeholder="Ex: Portrait d'un surfeur au coucher du soleil sur une plage sauvage, embruns dorés, textures de peau détaillées, style reflex numérique..."></textarea>
-                        
-                        <button id="btn-clear-prompt" title="Effacer" class="absolute bottom-2.5 right-2.5 text-neutral-500 hover:text-neutral-300 p-1.5 rounded-md hover:bg-neutral-800 transition-colors">
-                            <i class="fa-solid fa-xmark text-xs"></i>
-                        </button>
+                    <button id="btn-generate" class="w-full py-3.5 rounded-xl font-semibold text-black bg-sky-400 hover:bg-sky-300 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm mt-2">
+                        <i class="fa-solid fa-aperture text-base"></i>
+                        <span>Générer les Propositions</span>
+                    </button>
+                </div>
+
+                <!-- MODE 2: EDIT / RETOUCH -->
+                <div id="panel-edit" class="space-y-4 hidden">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-image text-sky-400"></i>
+                                <span>Image source à modifier</span>
+                            </label>
+                            <button id="btn-pick-from-gallery" type="button" class="text-[11px] font-medium text-sky-400 hover:text-sky-300 bg-sky-950/40 px-2 py-0.5 rounded border border-sky-800/40">
+                                <i class="fa-solid fa-images mr-1"></i> Choisir galerie
+                            </button>
+                        </div>
+
+                        <div id="source-dropzone" class="border-2 border-dashed border-neutral-800 hover:border-sky-500/50 rounded-xl p-4 text-center cursor-pointer transition-all bg-neutral-900/50 flex flex-col items-center justify-center min-h-[140px] relative overflow-hidden group">
+                            <input type="file" id="source-file-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20">
+                            <div id="source-placeholder-content" class="flex flex-col items-center">
+                                <i class="fa-solid fa-cloud-arrow-up text-sky-400 text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs text-neutral-300 font-medium">Glissez une photo ou cliquez</span>
+                                <span class="text-[10px] text-neutral-500 mt-0.5">Format 16:9 recommandé</span>
+                            </div>
+                            <img id="source-preview-img" class="absolute inset-0 w-full h-full object-cover hidden z-10" alt="Source">
+                            <button id="btn-clear-source" type="button" class="absolute top-2 right-2 bg-neutral-950/80 hover:bg-red-600 text-white rounded-lg p-1.5 text-xs z-30 hidden" title="Changer d'image">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Hidden default ratio / config info -->
-                <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-3 flex items-center justify-between text-neutral-400 text-xs">
-                    <span class="flex items-center gap-2">
-                        <i class="fa-solid fa-display text-sky-400"></i>
-                        <span>Format par défaut</span>
-                    </span>
-                    <span class="font-semibold text-white bg-neutral-800 px-2.5 py-1 rounded-lg border border-neutral-700">16:9 • Photo Réaliste HD</span>
-                </div>
+                    <div class="space-y-2">
+                        <label for="edit-prompt-input" class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-pen-nib text-sky-400"></i>
+                            <span>Instruction de retouche</span>
+                        </label>
+                        <textarea id="edit-prompt-input" rows="3" 
+                            class="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl p-3 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all resize-none shadow-inner"
+                            placeholder="Ex: Transformer le ciel en aurore boréale, ajouter de la pluie, etc..."></textarea>
+                    </div>
 
-                <!-- Generate Photo Button -->
-                <button id="btn-generate" class="w-full py-3.5 rounded-xl font-semibold text-black bg-sky-400 hover:bg-sky-300 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm mt-2">
-                    <i class="fa-solid fa-aperture text-base animate-spin" style="animation-duration: 10s;"></i>
-                    <span>Générer l'Image Photo-Réaliste</span>
-                </button>
+                    <button id="btn-edit" class="w-full py-3.5 rounded-xl font-semibold text-black bg-amber-400 hover:bg-amber-300 shadow-lg shadow-amber-500/15 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm mt-2">
+                        <i class="fa-solid fa-wand-magic text-base"></i>
+                        <span>Appliquer la Retouche (16:9)</span>
+                    </button>
+                </div>
 
             </div>
         </section>
 
-        <!-- RIGHT PANEL: Display / Darkroom Canvas -->
-        <section class="lg:col-span-7 flex flex-col gap-6">
-            <div class="studio-card p-4 sm:p-6 rounded-2xl shadow-2xl min-h-[520px] flex flex-col justify-between relative overflow-hidden">
+        <!-- RIGHT PANEL: Display / Grid Results Canvas -->
+        <section class="lg:col-span-8 flex flex-col gap-6">
+            <div class="studio-card p-4 sm:p-6 rounded-2xl shadow-2xl min-h-[560px] flex flex-col justify-between relative overflow-hidden">
                 
-                <!-- Display Header -->
                 <div class="flex justify-between items-center pb-3 border-b border-neutral-800">
                     <h2 class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-eye text-sky-400"></i>
-                        <span>Viseur Studio</span>
+                        <span>Viseur Studio (16:9)</span>
                     </h2>
-                    <span id="photo-spec-tag" class="text-[10px] text-neutral-400 bg-neutral-900 px-2.5 py-1 rounded-full border border-neutral-800 hidden">
-                        16:9 • Ultra HD
-                    </span>
+                    <div id="result-toolbar" class="hidden items-center gap-2">
+                        <button id="btn-download-all" class="text-[11px] font-semibold text-sky-400 hover:text-sky-300 bg-sky-950/60 border border-sky-800/50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-download"></i> Tout télécharger
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Main Display Canvas -->
-                <div class="my-auto py-4 flex flex-col items-center justify-center min-h-[400px] relative">
+                <div class="my-auto py-4 flex flex-col items-center justify-center min-h-[440px] relative w-full">
 
-                    <!-- Placeholder State -->
                     <div id="state-placeholder" class="text-center p-8 max-w-sm flex flex-col items-center">
                         <div class="w-16 h-16 mb-4 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-600 shadow-inner">
                             <i class="fa-solid fa-camera-viewfinder text-2xl text-sky-400/60"></i>
                         </div>
-                        <h3 class="text-neutral-200 font-medium text-sm mb-1">Prêt pour la création</h3>
-                        <p class="text-xs text-neutral-500 leading-relaxed">Saisissez votre description et lancez la génération pour obtenir votre photo 16:9.</p>
+                        <h3 class="text-neutral-200 font-medium text-sm mb-1">Studio Prêt</h3>
+                        <p class="text-xs text-neutral-500 leading-relaxed">Générez plusieurs propositions ou modifiez une photo existante en mode 16:9.</p>
                     </div>
 
-                    <!-- Loading State -->
                     <div id="state-loading" class="hidden text-center p-8 flex flex-col items-center justify-center space-y-4">
                         <div class="relative w-20 h-20 flex items-center justify-center">
                             <div class="absolute inset-0 rounded-full border-2 border-sky-500/20 border-t-sky-400 animate-spin"></div>
                             <i class="fa-solid fa-aperture text-xl text-sky-400 animate-pulse"></i>
                         </div>
                         <div class="space-y-1">
-                            <h3 class="text-neutral-200 font-medium text-sm">Génération 16:9 en cours...</h3>
-                            <p class="text-[11px] text-neutral-500 italic">Rendu de la lumière, piqué optique et micro-détails...</p>
+                            <h3 class="text-neutral-200 font-medium text-sm" id="loading-title">Traitement en cours...</h3>
+                            <p class="text-[11px] text-neutral-500 italic">Génération des rendus photo-réalistes 16:9...</p>
                         </div>
                     </div>
 
-                    <!-- Image Display Container -->
-                    <div id="state-result" class="hidden w-full flex flex-col items-center">
-                        <div class="relative group max-w-full rounded-xl overflow-hidden border border-neutral-800 shadow-2xl bg-black">
-                            <img id="generated-image" src="" alt="Cliché Photo-Réaliste IA" class="max-h-[520px] w-auto object-contain" />
-                        </div>
-
-                        <!-- Action Toolbar -->
-                        <div class="flex flex-wrap items-center justify-center gap-2.5 mt-5 w-full">
-                            <button id="btn-download" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-black font-semibold text-xs transition-all flex items-center gap-2 shadow-md shadow-sky-500/10">
-                                <i class="fa-solid fa-download"></i>
-                                <span>Télécharger (HD)</span>
-                            </button>
-                            <button id="btn-fullscreen" class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-medium text-xs border border-neutral-800 transition-all flex items-center gap-1.5">
-                                <i class="fa-solid fa-expand text-sky-400"></i>
-                                <span>Plein Écran</span>
-                            </button>
-                            <button id="btn-copy-prompt" class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-medium text-xs border border-neutral-800 transition-all flex items-center gap-1.5">
-                                <i class="fa-solid fa-copy text-amber-400"></i>
-                                <span>Copier le Prompt</span>
-                            </button>
-                        </div>
+                    <div id="state-result" class="hidden w-full">
+                        <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
 
-                    <!-- Error State -->
                     <div id="state-error" class="hidden text-center p-6 max-w-md bg-red-950/30 border border-red-900/40 rounded-2xl">
                         <i class="fa-solid fa-triangle-exclamation text-red-400 text-2xl mb-2"></i>
-                        <h3 class="text-red-200 font-medium text-xs mb-1">Erreur de génération</h3>
-                        <p id="error-message-text" class="text-[11px] text-red-300/70 mb-3">La génération a échoué. Veuillez réessayer.</p>
+                        <h3 class="text-red-200 font-medium text-xs mb-1">Erreur de traitement</h3>
+                        <p id="error-message-text" class="text-[11px] text-red-300/70 mb-3">L'opération a échoué. Veuillez réessayer.</p>
                         <button id="btn-retry" class="px-3 py-1 rounded bg-red-900/80 hover:bg-red-800 text-white text-[11px] transition-all">
                             Réessayer
                         </button>
@@ -214,11 +239,11 @@
 
     <!-- Gallery Modal -->
     <div id="gallery-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-neutral-800 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-box-archive text-sky-400"></i>
-                    <h3 class="font-semibold text-neutral-200 text-sm">Galerie Photo Réaliste (16:9)</h3>
+                    <h3 class="font-semibold text-neutral-200 text-sm">Galerie Studio 16:9</h3>
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="btn-clear-gallery" class="text-[11px] text-red-400 hover:text-red-300 font-medium px-2.5 py-1 rounded bg-red-950/40 border border-red-900/40">
@@ -240,6 +265,28 @@
         </div>
     </div>
 
+    <!-- Picker Modal (For selecting existing photo from gallery into retargeter) -->
+    <div id="picker-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-neutral-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-hand-pointer text-sky-400"></i>
+                    <h3 class="font-semibold text-neutral-200 text-sm">Sélectionner une photo source pour la retouche</h3>
+                </div>
+                <button id="btn-close-picker" class="text-neutral-400 hover:text-neutral-200 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <div id="picker-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+                <div id="picker-empty" class="text-center py-12 text-neutral-500">
+                    <i class="fa-regular fa-folder-open text-3xl mb-2 text-neutral-600"></i>
+                    <p class="text-xs">Aucune photo disponible dans la galerie pour le moment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Fullscreen Modal -->
     <div id="fullscreen-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
         <button id="btn-close-fullscreen" class="absolute top-6 right-6 text-white text-xl p-3 hover:text-sky-400">
@@ -251,34 +298,46 @@
     <script>
         const STATE = {
             apiKey: "",
-            ratio: "16:9", // Fixé par défaut en 16:9
-            currentFullPrompt: "",
-            currentImageBase64: null,
+            activeMode: 'gen',
+            variationsCount: 4,
+            currentBatchImages: [],
+            currentSourceBase64: null,
+            currentSourceMime: null,
             gallery: []
         };
 
         const DOM = {
+            tabGen: document.getElementById('tab-gen'),
+            tabEdit: document.getElementById('tab-edit'),
+            panelGen: document.getElementById('panel-gen'),
+            panelEdit: document.getElementById('panel-edit'),
+
             promptInput: document.getElementById('prompt-input'),
             btnEnhance: document.getElementById('btn-enhance-photo'),
             btnClearPrompt: document.getElementById('btn-clear-prompt'),
             btnGenerate: document.getElementById('btn-generate'),
+            varButtons: document.querySelectorAll('.var-btn'),
 
-            // Display states
+            sourceFileInput: document.getElementById('source-file-input'),
+            sourcePreviewImg: document.getElementById('source-preview-img'),
+            sourcePlaceholderContent: document.getElementById('source-placeholder-content'),
+            btnClearSource: document.getElementById('btn-clear-source'),
+            btnPickFromGallery: document.getElementById('btn-pick-from-gallery'),
+            editPromptInput: document.getElementById('edit-prompt-input'),
+            btnEdit: document.getElementById('btn-edit'),
+
             statePlaceholder: document.getElementById('state-placeholder'),
             stateLoading: document.getElementById('state-loading'),
             stateResult: document.getElementById('state-result'),
             stateError: document.getElementById('state-error'),
+            loadingTitle: document.getElementById('loading-title'),
             errorMessageText: document.getElementById('error-message-text'),
             btnRetry: document.getElementById('btn-retry'),
 
-            // Outputs
-            generatedImage: document.getElementById('generated-image'),
-            photoSpecTag: document.getElementById('photo-spec-tag'),
-            btnDownload: document.getElementById('btn-download'),
-            btnFullscreen: document.getElementById('btn-fullscreen'),
-            btnCopyPrompt: document.getElementById('btn-copy-prompt'),
+            resultsGrid: document.getElementById('results-grid'),
+            resultToolbar: document.getElementById('result-toolbar'),
+            btnDownloadAll: document.getElementById('btn-download-all'),
 
-            // Gallery & Fullscreen
             btnShowGallery: document.getElementById('btn-show-gallery'),
             galleryBadge: document.getElementById('gallery-badge'),
             galleryModal: document.getElementById('gallery-modal'),
@@ -286,6 +345,11 @@
             btnClearGallery: document.getElementById('btn-clear-gallery'),
             galleryGrid: document.getElementById('gallery-grid'),
             galleryEmpty: document.getElementById('gallery-empty'),
+
+            pickerModal: document.getElementById('picker-modal'),
+            btnClosePicker: document.getElementById('btn-close-picker'),
+            pickerGrid: document.getElementById('picker-grid'),
+            pickerEmpty: document.getElementById('picker-empty'),
 
             fullscreenModal: document.getElementById('fullscreen-modal'),
             fullscreenImage: document.getElementById('fullscreen-image'),
@@ -295,29 +359,80 @@
         window.onload = function() {
             loadGalleryFromStorage();
             bindEvents();
+            updateVariationsUI();
         };
 
         function bindEvents() {
+            DOM.tabGen.addEventListener('click', () => switchMode('gen'));
+            DOM.tabEdit.addEventListener('click', () => switchMode('edit'));
+
             DOM.btnClearPrompt.addEventListener('click', () => {
                 DOM.promptInput.value = '';
                 DOM.promptInput.focus();
             });
 
-            DOM.btnEnhance.addEventListener('click', boostPhotoRealism);
-            DOM.btnGenerate.addEventListener('click', generatePhoto);
-            DOM.btnRetry.addEventListener('click', generatePhoto);
+            DOM.varButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    STATE.variationsCount = parseInt(e.target.getAttribute('data-count'));
+                    updateVariationsUI();
+                });
+            });
 
-            DOM.btnDownload.addEventListener('click', downloadPhoto);
-            DOM.btnFullscreen.addEventListener('click', openFullscreen);
-            DOM.btnCopyPrompt.addEventListener('click', copyFullPrompt);
+            DOM.btnEnhance.addEventListener('click', boostPhotoRealism);
+            DOM.btnGenerate.addEventListener('click', generatePhotoBatch);
+            DOM.btnEdit.addEventListener('click', editExistingPhoto);
+            DOM.btnRetry.addEventListener('click', () => {
+                if (STATE.activeMode === 'gen') generatePhotoBatch();
+                else editExistingPhoto();
+            });
+
+            DOM.sourceFileInput.addEventListener('change', handleImageUpload);
+            DOM.btnClearSource.addEventListener('click', (e) => {
+                e.stopPropagation();
+                clearSourceImage();
+            });
+            DOM.btnPickFromGallery.addEventListener('click', openPickerModal);
+
+            DOM.btnDownloadAll.addEventListener('click', downloadAllBatch);
 
             DOM.btnShowGallery.addEventListener('click', openGallery);
             DOM.btnCloseGallery.addEventListener('click', closeGallery);
             DOM.btnClearGallery.addEventListener('click', clearGallery);
 
+            DOM.btnClosePicker.addEventListener('click', closePickerModal);
+            DOM.pickerModal.addEventListener('click', (e) => {
+                if (e.target === DOM.pickerModal) closePickerModal();
+            });
+
             DOM.btnCloseFullscreen.addEventListener('click', closeFullscreen);
             DOM.fullscreenModal.addEventListener('click', (e) => {
                 if (e.target === DOM.fullscreenModal) closeFullscreen();
+            });
+        }
+
+        function switchMode(mode) {
+            STATE.activeMode = mode;
+            if (mode === 'gen') {
+                DOM.tabGen.className = "py-2 rounded-lg bg-sky-500 text-black transition-all flex items-center justify-center gap-2";
+                DOM.tabEdit.className = "py-2 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                DOM.panelGen.classList.remove('hidden');
+                DOM.panelEdit.classList.add('hidden');
+            } else {
+                DOM.tabEdit.className = "py-2 rounded-lg bg-amber-400 text-black transition-all flex items-center justify-center gap-2";
+                DOM.tabGen.className = "py-2 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                DOM.panelEdit.classList.remove('hidden');
+                DOM.panelGen.classList.add('hidden');
+            }
+        }
+
+        function updateVariationsUI() {
+            DOM.varButtons.forEach(btn => {
+                const count = parseInt(btn.getAttribute('data-count'));
+                if (count === STATE.variationsCount) {
+                    btn.className = "var-btn py-2.5 rounded-xl border border-sky-500 bg-sky-950/40 text-xs font-semibold text-sky-400 shadow-sm transition-all";
+                } else {
+                    btn.className = "var-btn py-2.5 rounded-xl border border-neutral-800 bg-neutral-900 text-xs font-semibold text-neutral-300 hover:border-sky-500/50 transition-all";
+                }
             });
         }
 
@@ -326,9 +441,14 @@
             DOM.stateLoading.classList.add('hidden');
             DOM.stateResult.classList.add('hidden');
             DOM.stateError.classList.add('hidden');
+            DOM.resultToolbar.classList.add('hidden');
 
             if (state === 'loading') DOM.stateLoading.classList.remove('hidden');
-            if (state === 'result') DOM.stateResult.classList.remove('hidden');
+            if (state === 'result') {
+                DOM.stateResult.classList.remove('hidden');
+                DOM.resultToolbar.classList.remove('hidden');
+                DOM.resultToolbar.classList.add('flex');
+            }
             if (state === 'error') DOM.stateError.classList.remove('hidden');
             if (state === 'placeholder') DOM.statePlaceholder.classList.remove('hidden');
         }
@@ -339,6 +459,76 @@
             toast.innerHTML = `<i class="fa-solid fa-circle-check text-sky-400"></i> ${msg}`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 2800);
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const dataUrl = evt.target.result;
+                setSourceImageFromDataUrl(dataUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setSourceImageFromDataUrl(dataUrl) {
+            const arr = dataUrl.split(',');
+            if (arr.length < 2) return;
+            const mimeMatch = arr[0].match(/:(.*?);/);
+            STATE.sourceMime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+            STATE.sourceBase64 = arr[1];
+
+            DOM.sourcePreviewImg.src = dataUrl;
+            DOM.sourcePreviewImg.classList.remove('hidden');
+            DOM.sourcePlaceholderContent.classList.add('hidden');
+            DOM.btnClearSource.classList.remove('hidden');
+            showNotification("Image source prête pour la retouche !");
+        }
+
+        function clearSourceImage() {
+            STATE.sourceBase64 = null;
+            STATE.sourceMime = null;
+            DOM.sourcePreviewImg.src = '';
+            DOM.sourcePreviewImg.classList.add('hidden');
+            DOM.sourcePlaceholderContent.classList.remove('hidden');
+            DOM.btnClearSource.classList.add('hidden');
+            DOM.sourceFileInput.value = '';
+            showNotification("Image source réinitialisée.");
+        }
+
+        window.loadIntoEditorFromGallery = function(imgUrl) {
+            setSourceImageFromDataUrl(imgUrl);
+            switchMode('edit');
+            closeGallery();
+            closePickerModal();
+        };
+
+        function openPickerModal() {
+            renderPickerGallery();
+            DOM.pickerModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closePickerModal() {
+            DOM.pickerModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function renderPickerGallery() {
+            if (STATE.gallery.length === 0) {
+                DOM.pickerGrid.innerHTML = '';
+                DOM.pickerEmpty.classList.remove('hidden');
+                return;
+            }
+            DOM.pickerEmpty.classList.add('hidden');
+            DOM.pickerGrid.innerHTML = STATE.gallery.map(item => `
+                <div onclick="loadIntoEditorFromGallery('${item.img}')" class="group relative rounded-xl overflow-hidden bg-black border border-neutral-800 aspect-video cursor-pointer hover:border-sky-500 transition-all">
+                    <img src="${item.img}" class="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Sélection">
+                    <div class="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="bg-sky-500 text-black font-bold text-xs px-3 py-1.5 rounded-lg shadow"><i class="fa-solid fa-check mr-1"></i> Sélectionner</span>
+                    </div>
+                </div>
+            `).join('');
         }
 
         async function boostPhotoRealism() {
@@ -378,11 +568,11 @@
                 showNotification("Impossible d'optimiser le prompt.");
             } finally {
                 DOM.btnEnhance.disabled = false;
-                DOM.btnEnhance.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i><span>Booster le réalisme</span>`;
+                DOM.btnEnhance.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i><span>Booster</span>`;
             }
         }
 
-        async function generatePhoto() {
+        async function generatePhotoBatch() {
             const subject = DOM.promptInput.value.trim();
             if (!subject) {
                 showNotification("Veuillez inscrire une description pour votre photo.");
@@ -390,24 +580,119 @@
                 return;
             }
 
-            // Construction automatique du prompt optimisé photo-réaliste 16:9
             const fullPhotoPrompt = `Photographie professionnelle hyper-réaliste en format 16:9, ${subject}. Prise de vue reflex haut de gamme, piqué d'image exceptionnel, éclairage naturel soigné, micro-détails parfaits, nuances de couleurs subtiles, profondeur de champ cinématographique, qualité HD 8k.`;
 
-            STATE.currentFullPrompt = fullPhotoPrompt;
+            STATE.currentBatchImages = [];
             setDisplayState('loading');
 
             const model = "gemini-3.1-flash-image";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${STATE.apiKey}`;
 
+            const total = STATE.variationsCount;
+            const requests = [];
+
+            for (let i = 0; i < total; i++) {
+                const variantPrompt = fullPhotoPrompt + ` (Proposition de cadre n°${i+1}, angle et composition alternatifs).`;
+
+                const payload = {
+                    contents: [{
+                        role: 'user',
+                        parts: [{ text: variantPrompt }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ['IMAGE'],
+                        imageConfig: {
+                            aspectRatio: "16:9"
+                        }
+                    }
+                };
+
+                DOM.loadingTitle.innerText = `Génération (${i+1}/${total}) en cours...`;
+
+                requests.push(
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                        if (part && part.inlineData) {
+                            const mime = part.inlineData.mimeType || 'image/png';
+                            return `data:${mime};base64,${part.inlineData.data}`;
+                        }
+                        throw new Error("Format invalide");
+                    })
+                    .catch(err => {
+                        console.warn(`Échec de la variation ${i+1}:`, err);
+                        return null;
+                    })
+                );
+            }
+
+            try {
+                const results = await Promise.all(requests);
+                const validImages = results.filter(img => img !== null);
+
+                if (validImages.length === 0) {
+                    throw new Error("Toutes les requêtes de génération ont échoué.");
+                }
+
+                STATE.currentBatchImages = validImages;
+                renderBatchResults(validImages, subject);
+                setDisplayState('result');
+
+                validImages.forEach(imgUrl => {
+                    saveToGallery(imgUrl, subject);
+                });
+
+                showNotification(`${validImages.length} proposition(s) générée(s) avec succès !`);
+
+            } catch (err) {
+                console.error("Erreur de génération du batch:", err);
+                DOM.errorMessageText.innerText = err.message || "Erreur lors de la génération des propositions.";
+                setDisplayState('error');
+            }
+        }
+
+        async function editExistingPhoto() {
+            if (!STATE.currentSourceBase64) {
+                showNotification("Veuillez d'abord importer ou sélectionner une photo source.");
+                return;
+            }
+            const editInstruction = DOM.editPromptInput.value.trim();
+            if (!editInstruction) {
+                showNotification("Veuillez indiquer l'instruction de retouche.");
+                DOM.editPromptInput.focus();
+                return;
+            }
+
+            setDisplayState('loading');
+            DOM.loadingTitle.innerText = "Retouche photo en cours (16:9)...";
+
+            const model = "gemini-3.1-flash-image";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${STATE.apiKey}`;
+
+            const fullEditPrompt = `Modifie cette photographie existante en respectant le format 16:9 et un style photo-réaliste absolu. Instruction précise de retouche : ${editInstruction}. Conserve la haute qualité d'image et le piqué professionnel.`;
+
             const payload = {
                 contents: [{
-                    role: 'user',
-                    parts: [{ text: fullPhotoPrompt }]
+                    role: "user",
+                    parts: [
+                        { text: fullEditPrompt },
+                        {
+                            inlineData: {
+                                mimeType: STATE.sourceMime || "image/jpeg",
+                                data: STATE.currentSourceBase64
+                            }
+                        }
+                    ]
                 }],
                 generationConfig: {
                     responseModalities: ['IMAGE'],
                     imageConfig: {
-                        aspectRatio: STATE.ratio
+                        aspectRatio: "16:9"
                     }
                 }
             };
@@ -419,82 +704,102 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) throw new Error(`Erreur réseau (${response.status})`);
-
                 const result = await response.json();
                 const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
 
-                if (part && part.inlineData) {
-                    const mime = part.inlineData.mimeType || 'image/png';
-                    const base64Url = `data:${mime};base64,${part.inlineData.data}`;
-
-                    STATE.currentImageBase64 = base64Url;
-                    DOM.generatedImage.src = base64Url;
-
-                    DOM.photoSpecTag.innerText = `16:9 • Ultra HD`;
-                    DOM.photoSpecTag.classList.remove('hidden');
-
-                    setDisplayState('result');
-                    saveToGallery(base64Url, subject, fullPhotoPrompt);
-                } else {
-                    throw new Error("Format de réponse image non valide.");
+                if (!part || !part.inlineData) {
+                    throw new Error("Échec de la retouche par l'IA.");
                 }
 
+                const mime = part.inlineData.mimeType || 'image/png';
+                const editedImgUrl = `data:${mime};base64,${part.inlineData.data}`;
+
+                STATE.currentBatchImages = [editedImgUrl];
+                renderBatchResults([editedImgUrl], `Retouche: ${editInstruction}`);
+                setDisplayState('result');
+
+                saveToGallery(editedImgUrl, `Retouche: ${editInstruction}`);
+                showNotification("Photo retouchée avec succès !");
+
             } catch (err) {
-                console.error("Erreur de génération photo:", err);
-                DOM.errorMessageText.innerText = err.message || "Erreur lors de la capture photo.";
+                console.error("Erreur de retouche:", err);
+                DOM.errorMessageText.innerText = err.message || "Erreur lors de la retouche photo.";
                 setDisplayState('error');
             }
         }
 
-        function downloadPhoto() {
-            if (!STATE.currentImageBase64) return;
+        function renderBatchResults(images, subject) {
+            DOM.resultsGrid.innerHTML = images.map((imgUrl, index) => `
+                <div class="group relative rounded-xl overflow-hidden bg-black border border-neutral-800 aspect-video shadow-xl flex items-center justify-center">
+                    <img src="${imgUrl}" alt="Proposition ${index+1}" class="w-full h-full object-cover" />
+                    
+                    <div class="absolute inset-0 bg-neutral-950/80 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold bg-sky-500 text-black px-2 py-0.5 rounded-full">Option 0${index+1}</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="loadIntoEditorFromGallery('${imgUrl}')" title="Utiliser comme source de retouche" class="text-neutral-300 hover:text-amber-400 p-1.5 rounded-lg bg-neutral-900/80 border border-neutral-700 transition-colors">
+                                    <i class="fa-solid fa-paintbrush text-xs"></i>
+                                </button>
+                                <button onclick="openFullscreenModal('${imgUrl}')" class="text-neutral-300 hover:text-white p-1.5 rounded-lg bg-neutral-900/80 border border-neutral-700">
+                                    <i class="fa-solid fa-expand text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="downloadSingleImage('${imgUrl}', ${index+1})" class="flex-1 py-2 rounded-lg bg-sky-400 hover:bg-sky-300 text-black font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow">
+                                <i class="fa-solid fa-download"></i> Télécharger
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.downloadSingleImage = function(imgUrl, index) {
             const a = document.createElement('a');
-            a.href = STATE.currentImageBase64;
-            a.download = `aperture-photo-16-9-${Date.now()}.png`;
+            a.href = imgUrl;
+            a.download = `aperture-photo-16-9-${index}-${Date.now()}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            showNotification("Photo 16:9 téléchargée en HD.");
+            showNotification(`Proposition téléchargée.`);
+        };
+
+        function downloadAllBatch() {
+            if (STATE.currentBatchImages.length === 0) return;
+            STATE.currentBatchImages.forEach((imgUrl, index) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = imgUrl;
+                    a.download = `aperture-batch-${index+1}-${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, index * 300);
+            });
+            showNotification("Téléchargement de toutes les propositions en cours...");
         }
 
-        function openFullscreen() {
-            if (!STATE.currentImageBase64) return;
-            DOM.fullscreenImage.src = STATE.currentImageBase64;
+        window.openFullscreenModal = function(imgUrl) {
+            DOM.fullscreenImage.src = imgUrl;
             DOM.fullscreenModal.classList.remove('opacity-0', 'pointer-events-none');
-        }
+        };
 
         function closeFullscreen() {
             DOM.fullscreenModal.classList.add('opacity-0', 'pointer-events-none');
         }
 
-        function copyFullPrompt() {
-            if (!STATE.currentFullPrompt) return;
-            navigator.clipboard.writeText(STATE.currentFullPrompt).then(() => {
-                showNotification("Prompt photo copié dans le presse-papier !");
-            }).catch(() => {
-                const area = document.createElement('textarea');
-                area.value = STATE.currentFullPrompt;
-                document.body.appendChild(area);
-                area.select();
-                document.execCommand('copy');
-                document.body.removeChild(area);
-                showNotification("Prompt photo copié !");
-            });
-        }
-
-        function saveToGallery(img, subject, fullPrompt) {
+        function saveToGallery(img, subject) {
             const item = {
-                id: Date.now(),
+                id: Date.now() + Math.random(),
                 img,
-                subject,
-                fullPrompt
+                subject
             };
             STATE.gallery.unshift(item);
-            if (STATE.gallery.length > 12) STATE.gallery.pop();
+            if (STATE.gallery.length > 25) STATE.gallery.pop();
 
             try {
-                localStorage.setItem('aperture_photos_169_gallery', JSON.stringify(STATE.gallery));
+                localStorage.setItem('aperture_photos_final_gallery', JSON.stringify(STATE.gallery));
             } catch (e) {
                 console.warn("Stockage local plein.");
             }
@@ -503,7 +808,7 @@
 
         function loadGalleryFromStorage() {
             try {
-                const stored = localStorage.getItem('aperture_photos_169_gallery');
+                const stored = localStorage.getItem('aperture_photos_final_gallery');
                 if (stored) STATE.gallery = JSON.parse(stored);
             } catch (e) {
                 STATE.gallery = [];
@@ -526,7 +831,7 @@
 
         function clearGallery() {
             STATE.gallery = [];
-            localStorage.removeItem('aperture_photos_169_gallery');
+            localStorage.removeItem('aperture_photos_final_gallery');
             updateGalleryBadge();
             renderGallery();
             showNotification("Galerie vidée.");
@@ -543,27 +848,29 @@
                 <div class="group relative rounded-xl overflow-hidden bg-black border border-neutral-800 aspect-video">
                     <img src="${item.img}" class="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Cliché 16:9">
                     <div class="absolute inset-0 bg-neutral-950/85 opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-between">
-                        <p class="text-[11px] text-neutral-300 line-clamp-3">${item.subject}</p>
-                        <button onclick="loadPhotoFromGallery(${item.id})" class="text-[11px] bg-sky-400 hover:bg-sky-300 text-black font-semibold px-2 py-1.5 rounded transition-colors w-full">
-                            Afficher dans le viseur
-                        </button>
+                        <p class="text-[11px] text-neutral-300 line-clamp-2">${item.subject}</p>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="loadIntoEditorFromGallery('${item.img}')" title="Retoucher" class="flex-1 text-[10px] bg-amber-500 hover:bg-amber-400 text-black font-semibold px-2 py-1.5 rounded transition-colors text-center flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-paintbrush"></i> Retoucher
+                            </button>
+                            <button onclick="openFullscreenModal('${item.img}')" class="text-[11px] bg-sky-400 hover:bg-sky-300 text-black font-semibold px-2.5 py-1.5 rounded transition-colors">
+                                Voir
+                            </button>
+                            <button onclick="deleteGalleryItem(${item.id})" class="text-[11px] bg-red-950/80 hover:bg-red-900 text-red-300 px-2 py-1.5 rounded transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        window.loadPhotoFromGallery = function(id) {
-            const item = STATE.gallery.find(g => g.id === id);
-            if (!item) return;
-
-            STATE.currentImageBase64 = item.img;
-            STATE.currentFullPrompt = item.fullPrompt;
-            DOM.generatedImage.src = item.img;
-            DOM.promptInput.value = item.subject;
-
-            setDisplayState('result');
-            closeGallery();
-            showNotification("Cliché chargé dans le viseur.");
+        window.deleteGalleryItem = function(id) {
+            STATE.gallery = STATE.gallery.filter(g => g.id !== id);
+            localStorage.setItem('aperture_photos_final_gallery', JSON.stringify(STATE.gallery));
+            updateGalleryBadge();
+            renderGallery();
+            showNotification("Photo supprimée de la galerie.");
         };
     </script>
 </body>
