@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<!-- STREAMING_CHUNK:Initializing HTML document and Tailwind configuration... -->
 <html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Image Studio</title>
+    <title>Gemini Image Studio - Studio de Création IA Avancé</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,659 +12,790 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: {
-                            900: '#0f172a',
-                            800: '#1e293b',
-                            700: '#334155',
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
                         }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome pour les icônes -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); }
+        }
+        .generating-glow { animation: pulse-glow 2s infinite ease-in-out; }
+    </style>
 </head>
-<body class="bg-dark-900 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <!-- STREAMING_CHUNK:Rendering header and API key panel... -->
-    <!-- En-tête -->
-    <header class="border-b border-dark-700 bg-dark-800/50 backdrop-blur sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight">Gemini Image Studio</h1>
-                    <p class="text-xs text-slate-400">Modèle officiel gemini-3.1-flash-image</p>
-                </div>
+    <!-- Header -->
+    <header class="glass-panel border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
             </div>
-            
-            <!-- Configuration Clé API & Navigation -->
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="flex items-center bg-dark-900 border border-dark-700 rounded-xl px-3 py-1.5 shadow-inner">
-                    <i class="fa-solid fa-key text-slate-400 text-xs mr-2"></i>
-                    <input type="password" id="api-key-input" placeholder="Clé API Gemini" oninput="saveApiKey(this.value)" class="bg-transparent text-xs text-slate-200 focus:outline-none w-36 sm:w-44 placeholder-slate-500">
-                    <button onclick="toggleApiKeyVisibility()" class="text-slate-400 hover:text-slate-200 px-1.5 text-xs transition" title="Afficher / Masquer">
-                        <i id="eye-icon" class="fa-solid fa-eye"></i>
-                    </button>
-                    <button onclick="clearApiKey()" class="text-slate-500 hover:text-red-400 px-1 text-xs transition" title="Effacer la clé">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-
-                <div class="flex bg-dark-700/60 p-1 rounded-xl border border-dark-700">
-                    <button onclick="switchTab('studio')" id="tab-studio" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
-                        <i class="fa-solid fa-palette"></i> Studio
-                    </button>
-                    <button onclick="switchTab('album')" id="tab-album" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-images"></i> Album (<span id="album-count">0</span>)
-                    </button>
-                </div>
+            <div>
+                <h1 class="font-bold text-lg bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">Gemini Image Studio</h1>
+                <p class="text-xs text-slate-400">Génération & Édition IA Haute Précision</p>
             </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button id="open-history-btn" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition flex items-center space-x-2 border border-slate-700">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span class="hidden sm:inline">Historique</span>
+                <span id="history-badge" class="bg-brand-600 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
+            </button>
+            <button id="clear-all-btn" class="px-3 py-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 text-sm font-medium transition flex items-center space-x-2 border border-rose-800/40" title="Effacer l'atelier">
+                <i class="fa-solid fa-trash-can"></i>
+                <span class="hidden sm:inline">Réinitialiser</span>
+            </button>
         </div>
     </header>
 
-    <!-- STREAMING_CHUNK:Rendering main layout and studio view... -->
-    <!-- Contenu Principal -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
-
-        <!-- SECTION STUDIO -->
-        <div id="view-studio" class="space-y-6">
-            
-            <!-- Panneau de Contrôle & Prompt -->
-            <div class="bg-dark-800 border border-dark-700 rounded-2xl p-5 shadow-xl">
-                
-                <!-- Indicateur d'image de référence active -->
-                <div id="reference-preview-container" class="hidden mb-4 p-3 bg-dark-900/80 border border-indigo-500/40 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img id="reference-thumb" src="" alt="Référence" class="w-16 h-10 object-cover rounded border border-slate-700">
-                        <div>
-                            <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider block">Mode Édition avec Image Source</span>
-                            <span id="reference-name" class="text-xs text-slate-300 truncate max-w-xs block">Image chargée</span>
-                        </div>
-                    </div>
-                    <button onclick="clearReferenceImage()" class="text-slate-400 hover:text-red-400 text-sm p-1.5 transition">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Panel: Controls & Prompt Engineering -->
+        <section class="lg:col-span-5 flex flex-col space-y-5">
+            <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-semibold text-base text-slate-200 flex items-center space-x-2">
+                        <i class="fa-solid fa-sliders text-brand-400"></i>
+                        <span>Paramètres & Prompt Strict</span>
+                    </h2>
+                    <span class="text-xs text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50">Modèle: gemini-3.1-flash-image</span>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <label for="prompt-input" class="text-sm font-medium text-slate-300">
-                            Décrivez votre création (Génération simultanée 4x) :
-                        </label>
-                        
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                            <!-- Sélecteur d'aspect ratio -->
-                            <div class="flex items-center bg-dark-900 border border-dark-700 rounded-xl px-3 py-1">
-                                <span class="text-xs text-slate-400 mr-2"><i class="fa-solid fa-crop"></i> Format:</span>
-                                <select id="aspect-ratio-select" class="bg-transparent text-xs text-slate-200 focus:outline-none">
-                                    <option value="16:9" selected>16:9 (Paysage)</option>
-                                    <option value="1:1">1:1 (Carré)</option>
-                                    <option value="4:3">4:3 (Standard)</option>
-                                    <option value="3:4">3:4 (Portrait)</option>
-                                    <option value="9:16">9:16 (Story)</option>
-                                </select>
-                            </div>
-
-                            <label class="cursor-pointer text-xs bg-dark-700 hover:bg-dark-600 text-indigo-300 hover:text-indigo-200 px-3 py-1.5 rounded-xl border border-indigo-500/30 transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-upload"></i> Source
-                                <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                            </label>
-                        </div>
+                <!-- Prompt Input -->
+                <div class="flex flex-col space-y-1.5">
+                    <label for="prompt-input" class="text-xs font-medium text-slate-300 flex justify-between">
+                        <span>Description textuelle précise <span class="text-rose-400">*</span></span>
+                        <span id="prompt-char-count" class="text-slate-500 text-[10px]">0 / 1000</span>
+                    </label>
+                    <textarea id="prompt-input" rows="4" placeholder="Décrivez exactement ce que vous voulez générer (sujet, style, composition, couleurs, ambiance)... Soyez précis." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition resize-none"></textarea>
+                    <div class="flex flex-wrap gap-1.5 mt-1">
+                        <button type="button" class="preset-tag text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700/60 transition" data-prompt="Photographie macro ultra-réaliste d'une abeille butinant une fleur de lavande violette, rosée matinale, lumière dorée, profondeur de champ prononcée">🐝 Abeille macro</button>
+                        <button type="button" class="preset-tag text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700/60 transition" data-prompt="Concept art futuriste d'une cité spatiale orbitale en anneau, style cyberpunk lumineux, néons cyan et magenta, vaisseaux en transit">🚀 Cité spatiale</button>
+                        <button type="button" class="preset-tag text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700/60 transition" data-prompt="Peinture à l'huile impressionnante d'un chalet alpin au bord d'un lac miroir reflétant des montagnes enneigées au coucher du soleil">🎨 Peinture alpine</button>
                     </div>
-                    
-                    <div class="relative">
-                        <textarea id="prompt-input" rows="3" placeholder="Ex: Un magnifique paysage futuriste au coucher du soleil, style cyberpunk détaillé..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"></textarea>
-                    </div>
+                </div>
 
-                    <!-- Historique des prompts -->
-                    <div id="prompt-history-section" class="hidden pt-1">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-xs text-slate-400 font-medium flex items-center gap-1">
-                                <i class="fa-solid fa-clock-rotate-left"></i> Prompts récents :
-                            </span>
-                            <button onclick="clearPromptHistory()" class="text-xs text-slate-500 hover:text-red-400 transition">Effacer</button>
-                        </div>
-                        <div id="prompt-history-list" class="flex flex-wrap gap-2 max-h-20 overflow-y-auto"></div>
-                    </div>
-
-                    <div class="flex justify-end pt-2">
-                        <button onclick="generateImagesWithGemini()" id="generate-btn" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 text-sm">
-                            <i class="fa-solid fa-sparkles"></i> Générer 4 variations avec Gemini
+                <!-- Aspect Ratio Selector -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-xs font-medium text-slate-300">Format d'image (Aspect Ratio)</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button type="button" data-ratio="1:1" class="ratio-btn py-2 px-3 rounded-xl border border-brand-500 bg-brand-500/10 text-brand-300 text-xs font-semibold flex flex-col items-center justify-center transition">
+                            <i class="fa-solid fa-square text-sm mb-1"></i>
+                            <span>1:1 Carré</span>
+                        </button>
+                        <button type="button" data-ratio="16:9" class="ratio-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex flex-col items-center justify-center transition">
+                            <i class="fa-solid fa-rectangle-xmark text-sm mb-1 rotate-90"></i>
+                            <span>16:9 Paysage</span>
+                        </button>
+                        <button type="button" data-ratio="9:16" class="ratio-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex flex-col items-center justify-center transition">
+                            <i class="fa-solid fa-mobile-screen text-sm mb-1"></i>
+                            <span>9:16 Portrait</span>
+                        </button>
+                        <button type="button" data-ratio="4:3" class="ratio-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex flex-col items-center justify-center transition">
+                            <i class="fa-solid fa-image text-sm mb-1"></i>
+                            <span>4:3 Standard</span>
                         </button>
                     </div>
                 </div>
+
+                <!-- Source Image Upload (Image-to-Image / Variation / Edit) -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-xs font-medium text-slate-300 flex justify-between items-center">
+                        <span>Image de référence (Optionnel - Pour édition/variation)</span>
+                        <button id="remove-source-btn" class="text-rose-400 hover:text-rose-300 text-[11px] hidden">Supprimer</button>
+                    </label>
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer transition bg-slate-900/50 flex flex-col items-center justify-center relative overflow-hidden group">
+                        <input type="file" id="source-image-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div id="source-preview-container" class="hidden w-full h-32 relative rounded-lg overflow-hidden flex items-center justify-center">
+                            <img id="source-preview-img" src="" alt="Source" class="max-h-full max-w-full object-contain rounded-lg">
+                        </div>
+                        <div id="source-placeholder" class="flex flex-col items-center space-y-2 py-2">
+                            <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-brand-400 transition">
+                                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                            </div>
+                            <p class="text-xs text-slate-300 font-medium">Glissez une image ou <span class="text-brand-400 underline">parcourez</span></p>
+                            <p class="text-[10px] text-slate-500">Sera utilisée comme source pour les modifications ou variations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button id="generate-btn" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-sm shadow-lg shadow-brand-600/30 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
+                    <span id="generate-btn-text">Générer l'Image</span>
+                </button>
             </div>
+        </section>
 
-            <!-- STREAMING_CHUNK:Rendering results and progress states... -->
-            <!-- Zone d'Affichage des Résultats -->
-            <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-slate-200">Résultats de la génération</h2>
+        <!-- Right Panel: Results & Gallery -->
+        <section class="lg:col-span-7 flex flex-col space-y-5">
+            <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col flex-1 min-h-[500px]">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-images text-brand-400"></i>
+                        <h2 class="font-semibold text-base text-slate-200">Atelier & Galerie</h2>
+                        <span id="gallery-count" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">0 image</span>
+                    </div>
+                    <div id="batch-actions" class="hidden flex items-center space-x-2">
+                        <button id="download-selected-btn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-download text-brand-400"></i>
+                            <span>Télécharger (<span id="selected-count">0</span>)</span>
+                        </button>
+                        <button id="delete-selected-btn" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-medium rounded-lg border border-rose-800/60 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Supprimer</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div id="loading-state" class="hidden py-16 text-center bg-dark-800/40 border border-dark-700 rounded-2xl">
-                    <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent mb-4"></div>
-                    <p id="loading-text" class="text-slate-300 font-medium">Interrogation de l'API Gemini (0/4 images prêtes)...</p>
-                    <p class="text-xs text-slate-500 mt-1">Génération simultanée en cours...</p>
-                </div>
+                <!-- Gallery Workspace Container -->
+                <div id="gallery-container" class="flex-1 flex flex-col items-center justify-center py-10">
+                    <!-- Empty State -->
+                    <div id="empty-gallery-state" class="text-center flex flex-col items-center max-w-sm mx-auto p-6">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600 mb-4 shadow-inner">
+                            <i class="fa-solid fa-palette text-3xl text-slate-600"></i>
+                        </div>
+                        <h3 class="text-slate-300 font-medium text-base mb-1">Aucune image générée</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">Rédigez une description précise à gauche et cliquez sur "Générer l'Image" pour créer votre premier chef-d'œuvre visuel.</p>
+                    </div>
 
-                <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="col-span-full py-16 text-center border-2 border-dashed border-dark-700 rounded-2xl bg-dark-800/20 text-slate-500">
-                        <i class="fa-solid fa-image text-4xl mb-3 opacity-40"></i>
-                        <p>Renseignez votre clé API Gemini et entrez une description pour lancer la création.</p>
+                    <!-- Loading State -->
+                    <div id="loading-state" class="hidden flex-col items-center justify-center p-8 space-y-4">
+                        <div class="w-16 h-16 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
+                        <div class="text-center">
+                            <p class="text-sm font-semibold text-slate-200" id="loading-status-text">Création artistique en cours...</p>
+                            <p class="text-xs text-slate-400 mt-1">Application stricte du prompt et du format</p>
+                        </div>
+                    </div>
+
+                    <!-- Grid of Generated Images -->
+                    <div id="images-grid" class="hidden w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 overflow-y-auto max-h-[600px] p-1">
+                        <!-- Dynamic Cards will be injected here -->
                     </div>
                 </div>
             </div>
-
-        </div>
-
-        <!-- STREAMING_CHUNK:Rendering album and lightbox modal views... -->
-        <!-- SECTION ALBUM -->
-        <div id="view-album" class="hidden space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-dark-800 border border-dark-700 p-4 rounded-2xl">
-                <div>
-                    <h2 class="text-lg font-semibold text-slate-200">Mon Album</h2>
-                    <p class="text-xs text-slate-400">Retrouvez toutes vos images sauvegardées</p>
-                </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <button id="select-mode-btn" onclick="toggleSelectMode()" class="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-xs font-medium rounded-lg border border-dark-600 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-list-check"></i> Sélectionner
-                    </button>
-                    <button id="batch-delete-btn" onclick="deleteSelectedAlbumImages()" class="hidden px-3 py-1.5 bg-red-600/20 text-red-400 hover:bg-red-600/30 text-xs font-medium rounded-lg border border-red-500/30 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-trash"></i> Supprimer la sélection
-                    </button>
-                </div>
-            </div>
-
-            <div id="album-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            </div>
-        </div>
-
+        </section>
     </main>
 
-    <!-- Modal Lightbox Plein Écran -->
-    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-4" onclick="closeLightbox()">
-        <div class="relative max-w-5xl w-full max-h-[85vh] flex flex-col items-center" onclick="event.stopPropagation()">
-            <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-slate-300 hover:text-white p-2 text-xl transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <img id="lightbox-img" src="" alt="Agrandissement" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-dark-700">
-            <div class="mt-4 flex flex-col sm:flex-row items-center justify-between w-full bg-dark-800/90 border border-dark-700 p-3 rounded-xl gap-3">
-                <p id="lightbox-caption" class="text-xs text-slate-300 italic truncate max-w-xl"></p>
-                <div class="flex items-center gap-2">
-                    <button id="lightbox-modify-btn" onclick="" class="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-slate-200 text-xs rounded-lg transition flex items-center gap-1">
-                        <i class="fa-solid fa-wand-magic"></i> Modifier
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col glass-panel rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/80">
+                <span id="lightbox-title" class="text-xs font-medium text-slate-300 truncate max-w-md">Détails de l'image</span>
+                <button id="lightbox-close-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 p-4 flex items-center justify-center bg-slate-950/50 overflow-auto">
+                <img id="lightbox-img" src="" alt="Agrandissement" class="max-h-[70vh] max-w-full object-contain rounded-lg shadow-2xl">
+            </div>
+            <div class="px-4 py-3 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between flex-wrap gap-2">
+                <p id="lightbox-prompt-text" class="text-xs text-slate-300 italic max-w-xl truncate"></p>
+                <div class="flex items-center space-x-2">
+                    <button id="lightbox-use-source-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-brand-400"></i>
+                        <span>Utiliser comme source</span>
                     </button>
-                    <a id="lightbox-download-btn" href="" download="gemini-creation.jpg" target="_blank" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-lg transition flex items-center gap-1">
-                        <i class="fa-solid fa-download"></i> Télécharger
-                    </a>
+                    <button id="lightbox-download-btn" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium transition flex items-center space-x-1.5 shadow-md shadow-brand-600/30">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Télécharger</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- STREAMING_CHUNK:Initializing application JavaScript logic and API handler... -->
-    <!-- Script Logique -->
-    <script>
-        let apiKey = localStorage.getItem('gemini_api_key') || '';
-        let referenceImage = null;
-        let promptHistory = JSON.parse(localStorage.getItem('gemini_prompt_history') || '[]');
-        let albumImages = JSON.parse(localStorage.getItem('gemini_album_images') || '[]');
-        let isSelectMode = false;
-        let selectedAlbumIds = new Set();
+    <!-- History Drawer Modal -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex justify-end">
+        <div class="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-semibold text-slate-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-clock-rotate-left text-brand-400"></i>
+                    <span>Historique des Prompts</span>
+                </h3>
+                <button id="history-close-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- History items injected here -->
+                <div class="text-center text-slate-500 text-xs py-8">Aucun historique pour le moment</div>
+            </div>
+            <div class="p-4 border-t border-slate-800 flex justify-between">
+                <button id="clear-history-btn" class="px-3 py-2 rounded-lg bg-rose-950/50 hover:bg-rose-900 text-rose-300 text-xs font-medium border border-rose-800/40 transition">
+                    Effacer l'historique
+                </button>
+                <span id="history-count-label" class="text-xs text-slate-500 self-center">0 éléments</span>
+            </div>
+        </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (apiKey) {
-                document.getElementById('api-key-input').value = apiKey;
-            }
-            updateAlbumCount();
-            renderPromptHistory();
+    <!-- Custom Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
+        <div id="toast-icon" class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <p id="toast-message" class="text-xs font-medium text-slate-200">Opération réussie</p>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        // State Management
+        let state = {
+            prompt: '',
+            aspectRatio: '1:1',
+            sourceImage: null, // { base64, mimeType }
+            images: [], // Array of generated image objects { id, url, prompt, aspectRatio, timestamp, selected }
+            history: [], // Array of prompt strings
+            loading: false,
+            currentLightboxImage: null
+        };
+
+        // DOM Elements
+        const promptInput = document.getElementById('prompt-input');
+        const promptCharCount = document.getElementById('prompt-char-count');
+        const ratioBtns = document.querySelectorAll('.ratio-btn');
+        const sourceImageInput = document.getElementById('source-image-input');
+        const dropZone = document.getElementById('drop-zone');
+        const sourcePreviewContainer = document.getElementById('source-preview-container');
+        const sourcePreviewImg = document.getElementById('source-preview-img');
+        const sourcePlaceholder = document.getElementById('source-placeholder');
+        const removeSourceBtn = document.getElementById('remove-source-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const generateBtnText = document.getElementById('generate-btn-text');
+        const galleryContainer = document.getElementById('gallery-container');
+        const emptyGalleryState = document.getElementById('empty-gallery-state');
+        const loadingState = document.getElementById('loading-state');
+        const loadingStatusText = document.getElementById('loading-status-text');
+        const imagesGrid = document.getElementById('images-grid');
+        const galleryCount = document.getElementById('gallery-count');
+        const batchActions = document.getElementById('batch-actions');
+        const selectedCountSpan = document.getElementById('selected-count');
+        const downloadSelectedBtn = document.getElementById('download-selected-btn');
+        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        
+        // Modals
+        const lightboxModal = document.getElementById('lightbox-modal');
+        const lightboxCloseBtn = document.getElementById('lightbox-close-btn');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxPromptText = document.getElementById('lightbox-prompt-text');
+        const lightboxDownloadBtn = document.getElementById('lightbox-download-btn');
+        const lightboxUseSourceBtn = document.getElementById('lightbox-use-source-btn');
+
+        const openHistoryBtn = document.getElementById('open-history-btn');
+        const historyModal = document.getElementById('history-modal');
+        const historyCloseBtn = document.getElementById('history-close-btn');
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+        const historyBadge = document.getElementById('history-badge');
+        const historyCountLabel = document.getElementById('history-count-label');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+
+        // Preset Tags
+        document.querySelectorAll('.preset-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                promptInput.value = tag.getAttribute('data-prompt');
+                state.prompt = promptInput.value;
+                updateCharCount();
+                showToast('Prompt pré-rempli appliqué', 'success');
+            });
         });
 
-        function saveApiKey(val) {
-            apiKey = val.trim();
-            localStorage.setItem('gemini_api_key', apiKey);
+        // Prompt input listener
+        promptInput.addEventListener('input', (e) => {
+            state.prompt = e.target.value;
+            updateCharCount();
+        });
+
+        function updateCharCount() {
+            const len = state.prompt.length;
+            promptCharCount.textContent = `${len} / 1000`;
         }
 
-        function toggleApiKeyVisibility() {
-            const input = document.getElementById('api-key-input');
-            const icon = document.getElementById('eye-icon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fa-solid fa-eye-slash';
+        // Aspect Ratio selection
+        ratioBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                ratioBtns.forEach(b => {
+                    b.classList.remove('border-brand-500', 'bg-brand-500/10', 'text-brand-300');
+                    b.classList.add('border-slate-700', 'bg-slate-900', 'text-slate-300');
+                });
+                btn.classList.remove('border-slate-700', 'bg-slate-900', 'text-slate-300');
+                btn.classList.add('border-brand-500', 'bg-brand-500/10', 'text-brand-300');
+                state.aspectRatio = btn.getAttribute('data-ratio');
+            });
+        });
+
+        // Source Image Handling
+        sourceImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleSourceFile(file);
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-brand-500', 'bg-brand-500/5');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-brand-500', 'bg-brand-500/5');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-brand-500', 'bg-brand-500/5');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleSourceFile(file);
             } else {
-                input.type = 'password';
-                icon.className = 'fa-solid fa-eye';
+                showToast('Veuillez déposer un fichier image valide', 'error');
             }
-        }
+        });
 
-        function clearApiKey() {
-            apiKey = '';
-            localStorage.removeItem('gemini_api_key');
-            document.getElementById('api-key-input').value = '';
-        }
-
-        function switchTab(tabName) {
-            const studioView = document.getElementById('view-studio');
-            const albumView = document.getElementById('view-album');
-            const tabStudio = document.getElementById('tab-studio');
-            const tabAlbum = document.getElementById('tab-album');
-
-            if (tabName === 'studio') {
-                studioView.classList.remove('hidden');
-                albumView.classList.add('hidden');
-                tabStudio.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
-                tabAlbum.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-400 hover:text-white";
-            } else {
-                studioView.classList.add('hidden');
-                albumView.classList.remove('hidden');
-                tabAlbum.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
-                tabStudio.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-400 hover:text-white";
-                renderAlbum();
-            }
-        }
-
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
+        function handleSourceFile(file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
-                const base64Parts = dataUrl.split(',');
-                const mimeType = base64Parts[0].match(/:(.*?);/)[1];
-                const base64Data = base64Parts[1];
-
-                referenceImage = {
+            reader.onload = (event) => {
+                const base64Data = event.target.result.split(',')[1];
+                state.sourceImage = {
                     base64: base64Data,
-                    mimeType: mimeType,
-                    dataUrl: dataUrl,
-                    name: file.name
+                    mimeType: file.type,
+                    url: event.target.result
                 };
-                showReferencePreview();
+                sourcePreviewImg.src = state.sourceImage.url;
+                sourcePreviewContainer.classList.remove('hidden');
+                sourcePlaceholder.classList.add('hidden');
+                removeSourceBtn.classList.remove('hidden');
+                showToast('Image source chargée avec succès', 'success');
             };
             reader.readAsDataURL(file);
         }
 
-        function setReferenceImageFromSource(dataUrl, name) {
-            const base64Parts = dataUrl.split(',');
-            if (base64Parts.length < 2) {
-                fetch(dataUrl)
-                    .then(res => res.blob())
-                    .then(blob => {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const resUrl = e.target.result;
-                            const parts = resUrl.split(',');
-                            referenceImage = {
-                                base64: parts[1],
-                                mimeType: parts[0].match(/:(.*?);/)[1],
-                                dataUrl: resUrl,
-                                name: name
-                            };
-                            showReferencePreview();
-                            switchTab('studio');
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        };
-                        reader.readAsDataURL(blob);
-                    }).catch(err => console.error("Erreur chargement image source", err));
-                return;
-            }
+        removeSourceBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.sourceImage = null;
+            sourceImageInput.value = '';
+            sourcePreviewContainer.classList.add('hidden');
+            sourcePreviewImg.src = '';
+            sourcePlaceholder.classList.remove('hidden');
+            removeSourceBtn.classList.add('hidden');
+            showToast('Image source supprimée', 'info');
+        });
 
-            referenceImage = {
-                base64: base64Parts[1],
-                mimeType: base64Parts[0].match(/:(.*?);/)[1],
-                dataUrl: dataUrl,
-                name: name
-            };
-            showReferencePreview();
-            switchTab('studio');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showReferencePreview() {
-            const container = document.getElementById('reference-preview-container');
-            const thumb = document.getElementById('reference-thumb');
-            const nameEl = document.getElementById('reference-name');
-
-            if (referenceImage) {
-                thumb.src = referenceImage.dataUrl;
-                nameEl.textContent = referenceImage.name;
-                container.classList.remove('hidden');
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            if (type === 'success') {
+                toastIcon.className = 'w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs';
+                toastIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else if (type === 'error') {
+                toastIcon.className = 'w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs';
+                toastIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
             } else {
-                container.classList.add('hidden');
+                toastIcon.className = 'w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs';
+                toastIcon.innerHTML = '<i class="fa-solid fa-info"></i>';
             }
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
         }
 
-        function clearReferenceImage() {
-            referenceImage = null;
-            document.getElementById('image-upload').value = '';
-            showReferencePreview();
-        }
-
-        function addPromptToHistory(promptText) {
-            if (!promptText || !promptText.trim()) return;
-            const cleanText = promptText.trim();
-            promptHistory = promptHistory.filter(p => p !== cleanText);
-            promptHistory.unshift(cleanText);
-            if (promptHistory.length > 15) promptHistory.pop();
-            localStorage.setItem('gemini_prompt_history', JSON.stringify(promptHistory));
-            renderPromptHistory();
-        }
-
-        function renderPromptHistory() {
-            const section = document.getElementById('prompt-history-section');
-            const list = document.getElementById('prompt-history-list');
-
-            if (promptHistory.length === 0) {
-                section.classList.add('hidden');
+        // Generate Image API Call with strict prompt reinforcement
+        generateBtn.addEventListener('click', async () => {
+            const rawPrompt = state.prompt.trim();
+            if (!rawPrompt) {
+                showToast('Veuillez saisir une description textuelle', 'error');
+                promptInput.focus();
                 return;
             }
 
-            section.classList.remove('hidden');
-            list.innerHTML = promptHistory.map(p => `
-                <div class="flex items-center bg-dark-900 border border-dark-700 rounded-lg overflow-hidden">
-                    <button onclick="usePrompt('${p.replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white px-2.5 py-1.5 transition truncate max-w-xs">
-                        ${escapeHtml(p)}
-                    </button>
-                    <button onclick="copyPromptText('${p.replace(/'/g, "\\'")}', event)" class="px-2 py-1.5 text-slate-500 hover:text-indigo-400 text-xs border-l border-dark-700 transition" title="Copier le prompt">
-                        <i class="fa-solid fa-copy"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
+            setLoading(true);
 
-        function usePrompt(text) {
-            document.getElementById('prompt-input').value = text;
-        }
-
-        function copyPromptText(text, event) {
-            event.stopPropagation();
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            alert('Prompt copié dans le presse-papier !');
-        }
-
-        function clearPromptHistory() {
-            promptHistory = [];
-            localStorage.removeItem('gemini_prompt_history');
-            renderPromptHistory();
-        }
-
-        async function generateImagesWithGemini() {
-            const promptText = document.getElementById('prompt-input').value.trim();
-            const aspectRatio = document.getElementById('aspect-ratio-select').value;
-
-            if (!apiKey) {
-                alert('Veuillez entrer votre clé API Gemini dans le champ en haut à droite.');
-                document.getElementById('api-key-input').focus();
-                return;
+            // Add to history
+            if (!state.history.includes(rawPrompt)) {
+                state.history.unshift(rawPrompt);
+                updateHistoryUI();
             }
-            if (!promptText) {
-                alert('Veuillez entrer une description pour générer les images.');
-                return;
-            }
-
-            addPromptToHistory(promptText);
-
-            const loadingState = document.getElementById('loading-state');
-            const loadingText = document.getElementById('loading-text');
-            const resultsGrid = document.getElementById('results-grid');
-            const generateBtn = document.getElementById('generate-btn');
-
-            loadingState.classList.remove('hidden');
-            resultsGrid.innerHTML = '';
-            generateBtn.disabled = true;
 
             try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+                // Construct strictly reinforced prompt to prevent off-topic generations
+                const reinforcedPrompt = `Générer une image visuelle correspondant EXACTEMENT et STRICTEMENT à la description textuelle suivante, sans dévier du sujet demandé : "${rawPrompt}". Respecter rigoureusement chaque détail descriptif, le style artistique indiqué, la composition et l'atmosphère demandées.`;
 
-                let parts = [];
-                if (referenceImage) {
-                    parts.push({
-                        inlineData: {
-                            mimeType: referenceImage.mimeType,
-                            data: referenceImage.base64
-                        }
-                    });
-                }
-                parts.push({ text: `${promptText} (Generate image in ${aspectRatio} aspect ratio)` });
+                let payload = {};
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
 
-                let imageUrls = [];
-                let completedCount = 0;
-
-                // Lancement de 4 requêtes simultanées avec suivi de progression
-                const promises = [];
-                for (let i = 0; i < 4; i++) {
-                    const payload = {
-                        contents: [{ parts: parts }],
+                if (state.sourceImage) {
+                    // Image-to-Image / Variation / Edit mode with reinforced prompt instructions
+                    loadingStatusText.textContent = "Modification de l'image source selon vos instructions...";
+                    payload = {
+                        contents: [{
+                            role: "user",
+                            parts: [
+                                { text: reinforcedPrompt },
+                                {
+                                    inlineData: {
+                                        mimeType: state.sourceImage.mimeType,
+                                        data: state.sourceImage.base64
+                                    }
+                                }
+                            ]
+                        }],
                         generationConfig: {
-                            responseModalities: ["IMAGE", "TEXT"]
+                            responseModalities: ['IMAGE'],
+                            imageConfig: { aspectRatio: state.aspectRatio }
                         }
                     };
-
-                    const p = fetch(endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    }).then(async res => {
-                        if (!res.ok) {
-                            const errData = await res.json();
-                            throw new Error(errData.error?.message || 'Erreur API Gemini');
+                } else {
+                    // Text-to-Image mode with reinforced prompt
+                    loadingStatusText.textContent = "Génération de l'image haute fidélité...";
+                    payload = {
+                        contents: [{
+                            role: 'user',
+                            parts: [{ text: reinforcedPrompt }]
+                        }],
+                        generationConfig: {
+                            responseModalities: ['IMAGE'],
+                            imageConfig: { aspectRatio: state.aspectRatio }
                         }
-                        return res.json();
-                    }).then(data => {
-                        completedCount++;
-                        loadingText.textContent = `Interrogation de l'API Gemini (${completedCount}/4 images prêtes)...`;
-                        
-                        const candidate = data.candidates?.[0];
-                        const contentParts = candidate?.content?.parts || [];
-                        for (const part of contentParts) {
-                            if (part.inlineData && part.inlineData.data) {
-                                return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                            }
-                        }
-                        return `https://picsum.photos/seed/${Date.now() + i}/960/540`;
-                    }).catch(err => {
-                        completedCount++;
-                        loadingText.textContent = `Interrogation de l'API Gemini (${completedCount}/4 images prêtes)...`;
-                        console.warn(err);
-                        return `https://picsum.photos/seed/${Date.now() + i}/960/540`;
-                    });
-
-                    promises.push(p);
+                    };
                 }
 
-                imageUrls = await Promise.all(promises);
+                // Exponential backoff fetch implementation
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-                loadingState.classList.add('hidden');
-                resultsGrid.innerHTML = imageUrls.map((url, idx) => `
-                    <div class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden shadow-lg flex flex-col group">
-                        <div class="relative aspect-video bg-dark-900 overflow-hidden cursor-pointer" onclick="openLightbox('${url}', '${escapeHtml(promptText).replace(/'/g, "\\'")}')">
-                            <img src="${url}" alt="Variation ${idx + 1}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute top-2 left-2 bg-dark-900/80 backdrop-blur px-2 py-1 rounded text-xs font-semibold text-slate-300">
-                                #0${idx + 1} (${aspectRatio})
-                            </div>
-                        </div>
-                        <div class="p-3 flex items-center justify-between gap-2 bg-dark-800/80">
-                            <span class="text-xs text-slate-400 truncate max-w-[170px]">"${escapeHtml(promptText)}"</span>
-                            <div class="flex items-center gap-1">
-                                <button onclick="saveToAlbum('${url}', '${escapeHtml(promptText).replace(/'/g, "\\'")}')" class="px-2 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white text-xs font-medium rounded-lg border border-indigo-500/30 transition flex items-center gap-1" title="Album">
-                                    <i class="fa-solid fa-bookmark"></i>
-                                </button>
-                                <button onclick="setReferenceImageFromSource('${url}', 'Variation ${idx + 1}')" class="px-2 py-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white text-xs font-medium rounded-lg border border-dark-600 transition flex items-center gap-1" title="Modifier">
-                                    <i class="fa-solid fa-wand-magic"></i>
-                                </button>
-                                <a href="${url}" download="gemini-image-${idx + 1}.jpg" target="_blank" class="p-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white rounded-lg transition" title="Télécharger">
-                                    <i class="fa-solid fa-download text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+                if (!part || !part.inlineData) {
+                    throw new Error("L'API n'a pas retourné de données d'image valides.");
+                }
+
+                const imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                
+                const newImageObj = {
+                    id: 'img_' + Date.now(),
+                    url: imageUrl,
+                    prompt: rawPrompt,
+                    aspectRatio: state.aspectRatio,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    selected: false
+                };
+
+                state.images.unshift(newImageObj);
+                updateGalleryUI();
+                showToast('Image générée avec succès !', 'success');
 
             } catch (error) {
-                console.error(error);
-                loadingState.classList.add('hidden');
-                resultsGrid.innerHTML = `<div class="col-span-full py-10 text-center text-red-400">Erreur lors de l'appel API Gemini : ${escapeHtml(error.message)}</div>`;
+                console.error("Erreur de génération:", error);
+                showToast("Échec de la génération: " + (error.message || "Erreur réseau"), 'error');
             } finally {
-                generateBtn.disabled = false;
+                setLoading(false);
+            }
+        });
+
+        // Helper for fetch with exponential backoff
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`Erreur HTTP ${response.status}: ${errText}`);
+                }
+                return response;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(res => setTimeout(res, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                }
+                throw error;
             }
         }
 
-        function openLightbox(url, prompt) {
-            const modal = document.getElementById('lightbox-modal');
-            const img = document.getElementById('lightbox-img');
-            const caption = document.getElementById('lightbox-caption');
-            const downloadBtn = document.getElementById('lightbox-download-btn');
-            const modifyBtn = document.getElementById('lightbox-modify-btn');
-
-            img.src = url;
-            caption.textContent = `"${prompt}"`;
-            downloadBtn.href = url;
-            modifyBtn.setAttribute('onclick', `closeLightbox(); setReferenceImageFromSource('${url}', 'Lightbox Image');`);
-
-            modal.classList.remove('hidden');
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').classList.add('hidden');
-        }
-
-        function saveToAlbum(url, prompt) {
-            const newItem = {
-                id: 'img_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-                url,
-                prompt,
-                date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-            };
-
-            albumImages.unshift(newItem);
-            localStorage.setItem('gemini_album_images', JSON.stringify(albumImages));
-            updateAlbumCount();
-            alert('Image enregistrée avec succès dans votre album !');
-        }
-
-        function updateAlbumCount() {
-            document.getElementById('album-count').textContent = albumImages.length;
-        }
-
-        function toggleSelectMode() {
-            isSelectMode = !isSelectMode;
-            selectedAlbumIds.clear();
-            const selectBtn = document.getElementById('select-mode-btn');
-            const batchDeleteBtn = document.getElementById('batch-delete-btn');
-
-            if (isSelectMode) {
-                selectBtn.classList.add('bg-indigo-600', 'text-white');
-                selectBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Annuler';
-                batchDeleteBtn.classList.remove('hidden');
+        function setLoading(isLoading) {
+            state.loading = isLoading;
+            generateBtn.disabled = isLoading;
+            if (isLoading) {
+                generateBtnText.textContent = "Génération en cours...";
+                generateBtn.classList.add('opacity-50', 'generating-glow');
+                emptyGalleryState.classList.add('hidden');
+                imagesGrid.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+                loadingState.classList.add('flex');
             } else {
-                selectBtn.classList.remove('bg-indigo-600', 'text-white');
-                selectBtn.innerHTML = '<i class="fa-solid fa-list-check"></i> Sélectionner';
-                batchDeleteBtn.classList.add('hidden');
-            }
-            renderAlbum();
-        }
-
-        function toggleAlbumItemSelection(id, cardElement) {
-            if (selectedAlbumIds.has(id)) {
-                selectedAlbumIds.delete(id);
-                cardElement.classList.remove('ring-2', 'ring-indigo-500');
-            } else {
-                selectedAlbumIds.add(id);
-                cardElement.classList.add('ring-2', 'ring-indigo-500');
+                generateBtnText.textContent = "Générer l'Image";
+                generateBtn.classList.remove('opacity-50', 'generating-glow');
+                loadingState.classList.add('hidden');
+                loadingState.classList.remove('flex');
             }
         }
 
-        function deleteSelectedAlbumImages() {
-            if (selectedAlbumIds.size === 0) {
-                alert('Veuillez sélectionner au moins une image à supprimer.');
+        // Gallery UI Rendering & Management
+        function updateGalleryUI() {
+            const count = state.images.length;
+            galleryCount.textContent = `${count} image${count > 1 ? 's' : ''}`;
+
+            if (count === 0) {
+                emptyGalleryState.classList.remove('hidden');
+                imagesGrid.classList.add('hidden');
+                batchActions.classList.add('hidden');
                 return;
             }
 
-            if (confirm(`Voulez-vous vraiment supprimer les ${selectedAlbumIds.size} images sélectionnées de l'album ?`)) {
-                albumImages = albumImages.filter(img => !selectedAlbumIds.has(img.id));
-                localStorage.setItem('gemini_album_images', JSON.stringify(albumImages));
-                selectedAlbumIds.clear();
-                toggleSelectMode();
-                updateAlbumCount();
-                renderAlbum();
-            }
-        }
+            emptyGalleryState.classList.add('hidden');
+            imagesGrid.classList.remove('hidden');
 
-        function deleteSingleAlbumImage(id, event) {
-            event.stopPropagation();
-            if (confirm('Supprimer cette image de l\'album ?')) {
-                albumImages = albumImages.filter(img => img.id !== id);
-                localStorage.setItem('gemini_album_images', JSON.stringify(albumImages));
-                updateAlbumCount();
-                renderAlbum();
-            }
-        }
-
-        function renderAlbum() {
-            const grid = document.getElementById('album-grid');
-
-            if (albumImages.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-16 text-center border-2 border-dashed border-dark-700 rounded-2xl bg-dark-800/20 text-slate-500">
-                        <i class="fa-solid fa-images text-4xl mb-3 opacity-40"></i>
-                        <p>Votre album est vide. Enregistrez des images depuis le studio pour les retrouver ici.</p>
-                    </div>
-                `;
-                return;
+            const selectedCount = state.images.filter(img => img.selected).length;
+            if (selectedCount > 0) {
+                batchActions.classList.remove('hidden');
+                selectedCountSpan.textContent = selectedCount;
+            } else {
+                batchActions.classList.add('hidden');
             }
 
-            grid.innerHTML = albumImages.map(item => `
-                <div id="album-card-${item.id}" onclick="${isSelectMode ? `toggleAlbumItemSelection('${item.id}', this)` : ''}" class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden shadow-lg flex flex-col group ${isSelectMode ? 'cursor-pointer' : ''}">
-                    <div class="relative aspect-video bg-dark-900 overflow-hidden cursor-pointer" onclick="${!isSelectMode ? `openLightbox('${item.url}', '${escapeHtml(item.prompt).replace(/'/g, "\\'")}')` : ''}">
-                        <img src="${item.url}" alt="Album image" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute top-2 left-2 bg-dark-900/80 backdrop-blur px-2 py-0.5 rounded text-[10px] text-slate-300">
-                            ${item.date}
+            imagesGrid.innerHTML = state.images.map(img => `
+                <div class="group relative bg-slate-900 border ${img.selected ? 'border-brand-500 ring-2 ring-brand-500/30' : 'border-slate-800'} rounded-xl overflow-hidden shadow-lg transition flex flex-col">
+                    <div class="relative w-full h-48 bg-slate-950 flex items-center justify-center overflow-hidden cursor-pointer image-card-click" data-id="${img.id}">
+                        <img src="${img.url}" alt="${img.prompt}" class="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-3">
+                            <span class="text-[11px] text-white font-medium bg-slate-900/80 px-2 py-0.5 rounded backdrop-blur-sm border border-slate-700">Format ${img.aspectRatio}</span>
+                        </div>
+                        <div class="absolute top-2 left-2">
+                            <button class="select-img-btn w-6 h-6 rounded-lg ${img.selected ? 'bg-brand-500 text-white' : 'bg-slate-900/80 text-slate-400 border border-slate-700'} flex items-center justify-center text-xs transition" data-id="${img.id}">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="p-3 flex flex-col gap-2 bg-dark-800/80 flex-1 justify-between">
-                        <p class="text-xs text-slate-300 italic line-clamp-2">"${escapeHtml(item.prompt)}"</p>
-                        <div class="flex items-center justify-between pt-1 border-t border-dark-700/60">
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="setReferenceImageFromSource('${item.url}', 'Album')" class="px-2 py-1 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white text-xs font-medium rounded transition flex items-center gap-1">
-                                    <i class="fa-solid fa-wand-magic"></i> Modifier
+                    <div class="p-3 flex flex-col justify-between flex-1 space-y-2">
+                        <p class="text-xs text-slate-300 line-clamp-2" title="${img.prompt}">${img.prompt}</p>
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-800/60">
+                            <span>${img.timestamp}</span>
+                            <div class="flex items-center space-x-1">
+                                <button class="use-source-action-btn px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition" data-id="${img.id}" title="Utiliser comme source">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-brand-400"></i>
                                 </button>
-                                <a href="${item.url}" download="album-image.jpg" target="_blank" onclick="event.stopPropagation()" class="p-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white rounded transition">
-                                    <i class="fa-solid fa-download text-xs"></i>
-                                </a>
+                                <button class="download-single-btn px-2 py-1 bg-brand-600/20 hover:bg-brand-600 text-brand-300 hover:text-white rounded transition" data-id="${img.id}" title="Télécharger">
+                                    <i class="fa-solid fa-download"></i>
+                                </button>
                             </div>
-                            ${!isSelectMode ? `
-                                <button onclick="deleteSingleAlbumImage('${item.id}', event)" class="p-1.5 text-slate-500 hover:text-red-400 rounded transition" title="Supprimer">
-                                    <i class="fa-solid fa-trash text-xs"></i>
-                                </button>
-                            ` : ''}
                         </div>
                     </div>
                 </div>
             `).join('');
+
+            // Bind card event listeners
+            document.querySelectorAll('.image-card-click').forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = card.getAttribute('data-id');
+                    openLightbox(id);
+                });
+            });
+
+            document.querySelectorAll('.select-img-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    const imgObj = state.images.find(i => i.id === id);
+                    if (imgObj) {
+                        imgObj.selected = !imgObj.selected;
+                        updateGalleryUI();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.download-single-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    downloadImage(id);
+                });
+            });
+
+            document.querySelectorAll('.use-source-action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    useAsSource(id);
+                });
+            });
         }
 
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
+        function downloadImage(id) {
+            const imgObj = state.images.find(i => i.id === id);
+            if (!imgObj) return;
+            const a = document.createElement('a');
+            a.href = imgObj.url;
+            a.download = `gemini-studio_${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Image téléchargée', 'success');
+        }
+
+        function useAsSource(id) {
+            const imgObj = state.images.find(i => i.id === id);
+            if (!imgObj) return;
+            // Convert data url to source state
+            const arr = imgObj.url.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const b64 = arr[1];
+            state.sourceImage = {
+                base64: b64,
+                mimeType: mime,
+                url: imgObj.url
             };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            sourcePreviewImg.src = state.sourceImage.url;
+            sourcePreviewContainer.classList.remove('hidden');
+            sourcePlaceholder.classList.add('hidden');
+            removeSourceBtn.classList.remove('hidden');
+            showToast("Définie comme image source pour la prochaine variation", 'success');
+        }
+
+        // Batch Actions
+        downloadSelectedBtn.addEventListener('click', () => {
+            const selected = state.images.filter(i => i.selected);
+            selected.forEach((img, index) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = img.url;
+                    a.download = `gemini-studio_batch_${index + 1}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, index * 200);
+            });
+            showToast(`${selected.length} image(s) téléchargée(s)`, 'success');
+        });
+
+        deleteSelectedBtn.addEventListener('click', () => {
+            state.images = state.images.filter(i => !i.selected);
+            updateGalleryUI();
+            showToast('Images sélectionnées supprimées', 'info');
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            if (state.images.length === 0) return;
+            if (confirm("Voulez-vous vraiment réinitialiser l'atelier ?")) {
+                state.images = [];
+                state.sourceImage = null;
+                sourcePreviewContainer.classList.add('hidden');
+                sourcePlaceholder.classList.remove('hidden');
+                removeSourceBtn.classList.add('hidden');
+                promptInput.value = '';
+                state.prompt = '';
+                updateCharCount();
+                updateGalleryUI();
+                showToast('Atelier réinitialisé', 'info');
+            }
+        });
+
+        // Lightbox Modal Functions
+        function openLightbox(id) {
+            const imgObj = state.images.find(i => i.id === id);
+            if (!imgObj) return;
+            state.currentLightboxImage = imgObj;
+            lightboxImg.src = imgObj.url;
+            lightboxTitle.textContent = `Génération du ${imgObj.timestamp} (${imgObj.aspectRatio})`;
+            lightboxPromptText.textContent = `Prompt: "${imgObj.prompt}"`;
+            lightboxModal.classList.remove('hidden');
+        }
+
+        lightboxCloseBtn.addEventListener('click', () => {
+            lightboxModal.classList.add('hidden');
+        });
+
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal) {
+                lightboxModal.classList.add('hidden');
+            }
+        });
+
+        lightboxDownloadBtn.addEventListener('click', () => {
+            if (state.currentLightboxImage) {
+                downloadImage(state.currentLightboxImage.id);
+            }
+        });
+
+        lightboxUseSourceBtn.addEventListener('click', () => {
+            if (state.currentLightboxImage) {
+                useAsSource(state.currentLightboxImage.id);
+                lightboxModal.classList.add('hidden');
+            }
+        });
+
+        // History Drawer
+        openHistoryBtn.addEventListener('click', () => {
+            historyModal.classList.remove('hidden');
+        });
+
+        historyCloseBtn.addEventListener('click', () => {
+            historyModal.classList.add('hidden');
+        });
+
+        clearHistoryBtn.addEventListener('click', () => {
+            state.history = [];
+            updateHistoryUI();
+            showToast("Historique effacé", "info");
+        });
+
+        function updateHistoryUI() {
+            historyBadge.textContent = state.history.length;
+            historyCountLabel.textContent = `${state.history.length} éléments`;
+
+            if (state.history.length === 0) {
+                historyList.innerHTML = `<div class="text-center text-slate-500 text-xs py-8">Aucun historique pour le moment</div>`;
+                return;
+            }
+
+            historyList.innerHTML = state.history.map(item => `
+                <div class="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl cursor-pointer transition history-item group flex items-center justify-between" data-prompt="${item}">
+                    <p class="text-xs text-slate-300 line-clamp-2 pr-2">${item}</p>
+                    <button class="text-brand-400 hover:text-brand-300 text-xs opacity-0 group-hover:opacity-100 transition">
+                        <i class="fa-solid fa-arrow-rotate-left"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.history-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const p = el.getAttribute('data-prompt');
+                    promptInput.value = p;
+                    state.prompt = p;
+                    updateCharCount();
+                    historyModal.classList.add('hidden');
+                    showToast('Prompt restauré', 'success');
+                });
+            });
         }
     </script>
 </body>
 </html>
-```eof
