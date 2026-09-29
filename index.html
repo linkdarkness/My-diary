@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur d'Images IA - Gemini Studio</title>
+    <title>Gemini Image Studio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -36,7 +36,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Gemini Image Studio</h1>
-                    <p class="text-xs text-slate-400">Génération simultanée (4x 16:9) & Édition</p>
+                    <p class="text-xs text-slate-400">Génération 4x (16:9) • Édition & Album</p>
                 </div>
             </div>
             
@@ -61,7 +61,7 @@
             <!-- Panneau de Contrôle & Prompt -->
             <div class="bg-dark-800 border border-dark-700 rounded-2xl p-5 shadow-xl">
                 
-                <!-- Indicateur d'image de référence active -->
+                <!-- Indicateur d'image de référence active (Mode Édition) -->
                 <div id="reference-preview-container" class="hidden mb-4 p-3 bg-dark-900/80 border border-indigo-500/40 rounded-xl flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img id="reference-thumb" src="" alt="Référence" class="w-16 h-9 object-cover rounded border border-slate-700">
@@ -115,8 +115,8 @@
 
                 <div id="loading-state" class="hidden py-16 text-center bg-dark-800/40 border border-dark-700 rounded-2xl">
                     <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent mb-4"></div>
-                    <p class="text-slate-300 font-medium">Création de vos 4 images en cours...</p>
-                    <p class="text-xs text-slate-500 mt-1">Cela peut prendre quelques secondes.</p>
+                    <p class="text-slate-300 font-medium">Génération des 4 variations (16:9) via Gemini...</p>
+                    <p class="text-xs text-slate-500 mt-1">Création artistique en cours...</p>
                 </div>
 
                 <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -282,9 +282,10 @@
             generateBtn.disabled = true;
 
             try {
+                // Simulation du rendu haute fidélité style Gemini Flash Image (4x format 16:9)
                 await new Promise(resolve => setTimeout(resolve, 2200));
 
-                const seedBase = Math.floor(Math.random() * 1000);
+                const seedBase = Math.floor(Math.random() * 10000);
                 const generatedImages = [
                     `https://picsum.photos/seed/${seedBase + 1}/960/540`,
                     `https://picsum.photos/seed/${seedBase + 2}/960/540`,
