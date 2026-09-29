@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Image Studio - Studio de Création IA Avancé</title>
+    <title>Gemini Image Studio - Studio & Album IA</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -45,165 +45,195 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <!-- Header -->
-    <header class="glass-panel border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-lg bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">Gemini Image Studio</h1>
-                <p class="text-xs text-slate-400">Génération & Édition IA Haute Précision</p>
+    <!-- Header & Navigation Tabs -->
+    <header class="glass-panel border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">Gemini Image Studio</h1>
+                    <p class="text-[11px] text-slate-400">Génération 16:9 & Album Automatique</p>
+                </div>
             </div>
         </div>
-        <div class="flex items-center space-x-3">
-            <button id="open-history-btn" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition flex items-center space-x-2 border border-slate-700">
+
+        <!-- Tabs Navigation -->
+        <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <button id="nav-studio-btn" class="px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow transition flex items-center space-x-2">
+                <i class="fa-solid fa-palette"></i>
+                <span>Studio</span>
+            </button>
+            <button id="nav-album-btn" class="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition flex items-center space-x-2">
+                <i class="fa-solid fa-images"></i>
+                <span>Album (<span id="album-badge-count">0</span>)</span>
+            </button>
+        </div>
+
+        <!-- Global Actions -->
+        <div class="flex items-center space-x-2">
+            <button id="open-settings-btn" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700">
+                <i class="fa-solid fa-key"></i>
+                <span class="hidden sm:inline">Clé API</span>
+            </button>
+            <button id="open-history-btn" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span class="hidden sm:inline">Historique</span>
-                <span id="history-badge" class="bg-brand-600 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
-            </button>
-            <button id="clear-all-btn" class="px-3 py-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 text-sm font-medium transition flex items-center space-x-2 border border-rose-800/40" title="Effacer l'atelier">
-                <i class="fa-solid fa-trash-can"></i>
-                <span class="hidden sm:inline">Réinitialiser</span>
+                <span id="history-badge" class="bg-brand-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">0</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6">
         
-        <!-- Left Panel: Controls & Prompt Engineering -->
-        <section class="lg:col-span-5 flex flex-col space-y-5">
-            <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col space-y-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="font-semibold text-base text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-sliders text-brand-400"></i>
-                        <span>Paramètres & Prompt Strict</span>
-                    </h2>
-                    <span class="text-xs text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50">Modèle: gemini-3.1-flash-image</span>
-                </div>
-
-                <!-- Prompt Input -->
-                <div class="flex flex-col space-y-1.5">
-                    <label for="prompt-input" class="text-xs font-medium text-slate-300 flex justify-between">
-                        <span>Description textuelle précise <span class="text-rose-400">*</span></span>
-                        <span id="prompt-char-count" class="text-slate-500 text-[10px]">0 / 1000</span>
-                    </label>
-                    <textarea id="prompt-input" rows="4" placeholder="Décrivez exactement ce que vous voulez générer (sujet, style, composition, couleurs, ambiance)... Soyez précis." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition resize-none"></textarea>
-                    <div class="flex flex-wrap gap-1.5 mt-1">
-                        <button type="button" class="preset-tag text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700/60 transition" data-prompt="Photographie macro ultra-réaliste d'une abeille butinant une fleur de lavande violette, rosée matinale, lumière dorée, profondeur de champ prononcée">🐝 Abeille macro</button>
-                        <button type="button" class="preset-tag text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700/60 transition" data-prompt="Concept art futuriste d'une cité spatiale orbitale en anneau, style cyberpunk lumineux, néons cyan et magenta, vaisseaux en transit">🚀 Cité spatiale</button>
-                        <button type="button" class="preset-tag text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700/60 transition" data-prompt="Peinture à l'huile impressionnante d'un chalet alpin au bord d'un lac miroir reflétant des montagnes enneigées au coucher du soleil">🎨 Peinture alpine</button>
+        <!-- ================= STUDIO VIEW ================= -->
+        <div id="view-studio" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Panel: Controls & Prompt Engineering -->
+            <section class="lg:col-span-5 flex flex-col space-y-5">
+                <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-semibold text-sm text-slate-200 flex items-center space-x-2">
+                            <i class="fa-solid fa-sliders text-brand-400"></i>
+                            <span>Paramètres de Création</span>
+                        </h2>
+                        <span class="text-[11px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50">Format fixe 16:9</span>
                     </div>
-                </div>
 
-                <!-- Aspect Ratio Selector -->
-                <div class="flex flex-col space-y-1.5">
-                    <label class="text-xs font-medium text-slate-300">Format d'image (Aspect Ratio)</label>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button type="button" data-ratio="1:1" class="ratio-btn py-2 px-3 rounded-xl border border-brand-500 bg-brand-500/10 text-brand-300 text-xs font-semibold flex flex-col items-center justify-center transition">
-                            <i class="fa-solid fa-square text-sm mb-1"></i>
-                            <span>1:1 Carré</span>
-                        </button>
-                        <button type="button" data-ratio="16:9" class="ratio-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex flex-col items-center justify-center transition">
-                            <i class="fa-solid fa-rectangle-xmark text-sm mb-1 rotate-90"></i>
-                            <span>16:9 Paysage</span>
-                        </button>
-                        <button type="button" data-ratio="9:16" class="ratio-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex flex-col items-center justify-center transition">
-                            <i class="fa-solid fa-mobile-screen text-sm mb-1"></i>
-                            <span>9:16 Portrait</span>
-                        </button>
-                        <button type="button" data-ratio="4:3" class="ratio-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex flex-col items-center justify-center transition">
-                            <i class="fa-solid fa-image text-sm mb-1"></i>
-                            <span>4:3 Standard</span>
-                        </button>
+                    <!-- Prompt Input -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label for="prompt-input" class="text-xs font-medium text-slate-300 flex justify-between">
+                            <span>Description textuelle précise <span class="text-rose-400">*</span></span>
+                            <span id="prompt-char-count" class="text-slate-500 text-[10px]">0 / 1000</span>
+                        </label>
+                        <textarea id="prompt-input" rows="5" placeholder="Décrivez précisément votre visuel (sujet, style, éclairage, composition)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition resize-none"></textarea>
                     </div>
-                </div>
 
-                <!-- Source Image Upload (Image-to-Image / Variation / Edit) -->
-                <div class="flex flex-col space-y-1.5">
-                    <label class="text-xs font-medium text-slate-300 flex justify-between items-center">
-                        <span>Image de référence (Optionnel - Pour édition/variation)</span>
-                        <button id="remove-source-btn" class="text-rose-400 hover:text-rose-300 text-[11px] hidden">Supprimer</button>
-                    </label>
-                    <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer transition bg-slate-900/50 flex flex-col items-center justify-center relative overflow-hidden group">
-                        <input type="file" id="source-image-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div id="source-preview-container" class="hidden w-full h-32 relative rounded-lg overflow-hidden flex items-center justify-center">
-                            <img id="source-preview-img" src="" alt="Source" class="max-h-full max-w-full object-contain rounded-lg">
-                        </div>
-                        <div id="source-placeholder" class="flex flex-col items-center space-y-2 py-2">
-                            <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-brand-400 transition">
-                                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                    <!-- Reference Image Upload (Image-to-Image / Variation) -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-xs font-medium text-slate-300 flex justify-between items-center">
+                            <span>Image de référence (Optionnel - Édition / Variation)</span>
+                            <button id="remove-source-btn" class="text-rose-400 hover:text-rose-300 text-[11px] hidden">Supprimer</button>
+                        </label>
+                        <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-brand-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-900/50 flex flex-col items-center justify-center relative overflow-hidden group">
+                            <input type="file" id="source-image-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div id="source-preview-container" class="hidden w-full h-24 relative rounded-lg overflow-hidden flex items-center justify-center">
+                                <img id="source-preview-img" src="" alt="Source" class="max-h-full max-w-full object-contain rounded-lg">
                             </div>
-                            <p class="text-xs text-slate-300 font-medium">Glissez une image ou <span class="text-brand-400 underline">parcourez</span></p>
-                            <p class="text-[10px] text-slate-500">Sera utilisée comme source pour les modifications ou variations</p>
+                            <div id="source-placeholder" class="flex flex-col items-center space-y-1 py-1">
+                                <div class="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-brand-400 transition">
+                                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-300 font-medium">Glissez une image ou <span class="text-brand-400 underline">parcourez</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generate-btn" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-xs shadow-lg shadow-brand-600/30 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                        <span id="generate-btn-text">Générer 4 images simultanées (16:9)</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Results Gallery (Clean photo-only grid) -->
+            <section class="lg:col-span-7 flex flex-col space-y-5">
+                <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col flex-1 min-h-[500px]">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-sparkles text-brand-400"></i>
+                            <h2 class="font-semibold text-sm text-slate-200">Résultats Récents (16:9)</h2>
+                            <span id="result-count" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">0 image</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 italic">Enregistrement auto dans l'album</span>
+                    </div>
+
+                    <!-- Results Workspace Container -->
+                    <div class="flex-1 flex flex-col items-center justify-center py-8">
+                        <!-- Empty State -->
+                        <div id="empty-result-state" class="text-center flex flex-col items-center max-w-sm mx-auto p-6">
+                            <div class="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600 mb-3 shadow-inner">
+                                <i class="fa-solid fa-image text-2xl text-slate-600"></i>
+                            </div>
+                            <h3 class="text-slate-300 font-medium text-sm mb-1">Aucune génération en cours</h3>
+                            <p class="text-slate-500 text-[11px] leading-relaxed">Rédigez votre description à gauche pour lancer la génération simultanée de 4 visuels au format 16:9.</p>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div id="loading-state" class="hidden flex-col items-center justify-center p-8 space-y-4">
+                            <div class="relative w-20 h-20 flex items-center justify-center">
+                                <div class="absolute inset-0 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
+                                <span id="progress-counter-badge" class="text-xs font-bold text-brand-400">0/4</span>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs font-semibold text-slate-200" id="loading-status-text">Génération simultanée 16:9 en cours...</p>
+                                <p class="text-[10px] text-slate-400 mt-1">Sauvegarde automatique dans l'album à la réception</p>
+                            </div>
+                        </div>
+
+                        <!-- Grid of Generated Images (Clean Photo-Only View) -->
+                        <div id="results-grid" class="hidden w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 overflow-y-auto max-h-[550px] p-1">
+                            <!-- Dynamic Photo-only Cards injected here -->
                         </div>
                     </div>
                 </div>
+            </section>
+        </div>
 
-                <!-- Action Button -->
-                <button id="generate-btn" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-sm shadow-lg shadow-brand-600/30 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
-                    <span id="generate-btn-text">Générer l'Image</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Right Panel: Results & Gallery -->
-        <section class="lg:col-span-7 flex flex-col space-y-5">
-            <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col flex-1 min-h-[500px]">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <!-- ================= ALBUM VIEW ================= -->
+        <div id="view-album" class="hidden flex flex-col space-y-5">
+            <div class="glass-panel rounded-2xl p-5 shadow-xl border border-slate-800 flex flex-col flex-1 min-h-[550px]">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
                     <div class="flex items-center space-x-2">
                         <i class="fa-solid fa-images text-brand-400"></i>
-                        <h2 class="font-semibold text-base text-slate-200">Atelier & Galerie</h2>
-                        <span id="gallery-count" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">0 image</span>
+                        <h2 class="font-semibold text-sm text-slate-200">Album Personnel</h2>
+                        <span id="album-total-count" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">0 image</span>
                     </div>
-                    <div id="batch-actions" class="hidden flex items-center space-x-2">
-                        <button id="download-selected-btn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-download text-brand-400"></i>
-                            <span>Télécharger (<span id="selected-count">0</span>)</span>
+
+                    <!-- Album Selection & Batch Controls -->
+                    <div class="flex items-center space-x-2 flex-wrap gap-2">
+                        <button id="toggle-select-mode-btn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-check-double text-brand-400"></i>
+                            <span id="select-mode-btn-text">Mode Sélection</span>
                         </button>
-                        <button id="delete-selected-btn" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-medium rounded-lg border border-rose-800/60 transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-trash-can"></i>
-                            <span>Supprimer</span>
-                        </button>
+                        <div id="album-batch-actions" class="hidden flex items-center space-x-2">
+                            <button id="album-select-all-btn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition">
+                                Tout sélectionner
+                            </button>
+                            <button id="album-delete-selected-btn" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-medium rounded-lg border border-rose-800/60 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span>Supprimer (<span id="album-selected-count">0</span>)</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Gallery Workspace Container -->
-                <div id="gallery-container" class="flex-1 flex flex-col items-center justify-center py-10">
-                    <!-- Empty State -->
-                    <div id="empty-gallery-state" class="text-center flex flex-col items-center max-w-sm mx-auto p-6">
+                <!-- Album Container -->
+                <div class="flex-1 flex flex-col items-center justify-center py-6">
+                    <div id="empty-album-state" class="text-center flex flex-col items-center max-w-sm mx-auto p-6">
                         <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600 mb-4 shadow-inner">
-                            <i class="fa-solid fa-palette text-3xl text-slate-600"></i>
+                            <i class="fa-solid fa-box-archive text-3xl text-slate-600"></i>
                         </div>
-                        <h3 class="text-slate-300 font-medium text-base mb-1">Aucune image générée</h3>
-                        <p class="text-slate-500 text-xs leading-relaxed">Rédigez une description précise à gauche et cliquez sur "Générer l'Image" pour créer votre premier chef-d'œuvre visuel.</p>
+                        <h3 class="text-slate-300 font-medium text-base mb-1">Votre album est vide</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">Les images générées s'enregistreront automatiquement ici.</p>
                     </div>
 
-                    <!-- Loading State -->
-                    <div id="loading-state" class="hidden flex-col items-center justify-center p-8 space-y-4">
-                        <div class="w-16 h-16 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
-                        <div class="text-center">
-                            <p class="text-sm font-semibold text-slate-200" id="loading-status-text">Création artistique en cours...</p>
-                            <p class="text-xs text-slate-400 mt-1">Application stricte du prompt et du format</p>
-                        </div>
-                    </div>
-
-                    <!-- Grid of Generated Images -->
-                    <div id="images-grid" class="hidden w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 overflow-y-auto max-h-[600px] p-1">
-                        <!-- Dynamic Cards will be injected here -->
+                    <div id="album-grid" class="hidden w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 overflow-y-auto max-h-[600px] p-1">
+                        <!-- Album cards injected here -->
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
 
     <!-- Lightbox Modal -->
     <div id="lightbox-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col glass-panel rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
             <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/80">
-                <span id="lightbox-title" class="text-xs font-medium text-slate-300 truncate max-w-md">Détails de l'image</span>
+                <span id="lightbox-title" class="text-xs font-medium text-slate-300 truncate max-w-md">Détails de l'image (16:9)</span>
                 <button id="lightbox-close-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -227,6 +257,41 @@
         </div>
     </div>
 
+    <!-- API Key Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md glass-panel rounded-2xl p-6 border border-slate-700 shadow-2xl flex flex-col space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-semibold text-slate-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-key text-brand-400"></i>
+                    <span>Configuration de la Clé API Gemini</span>
+                </h3>
+                <button id="settings-close-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-2">
+                <label for="api-key-input" class="text-xs font-medium text-slate-300">Clé API Google Gemini</label>
+                <div class="relative flex items-center">
+                    <input type="password" id="api-key-input" placeholder="Entrez votre clé API..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 pr-16">
+                    <div class="absolute right-2 flex items-center space-x-1">
+                        <button type="button" id="clear-api-key-btn" class="text-slate-500 hover:text-rose-400 px-1.5 py-1 text-xs" title="Effacer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <button type="button" id="toggle-api-key-visibility" class="text-slate-400 hover:text-slate-200 px-1.5 py-1 text-xs">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-500">Votre clé est enregistrée localement dans votre navigateur uniquement.</p>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button id="save-api-key-btn" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-medium transition shadow-md shadow-brand-600/30">
+                    Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- History Drawer Modal -->
     <div id="history-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex justify-end">
         <div class="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl">
@@ -240,7 +305,6 @@
                 </button>
             </div>
             <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-                <!-- History items injected here -->
                 <div class="text-center text-slate-500 text-xs py-8">Aucun historique pour le moment</div>
             </div>
             <div class="p-4 border-t border-slate-800 flex justify-between">
@@ -264,19 +328,26 @@
     <script>
         // State Management
         let state = {
+            apiKey: localStorage.getItem('gemini_api_key') || '',
             prompt: '',
-            aspectRatio: '1:1',
-            sourceImage: null, // { base64, mimeType }
-            images: [], // Array of generated image objects { id, url, prompt, aspectRatio, timestamp, selected }
-            history: [], // Array of prompt strings
-            loading: false,
+            sourceImage: null, // { base64, mimeType, url }
+            results: [], // Recent generations
+            album: JSON.parse(localStorage.getItem('gemini_image_album') || '[]'),
+            history: JSON.parse(localStorage.getItem('gemini_prompt_history') || '[]'),
+            currentTab: 'studio', // 'studio' or 'album'
+            selectMode: false,
             currentLightboxImage: null
         };
 
         // DOM Elements
+        const navStudioBtn = document.getElementById('nav-studio-btn');
+        const navAlbumBtn = document.getElementById('nav-album-btn');
+        const viewStudio = document.getElementById('view-studio');
+        const viewAlbum = document.getElementById('view-album');
+        const albumBadgeCount = document.getElementById('album-badge-count');
+
         const promptInput = document.getElementById('prompt-input');
         const promptCharCount = document.getElementById('prompt-char-count');
-        const ratioBtns = document.querySelectorAll('.ratio-btn');
         const sourceImageInput = document.getElementById('source-image-input');
         const dropZone = document.getElementById('drop-zone');
         const sourcePreviewContainer = document.getElementById('source-preview-container');
@@ -285,19 +356,35 @@
         const removeSourceBtn = document.getElementById('remove-source-btn');
         const generateBtn = document.getElementById('generate-btn');
         const generateBtnText = document.getElementById('generate-btn-text');
-        const galleryContainer = document.getElementById('gallery-container');
-        const emptyGalleryState = document.getElementById('empty-gallery-state');
+
+        // Results elements
+        const emptyResultState = document.getElementById('empty-result-state');
         const loadingState = document.getElementById('loading-state');
-        const loadingStatusText = document.getElementById('loading-status-text');
-        const imagesGrid = document.getElementById('images-grid');
-        const galleryCount = document.getElementById('gallery-count');
-        const batchActions = document.getElementById('batch-actions');
-        const selectedCountSpan = document.getElementById('selected-count');
-        const downloadSelectedBtn = document.getElementById('download-selected-btn');
-        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-        const clearAllBtn = document.getElementById('clear-all-btn');
-        
-        // Modals
+        const progressCounterBadge = document.getElementById('progress-counter-badge');
+        const resultsGrid = document.getElementById('results-grid');
+        const resultCount = document.getElementById('result-count');
+
+        // Album elements
+        const albumTotalCount = document.getElementById('album-total-count');
+        const emptyAlbumState = document.getElementById('empty-album-state');
+        const albumGrid = document.getElementById('album-grid');
+        const toggleSelectModeBtn = document.getElementById('toggle-select-mode-btn');
+        const selectModeBtnText = document.getElementById('select-mode-btn-text');
+        const albumBatchActions = document.getElementById('album-batch-actions');
+        const albumSelectAllBtn = document.getElementById('album-select-all-btn');
+        const albumDeleteSelectedBtn = document.getElementById('album-delete-selected-btn');
+        const albumSelectedCount = document.getElementById('album-selected-count');
+
+        // Settings Modal
+        const settingsModal = document.getElementById('settings-modal');
+        const openSettingsBtn = document.getElementById('open-settings-btn');
+        const settingsCloseBtn = document.getElementById('settings-close-btn');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const toggleApiKeyVisibility = document.getElementById('toggle-api-key-visibility');
+        const clearApiKeyBtn = document.getElementById('clear-api-key-btn');
+        const saveApiKeyBtn = document.getElementById('save-api-key-btn');
+
+        // Lightbox Modal
         const lightboxModal = document.getElementById('lightbox-modal');
         const lightboxCloseBtn = document.getElementById('lightbox-close-btn');
         const lightboxImg = document.getElementById('lightbox-img');
@@ -306,6 +393,7 @@
         const lightboxDownloadBtn = document.getElementById('lightbox-download-btn');
         const lightboxUseSourceBtn = document.getElementById('lightbox-use-source-btn');
 
+        // History Drawer
         const openHistoryBtn = document.getElementById('open-history-btn');
         const historyModal = document.getElementById('history-modal');
         const historyCloseBtn = document.getElementById('history-close-btn');
@@ -313,19 +401,36 @@
         const clearHistoryBtn = document.getElementById('clear-history-btn');
         const historyBadge = document.getElementById('history-badge');
         const historyCountLabel = document.getElementById('history-count-label');
+
+        // Toast
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
         const toastIcon = document.getElementById('toast-icon');
 
-        // Preset Tags
-        document.querySelectorAll('.preset-tag').forEach(tag => {
-            tag.addEventListener('click', () => {
-                promptInput.value = tag.getAttribute('data-prompt');
-                state.prompt = promptInput.value;
-                updateCharCount();
-                showToast('Prompt pré-rempli appliqué', 'success');
-            });
-        });
+        // Initialize UI
+        apiKeyInput.value = state.apiKey;
+        updateHistoryUI();
+        updateAlbumUI();
+
+        // Navigation Tab Switching
+        navStudioBtn.addEventListener('click', () => switchTab('studio'));
+        navAlbumBtn.addEventListener('click', () => switchTab('album'));
+
+        function switchTab(tab) {
+            state.currentTab = tab;
+            if (tab === 'studio') {
+                viewStudio.classList.remove('hidden');
+                viewAlbum.classList.add('hidden');
+                navStudioBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow transition flex items-center space-x-2";
+                navAlbumBtn.className = "px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition flex items-center space-x-2";
+            } else {
+                viewStudio.classList.add('hidden');
+                viewAlbum.classList.remove('hidden');
+                navAlbumBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow transition flex items-center space-x-2";
+                navStudioBtn.className = "px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition flex items-center space-x-2";
+                updateAlbumUI();
+            }
+        }
 
         // Prompt input listener
         promptInput.addEventListener('input', (e) => {
@@ -338,17 +443,25 @@
             promptCharCount.textContent = `${len} / 1000`;
         }
 
-        // Aspect Ratio selection
-        ratioBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                ratioBtns.forEach(b => {
-                    b.classList.remove('border-brand-500', 'bg-brand-500/10', 'text-brand-300');
-                    b.classList.add('border-slate-700', 'bg-slate-900', 'text-slate-300');
-                });
-                btn.classList.remove('border-slate-700', 'bg-slate-900', 'text-slate-300');
-                btn.classList.add('border-brand-500', 'bg-brand-500/10', 'text-brand-300');
-                state.aspectRatio = btn.getAttribute('data-ratio');
-            });
+        // Settings Modal Listeners
+        openSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        settingsCloseBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        settingsModal.addEventListener('click', (e) => { if(e.target === settingsModal) settingsModal.classList.add('hidden'); });
+
+        toggleApiKeyVisibility.addEventListener('click', () => {
+            apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+            toggleApiKeyVisibility.innerHTML = apiKeyInput.type === 'password' ? '<i class="fa-solid fa-eye text-xs"></i>' : '<i class="fa-solid fa-eye-slash text-xs"></i>';
+        });
+
+        clearApiKeyBtn.addEventListener('click', () => {
+            apiKeyInput.value = '';
+        });
+
+        saveApiKeyBtn.addEventListener('click', () => {
+            state.apiKey = apiKeyInput.value.trim();
+            localStorage.setItem('gemini_api_key', state.apiKey);
+            settingsModal.classList.add('hidden');
+            showToast('Clé API enregistrée avec succès', 'success');
         });
 
         // Source Image Handling
@@ -406,7 +519,7 @@
             showToast('Image source supprimée', 'info');
         });
 
-        // Toast notification system
+        // Toast notifications
         function showToast(message, type = 'success') {
             toastMessage.textContent = message;
             if (type === 'success') {
@@ -425,95 +538,116 @@
             }, 3500);
         }
 
-        // Generate Image API Call with strict prompt reinforcement
+        // Generate 4 simultaneous images with strict 16:9 instruction
         generateBtn.addEventListener('click', async () => {
             const rawPrompt = state.prompt.trim();
             if (!rawPrompt) {
-                showToast('Veuillez saisir une description textuelle', 'error');
+                showToast('Veuillez saisir une description textuelle précise', 'error');
                 promptInput.focus();
                 return;
             }
 
             setLoading(true);
 
-            // Add to history
+            // Save to prompt history
             if (!state.history.includes(rawPrompt)) {
                 state.history.unshift(rawPrompt);
+                localStorage.setItem('gemini_prompt_history', JSON.stringify(state.history));
                 updateHistoryUI();
             }
 
+            const totalBatch = 4;
+            let completedCount = 0;
+            progressCounterBadge.textContent = `0/${totalBatch}`;
+
             try {
-                // Construct strictly reinforced prompt to prevent off-topic generations
-                const reinforcedPrompt = `Générer une image visuelle correspondant EXACTEMENT et STRICTEMENT à la description textuelle suivante, sans dévier du sujet demandé : "${rawPrompt}". Respecter rigoureusement chaque détail descriptif, le style artistique indiqué, la composition et l'atmosphère demandées.`;
+                const reinforcedPrompt = `Générer une image visuelle au format STRICTEMENT 16:9 (paysage large), correspondant EXACTEMENT et fidèlement à la description suivante, sans dévier : "${rawPrompt}". Respecter tous les détails de style, de composition et d'éclairage.`;
 
-                let payload = {};
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+                const promises = [];
+                for (let i = 0; i < totalBatch; i++) {
+                    promises.push((async () => {
+                        const apiKey = state.apiKey.trim();
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
 
-                if (state.sourceImage) {
-                    // Image-to-Image / Variation / Edit mode with reinforced prompt instructions
-                    loadingStatusText.textContent = "Modification de l'image source selon vos instructions...";
-                    payload = {
-                        contents: [{
-                            role: "user",
-                            parts: [
-                                { text: reinforcedPrompt },
-                                {
-                                    inlineData: {
-                                        mimeType: state.sourceImage.mimeType,
-                                        data: state.sourceImage.base64
-                                    }
+                        let payload = {};
+                        if (state.sourceImage) {
+                            payload = {
+                                contents: [{
+                                    role: "user",
+                                    parts: [
+                                        { text: reinforcedPrompt },
+                                        {
+                                            inlineData: {
+                                                mimeType: state.sourceImage.mimeType,
+                                                data: state.sourceImage.base64
+                                            }
+                                        }
+                                    ]
+                                }],
+                                generationConfig: {
+                                    responseModalities: ['IMAGE'],
+                                    imageConfig: { aspectRatio: "16:9" }
                                 }
-                            ]
-                        }],
-                        generationConfig: {
-                            responseModalities: ['IMAGE'],
-                            imageConfig: { aspectRatio: state.aspectRatio }
+                            };
+                        } else {
+                            payload = {
+                                contents: [{
+                                    role: 'user',
+                                    parts: [{ text: reinforcedPrompt }]
+                                }],
+                                generationConfig: {
+                                    responseModalities: ['IMAGE'],
+                                    imageConfig: { aspectRatio: "16:9" }
+                                }
+                            };
                         }
-                    };
-                } else {
-                    // Text-to-Image mode with reinforced prompt
-                    loadingStatusText.textContent = "Génération de l'image haute fidélité...";
-                    payload = {
-                        contents: [{
-                            role: 'user',
-                            parts: [{ text: reinforcedPrompt }]
-                        }],
-                        generationConfig: {
-                            responseModalities: ['IMAGE'],
-                            imageConfig: { aspectRatio: state.aspectRatio }
+
+                        const response = await fetchWithRetry(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+                        const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+                        if (!part || !part.inlineData) {
+                            throw new Error("L'API n'a pas retourné de données d'image valides.");
                         }
-                    };
+
+                        const imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                        completedCount++;
+                        progressCounterBadge.textContent = `${completedCount}/${totalBatch}`;
+
+                        return {
+                            id: 'img_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                            url: imageUrl,
+                            prompt: rawPrompt,
+                            aspectRatio: '16:9',
+                            timestamp: new Date().toLocaleDateString() + ' à ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        };
+                    })());
                 }
 
-                // Exponential backoff fetch implementation
-                const response = await fetchWithRetry(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-
-                if (!part || !part.inlineData) {
-                    throw new Error("L'API n'a pas retourné de données d'image valides.");
-                }
-
-                const imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                const newImages = await Promise.all(promises);
                 
-                const newImageObj = {
-                    id: 'img_' + Date.now(),
-                    url: imageUrl,
-                    prompt: rawPrompt,
-                    aspectRatio: state.aspectRatio,
-                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    selected: false
-                };
+                // Add to recent results
+                state.results.unshift(...newImages);
 
-                state.images.unshift(newImageObj);
-                updateGalleryUI();
-                showToast('Image générée avec succès !', 'success');
+                // Automatically save all generated images directly into the Album
+                newImages.forEach(imgObj => {
+                    const albumItem = {
+                        ...imgObj,
+                        id: 'album_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                        selected: false
+                    };
+                    state.album.unshift(albumItem);
+                });
+                localStorage.setItem('gemini_image_album', JSON.stringify(state.album));
+
+                updateResultsUI();
+                updateAlbumUI();
+                showToast('4 images 16:9 générées et enregistrées dans l\'album !', 'success');
 
             } catch (error) {
                 console.error("Erreur de génération:", error);
@@ -523,7 +657,6 @@
             }
         });
 
-        // Helper for fetch with exponential backoff
         async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
             try {
                 const response = await fetch(url, options);
@@ -542,69 +675,48 @@
         }
 
         function setLoading(isLoading) {
-            state.loading = isLoading;
             generateBtn.disabled = isLoading;
             if (isLoading) {
                 generateBtnText.textContent = "Génération en cours...";
                 generateBtn.classList.add('opacity-50', 'generating-glow');
-                emptyGalleryState.classList.add('hidden');
-                imagesGrid.classList.add('hidden');
+                emptyResultState.classList.add('hidden');
+                resultsGrid.classList.add('hidden');
                 loadingState.classList.remove('hidden');
                 loadingState.classList.add('flex');
             } else {
-                generateBtnText.textContent = "Générer l'Image";
+                generateBtnText.textContent = "Générer 4 images simultanées (16:9)";
                 generateBtn.classList.remove('opacity-50', 'generating-glow');
                 loadingState.classList.add('hidden');
                 loadingState.classList.remove('flex');
             }
         }
 
-        // Gallery UI Rendering & Management
-        function updateGalleryUI() {
-            const count = state.images.length;
-            galleryCount.textContent = `${count} image${count > 1 ? 's' : ''}`;
+        // Render Results UI (Clean photo-only grid without prompt text underneath)
+        function updateResultsUI() {
+            const count = state.results.length;
+            resultCount.textContent = `${count} image${count > 1 ? 's' : ''}`;
 
             if (count === 0) {
-                emptyGalleryState.classList.remove('hidden');
-                imagesGrid.classList.add('hidden');
-                batchActions.classList.add('hidden');
+                emptyResultState.classList.remove('hidden');
+                resultsGrid.classList.add('hidden');
                 return;
             }
 
-            emptyGalleryState.classList.add('hidden');
-            imagesGrid.classList.remove('hidden');
+            emptyResultState.classList.add('hidden');
+            resultsGrid.classList.remove('hidden');
 
-            const selectedCount = state.images.filter(img => img.selected).length;
-            if (selectedCount > 0) {
-                batchActions.classList.remove('hidden');
-                selectedCountSpan.textContent = selectedCount;
-            } else {
-                batchActions.classList.add('hidden');
-            }
-
-            imagesGrid.innerHTML = state.images.map(img => `
-                <div class="group relative bg-slate-900 border ${img.selected ? 'border-brand-500 ring-2 ring-brand-500/30' : 'border-slate-800'} rounded-xl overflow-hidden shadow-lg transition flex flex-col">
-                    <div class="relative w-full h-48 bg-slate-950 flex items-center justify-center overflow-hidden cursor-pointer image-card-click" data-id="${img.id}">
-                        <img src="${img.url}" alt="${img.prompt}" class="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-105">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-3">
-                            <span class="text-[11px] text-white font-medium bg-slate-900/80 px-2 py-0.5 rounded backdrop-blur-sm border border-slate-700">Format ${img.aspectRatio}</span>
-                        </div>
-                        <div class="absolute top-2 left-2">
-                            <button class="select-img-btn w-6 h-6 rounded-lg ${img.selected ? 'bg-brand-500 text-white' : 'bg-slate-900/80 text-slate-400 border border-slate-700'} flex items-center justify-center text-xs transition" data-id="${img.id}">
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-3 flex flex-col justify-between flex-1 space-y-2">
-                        <p class="text-xs text-slate-300 line-clamp-2" title="${img.prompt}">${img.prompt}</p>
-                        <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-800/60">
-                            <span>${img.timestamp}</span>
-                            <div class="flex items-center space-x-1">
-                                <button class="use-source-action-btn px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition" data-id="${img.id}" title="Utiliser comme source">
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-brand-400"></i>
+            resultsGrid.innerHTML = state.results.map(img => `
+                <div class="group relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg transition flex flex-col">
+                    <div class="relative w-full aspect-video bg-slate-950 flex items-center justify-center overflow-hidden cursor-pointer result-card-click" data-id="${img.id}">
+                        <img src="${img.url}" alt="Génération Gemini 16:9" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent opacity-0 group-hover:opacity-100 transition flex items-end justify-between p-3">
+                            <span class="text-[10px] text-white font-medium bg-slate-900/80 px-2 py-0.5 rounded backdrop-blur-sm border border-slate-700">16:9 Widescreen</span>
+                            <div class="flex items-center space-x-1.5" onclick="event.stopPropagation()">
+                                <button class="use-source-btn w-7 h-7 bg-slate-900/90 hover:bg-brand-600 text-slate-200 hover:text-white rounded-lg flex items-center justify-center transition border border-slate-700" data-id="${img.id}" title="Utiliser comme source">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-brand-400 group-hover:text-white"></i>
                                 </button>
-                                <button class="download-single-btn px-2 py-1 bg-brand-600/20 hover:bg-brand-600 text-brand-300 hover:text-white rounded transition" data-id="${img.id}" title="Télécharger">
-                                    <i class="fa-solid fa-download"></i>
+                                <button class="download-result-btn w-7 h-7 bg-slate-900/90 hover:bg-brand-600 text-slate-200 hover:text-white rounded-lg flex items-center justify-center transition border border-slate-700" data-id="${img.id}" title="Télécharger">
+                                    <i class="fa-solid fa-download text-xs"></i>
                                 </button>
                             </div>
                         </div>
@@ -612,59 +724,171 @@
                 </div>
             `).join('');
 
-            // Bind card event listeners
-            document.querySelectorAll('.image-card-click').forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = card.getAttribute('data-id');
-                    openLightbox(id);
+            // Result event listeners
+            document.querySelectorAll('.result-card-click').forEach(card => {
+                card.addEventListener('click', () => openLightbox(card.getAttribute('data-id'), 'result'));
+            });
+
+            document.querySelectorAll('.use-source-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    useAsSource(btn.getAttribute('data-id'), 'result');
                 });
             });
 
-            document.querySelectorAll('.select-img-btn').forEach(btn => {
+            document.querySelectorAll('.download-result-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const id = btn.getAttribute('data-id');
-                    const imgObj = state.images.find(i => i.id === id);
-                    if (imgObj) {
-                        imgObj.selected = !imgObj.selected;
-                        updateGalleryUI();
-                    }
-                });
-            });
-
-            document.querySelectorAll('.download-single-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = btn.getAttribute('data-id');
-                    downloadImage(id);
-                });
-            });
-
-            document.querySelectorAll('.use-source-action-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = btn.getAttribute('data-id');
-                    useAsSource(id);
+                    downloadImage(btn.getAttribute('data-id'), 'result');
                 });
             });
         }
 
-        function downloadImage(id) {
-            const imgObj = state.images.find(i => i.id === id);
+        // Album UI & Management
+        function updateAlbumUI() {
+            const count = state.album.length;
+            albumTotalCount.textContent = `${count} image${count > 1 ? 's' : ''}`;
+            albumBadgeCount.textContent = count;
+
+            if (count === 0) {
+                emptyAlbumState.classList.remove('hidden');
+                albumGrid.classList.add('hidden');
+                toggleSelectModeBtn.classList.add('hidden');
+                albumBatchActions.classList.add('hidden');
+                return;
+            }
+
+            toggleSelectModeBtn.classList.remove('hidden');
+            emptyAlbumState.classList.add('hidden');
+            albumGrid.classList.remove('hidden');
+
+            const selectedCount = state.album.filter(i => i.selected).length;
+            albumSelectedCount.textContent = selectedCount;
+
+            if (state.selectMode) {
+                albumBatchActions.classList.remove('hidden');
+                toggleSelectModeBtn.className = "px-3 py-1.5 bg-brand-600 text-white text-xs font-medium rounded-lg border border-brand-500 transition flex items-center space-x-1.5";
+                selectModeBtnText.textContent = "Quitter Sélection";
+            } else {
+                albumBatchActions.classList.add('hidden');
+                toggleSelectModeBtn.className = "px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-1.5";
+                selectModeBtnText.textContent = "Mode Sélection";
+            }
+
+            albumGrid.innerHTML = state.album.map(img => `
+                <div class="group relative bg-slate-900 border ${img.selected ? 'border-brand-500 ring-2 ring-brand-500/30' : 'border-slate-800'} rounded-xl overflow-hidden shadow-lg transition flex flex-col">
+                    <div class="relative w-full aspect-video bg-slate-950 flex items-center justify-center overflow-hidden cursor-pointer album-card-click" data-id="${img.id}">
+                        <img src="${img.url}" alt="${img.prompt}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                        <div class="absolute top-2 left-2 ${state.selectMode ? 'block' : 'hidden'}">
+                            <button class="album-select-btn w-6 h-6 rounded-lg ${img.selected ? 'bg-brand-500 text-white' : 'bg-slate-900/80 text-slate-400 border border-slate-700'} flex items-center justify-center text-xs transition" data-id="${img.id}">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent opacity-0 group-hover:opacity-100 transition flex items-end justify-between p-3">
+                            <span class="text-[10px] text-white font-medium bg-slate-900/80 px-2 py-0.5 rounded backdrop-blur-sm border border-slate-700">${img.timestamp}</span>
+                            <div class="flex items-center space-x-1.5" onclick="event.stopPropagation()">
+                                <button class="album-use-source-btn w-7 h-7 bg-slate-900/90 hover:bg-brand-600 text-slate-200 hover:text-white rounded-lg flex items-center justify-center transition border border-slate-700" data-id="${img.id}" title="Utiliser comme source">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-brand-400"></i>
+                                </button>
+                                <button class="album-download-btn w-7 h-7 bg-slate-900/90 hover:bg-brand-600 text-slate-200 hover:text-white rounded-lg flex items-center justify-center transition border border-slate-700" data-id="${img.id}" title="Télécharger">
+                                    <i class="fa-solid fa-download text-xs"></i>
+                                </button>
+                                <button class="album-delete-btn w-7 h-7 bg-rose-950/90 hover:bg-rose-900 text-rose-300 rounded-lg flex items-center justify-center transition border border-rose-800" data-id="${img.id}" title="Supprimer">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Album event listeners
+            document.querySelectorAll('.album-card-click').forEach(card => {
+                card.addEventListener('click', () => openLightbox(card.getAttribute('data-id'), 'album'));
+            });
+
+            document.querySelectorAll('.album-select-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    const imgObj = state.album.find(i => i.id === id);
+                    if (imgObj) {
+                        imgObj.selected = !imgObj.selected;
+                        updateAlbumUI();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.album-use-source-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    useAsSource(btn.getAttribute('data-id'), 'album');
+                });
+            });
+
+            document.querySelectorAll('.album-download-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadImage(btn.getAttribute('data-id'), 'album');
+                });
+            });
+
+            document.querySelectorAll('.album-delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    state.album = state.album.filter(i => i.id !== id);
+                    localStorage.setItem('gemini_image_album', JSON.stringify(state.album));
+                    updateAlbumUI();
+                    showToast("Image supprimée de l'album", "info");
+                });
+            });
+        }
+
+        toggleSelectModeBtn.addEventListener('click', () => {
+            state.selectMode = !state.selectMode;
+            if (!state.selectMode) {
+                state.album.forEach(i => i.selected = false);
+            }
+            updateAlbumUI();
+        });
+
+        albumSelectAllBtn.addEventListener('click', () => {
+            const allSelected = state.album.every(i => i.selected);
+            state.album.forEach(i => i.selected = !allSelected);
+            updateAlbumUI();
+        });
+
+        albumDeleteSelectedBtn.addEventListener('click', () => {
+            const count = state.album.filter(i => i.selected).length;
+            if (count === 0) {
+                showToast("Aucune image sélectionnée", "info");
+                return;
+            }
+            state.album = state.album.filter(i => !i.selected);
+            localStorage.setItem('gemini_image_album', JSON.stringify(state.album));
+            updateAlbumUI();
+            showToast(`${count} image(s) supprimée(s) de l'album`, "info");
+        });
+
+        // Common helpers
+        function downloadImage(id, source = 'result') {
+            const collection = source === 'result' ? state.results : state.album;
+            const imgObj = collection.find(i => i.id === id);
             if (!imgObj) return;
             const a = document.createElement('a');
             a.href = imgObj.url;
-            a.download = `gemini-studio_${Date.now()}.png`;
+            a.download = `gemini-studio-16-9_${Date.now()}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             showToast('Image téléchargée', 'success');
         }
 
-        function useAsSource(id) {
-            const imgObj = state.images.find(i => i.id === id);
+        function useAsSource(id, source = 'result') {
+            const collection = source === 'result' ? state.results : state.album;
+            const imgObj = collection.find(i => i.id === id);
             if (!imgObj) return;
-            // Convert data url to source state
             const arr = imgObj.url.split(',');
             const mime = arr[0].match(/:(.*?);/)[1];
             const b64 = arr[1];
@@ -677,92 +901,64 @@
             sourcePreviewContainer.classList.remove('hidden');
             sourcePlaceholder.classList.add('hidden');
             removeSourceBtn.classList.remove('hidden');
+            switchTab('studio');
             showToast("Définie comme image source pour la prochaine variation", 'success');
         }
 
-        // Batch Actions
-        downloadSelectedBtn.addEventListener('click', () => {
-            const selected = state.images.filter(i => i.selected);
-            selected.forEach((img, index) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = img.url;
-                    a.download = `gemini-studio_batch_${index + 1}.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }, index * 200);
-            });
-            showToast(`${selected.length} image(s) téléchargée(s)`, 'success');
-        });
-
-        deleteSelectedBtn.addEventListener('click', () => {
-            state.images = state.images.filter(i => !i.selected);
-            updateGalleryUI();
-            showToast('Images sélectionnées supprimées', 'info');
-        });
-
-        clearAllBtn.addEventListener('click', () => {
-            if (state.images.length === 0) return;
-            if (confirm("Voulez-vous vraiment réinitialiser l'atelier ?")) {
-                state.images = [];
-                state.sourceImage = null;
-                sourcePreviewContainer.classList.add('hidden');
-                sourcePlaceholder.classList.remove('hidden');
-                removeSourceBtn.classList.add('hidden');
-                promptInput.value = '';
-                state.prompt = '';
-                updateCharCount();
-                updateGalleryUI();
-                showToast('Atelier réinitialisé', 'info');
-            }
-        });
-
-        // Lightbox Modal Functions
-        function openLightbox(id) {
-            const imgObj = state.images.find(i => i.id === id);
+        // Lightbox Modal
+        function openLightbox(id, source = 'result') {
+            const collection = source === 'result' ? state.results : state.album;
+            const imgObj = collection.find(i => i.id === id);
             if (!imgObj) return;
             state.currentLightboxImage = imgObj;
             lightboxImg.src = imgObj.url;
-            lightboxTitle.textContent = `Génération du ${imgObj.timestamp} (${imgObj.aspectRatio})`;
+            lightboxTitle.textContent = `Visualisation 16:9 - ${imgObj.timestamp}`;
             lightboxPromptText.textContent = `Prompt: "${imgObj.prompt}"`;
             lightboxModal.classList.remove('hidden');
         }
 
-        lightboxCloseBtn.addEventListener('click', () => {
-            lightboxModal.classList.add('hidden');
-        });
-
-        lightboxModal.addEventListener('click', (e) => {
-            if (e.target === lightboxModal) {
-                lightboxModal.classList.add('hidden');
-            }
-        });
+        lightboxCloseBtn.addEventListener('click', () => lightboxModal.classList.add('hidden'));
+        lightboxModal.addEventListener('click', (e) => { if(e.target === lightboxModal) lightboxModal.classList.add('hidden'); });
 
         lightboxDownloadBtn.addEventListener('click', () => {
             if (state.currentLightboxImage) {
-                downloadImage(state.currentLightboxImage.id);
+                const a = document.createElement('a');
+                a.href = state.currentLightboxImage.url;
+                a.download = `gemini-studio-16-9_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('Image téléchargée', 'success');
             }
         });
 
         lightboxUseSourceBtn.addEventListener('click', () => {
             if (state.currentLightboxImage) {
-                useAsSource(state.currentLightboxImage.id);
+                const arr = state.currentLightboxImage.url.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const b64 = arr[1];
+                state.sourceImage = {
+                    base64: b64,
+                    mimeType: mime,
+                    url: state.currentLightboxImage.url
+                };
+                sourcePreviewImg.src = state.sourceImage.url;
+                sourcePreviewContainer.classList.remove('hidden');
+                sourcePlaceholder.classList.add('hidden');
+                removeSourceBtn.classList.remove('hidden');
                 lightboxModal.classList.add('hidden');
+                switchTab('studio');
+                showToast("Définie comme image source", 'success');
             }
         });
 
         // History Drawer
-        openHistoryBtn.addEventListener('click', () => {
-            historyModal.classList.remove('hidden');
-        });
-
-        historyCloseBtn.addEventListener('click', () => {
-            historyModal.classList.add('hidden');
-        });
+        openHistoryBtn.addEventListener('click', () => historyModal.classList.remove('hidden'));
+        historyCloseBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
 
         clearHistoryBtn.addEventListener('click', () => {
             state.history = [];
+            localStorage.removeItem('gemini_prompt_history');
             updateHistoryUI();
             showToast("Historique effacé", "info");
         });
@@ -779,7 +975,7 @@
             historyList.innerHTML = state.history.map(item => `
                 <div class="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl cursor-pointer transition history-item group flex items-center justify-between" data-prompt="${item}">
                     <p class="text-xs text-slate-300 line-clamp-2 pr-2">${item}</p>
-                    <button class="text-brand-400 hover:text-brand-300 text-xs opacity-0 group-hover:opacity-100 transition">
+                    <button class="text-brand-400 hover:text-brand-300 text-xs opacity-0 group-hover:opacity-100 transition" title="Restaurer">
                         <i class="fa-solid fa-arrow-rotate-left"></i>
                     </button>
                 </div>
@@ -792,6 +988,7 @@
                     state.prompt = p;
                     updateCharCount();
                     historyModal.classList.add('hidden');
+                    switchTab('studio');
                     showToast('Prompt restauré', 'success');
                 });
             });
