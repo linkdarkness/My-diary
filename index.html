@@ -142,6 +142,21 @@
                 </div>
             </div>
 
+            <!-- BOUTON SÉLECTION / SUPPRESSION MULTIPLE -->
+            <div class="flex items-center justify-between bg-dark-800 border border-dark-700 p-2.5 rounded-xl">
+                <button onclick="toggleSelectMode()" id="select-mode-btn" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center space-x-1.5">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span id="select-mode-text">Sélectionner des photos</span>
+                </button>
+                <div id="selection-actions" class="hidden space-x-2">
+                    <button onclick="selectAllPhotos()" class="text-xs bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1 rounded-lg">Tout cocher</button>
+                    <button onclick="deleteSelectedPhotos()" class="text-xs bg-red-600/80 hover:bg-red-600 text-white px-2.5 py-1 rounded-lg flex items-center space-x-1">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Supprimer (<span id="selected-count">0</span>)</span>
+                    </button>
+                </div>
+            </div>
+
             <div id="album-grid" class="grid grid-cols-2 gap-3">
                 <!-- Les images enregistrées s'afficheront ici -->
             </div>
@@ -195,6 +210,8 @@
         let currentModalIndex = null;
         let currentFilter = 'all';
         let selectedEditImageBase64 = null;
+        let isSelectMode = false;
+        let selectedPhotoIds = new Set();
 
         const randomPrompts = [
             "Un paysage mystique de forêt de redwoods en Californie avec des rayons de soleil filtrant à travers la brume, photoréaliste 8k",
@@ -217,7 +234,10 @@
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             document.getElementById(`nav-${tabId}`).className = "w-10 h-10 rounded-lg flex items-center justify-center text-indigo-400 bg-dark-700 transition-all";
             
-            if (tabId === 'album') renderAlbum();
+            if (tabId === 'album') {
+                resetSelectMode();
+                renderAlbum();
+            }
         }
 
         function generateImages() {
@@ -234,7 +254,6 @@
             const resultsGrid = document.getElementById('results-grid');
             resultsGrid.innerHTML = '';
 
-            // Génération directe des 4 URLs d'images 16:9
             const imageUrls = [];
             for (let i = 0; i < 4; i++) {
                 const seed = Math.floor(Math.random() * 1000000);
@@ -242,7 +261,6 @@
                 imageUrls.push(url);
             }
 
-            // Affichage immédiat pour éviter les blocages de chargement réseau
             setTimeout(() => {
                 imageUrls.forEach(url => {
                     const item = {
@@ -309,24 +327,104 @@
             }
 
             filtered.forEach(item => {
+                const isSelected = selectedPhotoIds.has(item.id);
                 const card = document.createElement('div');
-                card.className = "relative rounded-xl overflow-hidden bg-dark-800 border border-dark-700 shadow-md aspect-video group";
+                card.className = `relative rounded-xl overflow-hidden bg-dark-800 border ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/50' : 'border-dark-700'} shadow-md aspect-video group cursor-pointer`;
+                
+                card.onclick = () => {
+                    if (isSelectMode) {
+                        togglePhotoSelection(item.id);
+                    } else {
+                        openModalById(item.id);
+                    }
+                };
+
                 card.innerHTML = `
-                    <img src="${item.url}" loading="lazy" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
-                    <div class="absolute top-2 right-2">
-                        <button onclick="toggleFavorite('${item.id}'); event.stopPropagation();" class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
-                            <i class="${item.favorite ? 'fa-solid text-amber-400' : 'fa-regular'} fa-star text-xs"></i>
-                        </button>
-                    </div>
+                    <img src="${item.url}" loading="lazy" class="w-full h-full object-cover">
+                    ${isSelectMode ? `
+                        <div class="absolute top-2 left-2 w-6 h-6 rounded-full ${isSelected ? 'bg-indigo-600 text-white' : 'bg-black/60 border border-white/40'} flex items-center justify-center text-xs">
+                            ${isSelected ? '<i class="fa-solid fa-check"></i>' : ''}
+                        </div>
+                    ` : `
+                        <div class="absolute top-2 right-2">
+                            <button onclick="toggleFavorite('${item.id}'); event.stopPropagation();" class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
+                                <i class="${item.favorite ? 'fa-solid text-amber-400' : 'fa-regular'} fa-star text-xs"></i>
+                            </button>
+                        </div>
+                    `}
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode;
+            selectedPhotoIds.clear();
+            const btnText = document.getElementById('select-mode-text');
+            const actions = document.getElementById('selection-actions');
+            
+            if (isSelectMode) {
+                btnText.textContent = "Annuler sélection";
+                actions.classList.remove('hidden');
+                actions.classList.add('flex');
+            } else {
+                resetSelectMode();
+            }
+            renderAlbum();
+        }
+
+        function resetSelectMode() {
+            isSelectMode = false;
+            selectedPhotoIds.clear();
+            document.getElementById('select-mode-text').textContent = "Sélectionner des photos";
+            const actions = document.getElementById('selection-actions');
+            actions.classList.add('hidden');
+            actions.classList.remove('flex');
+            document.getElementById('selected-count').textContent = '0';
+        }
+
+        function togglePhotoSelection(id) {
+            if (selectedPhotoIds.has(id)) {
+                selectedPhotoIds.delete(id);
+            } else {
+                selectedPhotoIds.add(id);
+            }
+            document.getElementById('selected-count').textContent = selectedPhotoIds.size;
+            renderAlbum();
+        }
+
+        function selectAllPhotos() {
+            const filtered = album.filter(item => {
+                if (currentFilter === 'favorites') return item.favorite;
+                return true;
+            });
+            if (selectedPhotoIds.size === filtered.length) {
+                selectedPhotoIds.clear();
+            } else {
+                filtered.forEach(item => selectedPhotoIds.add(item.id));
+            }
+            document.getElementById('selected-count').textContent = selectedPhotoIds.size;
+            renderAlbum();
+        }
+
+        function deleteSelectedPhotos() {
+            if (selectedPhotoIds.size === 0) {
+                alert("Aucune photo sélectionnée.");
+                return;
+            }
+            if (confirm(`Supprimer les ${selectedPhotoIds.size} photos sélectionnées de l'album ?`)) {
+                album = album.filter(item => !selectedPhotoIds.has(item.id));
+                saveAlbum();
+                resetSelectMode();
+                renderAlbum();
+            }
         }
 
         function filterAlbum(filter) {
             currentFilter = filter;
             document.getElementById('filter-all').className = `px-3 py-1.5 rounded-md transition-all ${filter === 'all' ? 'bg-indigo-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`;
             document.getElementById('filter-favorites').className = `px-3 py-1.5 rounded-md transition-all ${filter === 'favorites' ? 'bg-indigo-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`;
+            resetSelectMode();
             renderAlbum();
         }
 
