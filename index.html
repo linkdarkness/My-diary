@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur d'Images IA - Gemini</title>
+    <title>Générateur d'Images IA - Gemini Studio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -120,7 +120,6 @@
                 </div>
 
                 <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Les images générées apparaîtront ici -->
                     <div class="col-span-full py-16 text-center border-2 border-dashed border-dark-700 rounded-2xl bg-dark-800/20 text-slate-500">
                         <i class="fa-solid fa-image text-4xl mb-3 opacity-40"></i>
                         <p>Entrez une description ci-dessus pour lancer la génération simultanée de 4 images.</p>
@@ -148,7 +147,6 @@
             </div>
 
             <div id="album-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Les images enregistrées s'afficheront ici -->
             </div>
         </div>
 
@@ -156,7 +154,6 @@
 
     <!-- Script Logique -->
     <script>
-        // Gestion des onglets
         function switchTab(tabName) {
             const studioView = document.getElementById('view-studio');
             const albumView = document.getElementById('view-album');
@@ -177,20 +174,17 @@
             }
         }
 
-        // État de l'application
-        let referenceImage = null; // { dataUrl: string, name: string }
+        let referenceImage = null;
         let promptHistory = JSON.parse(localStorage.getItem('gemini_prompt_history') || '[]');
         let albumImages = JSON.parse(localStorage.getItem('gemini_album_images') || '[]');
         let isSelectMode = false;
         let selectedAlbumIds = new Set();
 
-        // Initialisation de l'historique et album au chargement
         document.addEventListener('DOMContentLoaded', () => {
             updateAlbumCount();
             renderPromptHistory();
         });
 
-        // Gestion de l'upload d'image de référence
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -233,14 +227,11 @@
             showReferencePreview();
         }
 
-        // Gestion de l'historique des prompts
         function addPromptToHistory(promptText) {
             if (!promptText || !promptText.trim()) return;
             const cleanText = promptText.trim();
-            // Éviter les doublons consécutifs ou trop proches
             promptHistory = promptHistory.filter(p => p !== cleanText);
             promptHistory.unshift(cleanText);
-            // Garder les 15 derniers
             if (promptHistory.length > 15) promptHistory.pop();
             localStorage.setItem('gemini_prompt_history', JSON.stringify(promptHistory));
             renderPromptHistory();
@@ -273,7 +264,6 @@
             renderPromptHistory();
         }
 
-        // Simulation / Génération de 4 images 16:9
         async function generateImages() {
             const promptText = document.getElementById('prompt-input').value.trim();
             if (!promptText) {
@@ -292,11 +282,8 @@
             generateBtn.disabled = true;
 
             try {
-                // Simulation d'appel API Gemini 3.1 Flash Image (4 variations 16:9)
-                // Dans une implémentation réelle avec SDK Gemini, vous feriez l'appel avec aspectRatio: "16:9" et count: 4
-                await new Promise(resolve => setTimeout(resolve, 2500));
+                await new Promise(resolve => setTimeout(resolve, 2200));
 
-                // Images de démonstration aléatoires de haute qualité en 16:9 (via Picsum / Unsplash)
                 const seedBase = Math.floor(Math.random() * 1000);
                 const generatedImages = [
                     `https://picsum.photos/seed/${seedBase + 1}/960/540`,
@@ -340,7 +327,6 @@
             }
         }
 
-        // Gestion de l'Album
         function saveToAlbum(url, prompt) {
             const newItem = {
                 id: 'img_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
@@ -352,8 +338,6 @@
             albumImages.unshift(newItem);
             localStorage.setItem('gemini_album_images', JSON.stringify(albumImages));
             updateAlbumCount();
-            
-            // Notification visuelle rapide
             alert('Image enregistrée avec succès dans votre album !');
         }
 
@@ -458,7 +442,6 @@
             `).join('');
         }
 
-        // Utilitaire d'échappement HTML pour la sécurité
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
