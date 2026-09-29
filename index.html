@@ -55,7 +55,7 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            <!-- BOUTON INSTALLATION PWA (Caché par défaut jusqu'à ce que le navigateur autorise l'installation) -->
+            <!-- BOUTON INSTALLATION PWA -->
             <button id="install-pwa-btn" onclick="installPWA()" class="hidden text-xs bg-indigo-600/30 border border-indigo-500/50 text-indigo-300 px-2.5 py-1.5 rounded-xl flex items-center space-x-1.5 hover:bg-indigo-600 hover:text-white transition-all">
                 <i class="fa-solid fa-download"></i>
                 <span>Installer</span>
@@ -125,12 +125,29 @@
                     </button>
                 </div>
                 
-                <div class="relative">
+                <div class="relative mb-3">
                     <textarea id="prompt-input" rows="3" placeholder="Décrivez votre image réaliste..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
                     <button onclick="document.getElementById('prompt-input').value = ''" class="absolute bottom-3 right-3 text-xs text-gray-500 hover:text-gray-300 bg-dark-800 px-2 py-1 rounded">Effacer</button>
                 </div>
 
-                <button onclick="generateImages()" id="generate-btn" class="w-full mt-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
+                <!-- HISTORIQUE & FAVORIS DE PROMPTS (NOUVEAU) -->
+                <div class="mb-3 bg-dark-900/60 border border-dark-700/60 rounded-xl p-2.5">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wide flex items-center space-x-1">
+                            <i class="fa-solid fa-clock-rotate-left text-indigo-400 text-xs"></i>
+                            <span>Prompts récents & Favoris</span>
+                        </span>
+                        <div class="space-x-2">
+                            <button onclick="switchPromptFilter('all')" id="p-filter-all" class="text-[10px] text-indigo-400 font-medium underline">Tous</button>
+                            <button onclick="switchPromptFilter('fav')" id="p-filter-fav" class="text-[10px] text-gray-500 hover:text-gray-300">Favoris ⭐</button>
+                        </div>
+                    </div>
+                    <div id="prompts-history-container" class="max-h-28 overflow-y-auto space-y-1.5 pr-1 no-scrollbar">
+                        <!-- Injecté dynamiquement en JS -->
+                    </div>
+                </div>
+
+                <button onclick="generateImages()" id="generate-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <span>Générer l'image (Gemini)</span>
                 </button>
@@ -253,6 +270,8 @@
     <!-- LOGIQUE JAVASCRIPT -->
     <script>
         let album = JSON.parse(localStorage.getItem('mon_studio_album') || '[]');
+        let promptHistory = JSON.parse(localStorage.getItem('mon_studio_prompts') || '[]');
+        let currentPromptFilter = 'all';
         let currentModalIndex = null;
         let currentFilter = 'all';
         let selectedEditImageBase64 = null;
@@ -298,6 +317,7 @@
             if (geminiApiKey) {
                 updateQuotaDisplay('active', 'Clé enregistrée & prête');
             }
+            renderPromptHistory();
         });
 
         function updateQuotaDisplay(status, message, details = '') {
@@ -359,6 +379,74 @@
             document.getElementById('prompt-input').value = randomPrompts[randomIndex];
         }
 
+        // --- GESTION DE L'HISTORIQUE ET DES FAVORIS DE PROMPTS ---
+        function addPromptToHistory(text) {
+            if (!text) return;
+            // Éviter les doublons exacts en tête
+            promptHistory = promptHistory.filter(p => p.text !== text);
+            promptHistory.unshift({
+                id: Date.now() + Math.random(),
+                text: text,
+                favorite: false
+            });
+            // Garder max 15 éléments
+            if (promptHistory.length > 15) promptHistory.pop();
+            localStorage.setItem('mon_studio_prompts', JSON.stringify(promptHistory));
+            renderPromptHistory();
+        }
+
+        function togglePromptFavorite(id, event) {
+            event.stopPropagation();
+            const item = promptHistory.find(p => p.id == id);
+            if (item) {
+                item.favorite = !item.favorite;
+                localStorage.setItem('mon_studio_prompts', JSON.stringify(promptHistory));
+                renderPromptHistory();
+            }
+        }
+
+        function usePrompt(text) {
+            document.getElementById('prompt-input').value = text;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchPromptFilter(filter) {
+            currentPromptFilter = filter;
+            document.getElementById('p-filter-all').className = filter === 'all' ? "text-[10px] text-indigo-400 font-medium underline" : "text-[10px] text-gray-500 hover:text-gray-300";
+            document.getElementById('p-filter-fav').className = filter === 'fav' ? "text-[10px] text-indigo-400 font-medium underline" : "text-[10px] text-gray-500 hover:text-gray-300";
+            renderPromptHistory();
+        }
+
+        function renderPromptHistory() {
+            const container = document.getElementById('prompts-history-container');
+            container.innerHTML = '';
+
+            const filtered = promptHistory.filter(item => {
+                if (currentPromptFilter === 'fav') return item.favorite;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-gray-500 text-center py-2">Aucun prompt enregistré.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-dark-800 hover:bg-dark-700/80 border border-dark-700 rounded-lg px-2.5 py-1.5 cursor-pointer transition-colors group";
+                div.onclick = () => usePrompt(item.text);
+
+                div.innerHTML = `
+                    <span class="text-xs text-gray-300 truncate flex-1 pr-2">${item.text}</span>
+                    <button onclick="togglePromptFavorite('${item.id}', event)" class="text-gray-500 hover:text-amber-400 px-1 shrink-0">
+                        <i class="${item.favorite ? 'fa-solid text-amber-400' : 'fa-regular'} fa-star text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+        // --------------------------------------------------------
+
         function switchTab(tabId) {
             ['generator', 'edit', 'album'].forEach(id => {
                 document.getElementById(`tab-${id}`).classList.add('hidden');
@@ -387,6 +475,9 @@
                 toggleApiKeyInput();
                 return;
             }
+
+            // Enregistrer dans l'historique des prompts
+            addPromptToHistory(prompt);
 
             document.getElementById('generate-btn').disabled = true;
             document.getElementById('loading-container').classList.remove('hidden');
