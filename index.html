@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+<!-- STREAMING_CHUNK:Initializing HTML document and Tailwind configuration... -->
 <html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Image Studio - API officielle</title>
+    <title>Gemini Image Studio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,8 +28,9 @@
 </head>
 <body class="bg-dark-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
+    <!-- STREAMING_CHUNK:Rendering header and API key panel... -->
     <!-- En-tête -->
-    <header class="border-b border-dark-700 bg-dark-800/50 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-dark-700 bg-dark-800/50 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/30">
@@ -36,7 +38,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Gemini Image Studio</h1>
-                    <p class="text-xs text-slate-400">Propulsé par Google Gemini API (16:9)</p>
+                    <p class="text-xs text-slate-400">Modèle officiel gemini-3.1-flash-image</p>
                 </div>
             </div>
             
@@ -44,7 +46,13 @@
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center bg-dark-900 border border-dark-700 rounded-xl px-3 py-1.5 shadow-inner">
                     <i class="fa-solid fa-key text-slate-400 text-xs mr-2"></i>
-                    <input type="password" id="api-key-input" placeholder="Clé API Gemini (AI Studio)" onchange="saveApiKey(this.value)" class="bg-transparent text-xs text-slate-200 focus:outline-none w-44 sm:w-52 placeholder-slate-500">
+                    <input type="password" id="api-key-input" placeholder="Clé API Gemini" oninput="saveApiKey(this.value)" class="bg-transparent text-xs text-slate-200 focus:outline-none w-36 sm:w-44 placeholder-slate-500">
+                    <button onclick="toggleApiKeyVisibility()" class="text-slate-400 hover:text-slate-200 px-1.5 text-xs transition" title="Afficher / Masquer">
+                        <i id="eye-icon" class="fa-solid fa-eye"></i>
+                    </button>
+                    <button onclick="clearApiKey()" class="text-slate-500 hover:text-red-400 px-1 text-xs transition" title="Effacer la clé">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 </div>
 
                 <div class="flex bg-dark-700/60 p-1 rounded-xl border border-dark-700">
@@ -59,6 +67,7 @@
         </div>
     </header>
 
+    <!-- STREAMING_CHUNK:Rendering main layout and studio view... -->
     <!-- Contenu Principal -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
 
@@ -71,9 +80,9 @@
                 <!-- Indicateur d'image de référence active -->
                 <div id="reference-preview-container" class="hidden mb-4 p-3 bg-dark-900/80 border border-indigo-500/40 rounded-xl flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <img id="reference-thumb" src="" alt="Référence" class="w-16 h-9 object-cover rounded border border-slate-700">
+                        <img id="reference-thumb" src="" alt="Référence" class="w-16 h-10 object-cover rounded border border-slate-700">
                         <div>
-                            <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider block">Mode Édition / Modification avec Référence</span>
+                            <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider block">Mode Édition avec Image Source</span>
                             <span id="reference-name" class="text-xs text-slate-300 truncate max-w-xs block">Image chargée</span>
                         </div>
                     </div>
@@ -82,14 +91,31 @@
                     </button>
                 </div>
 
-                <div class="space-y-3">
-                    <label for="prompt-input" class="block text-sm font-medium text-slate-300 flex items-center justify-between">
-                        <span>Décrivez votre création (Génération simultanée 4x en 16:9) :</span>
-                        <label class="cursor-pointer text-xs bg-dark-700 hover:bg-dark-700/80 text-indigo-300 hover:text-indigo-200 px-3 py-1 rounded-lg border border-indigo-500/30 transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-upload"></i> Importer une image source
-                            <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <label for="prompt-input" class="text-sm font-medium text-slate-300">
+                            Décrivez votre création (Génération simultanée 4x) :
                         </label>
-                    </label>
+                        
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                            <!-- Sélecteur d'aspect ratio -->
+                            <div class="flex items-center bg-dark-900 border border-dark-700 rounded-xl px-3 py-1">
+                                <span class="text-xs text-slate-400 mr-2"><i class="fa-solid fa-crop"></i> Format:</span>
+                                <select id="aspect-ratio-select" class="bg-transparent text-xs text-slate-200 focus:outline-none">
+                                    <option value="16:9" selected>16:9 (Paysage)</option>
+                                    <option value="1:1">1:1 (Carré)</option>
+                                    <option value="4:3">4:3 (Standard)</option>
+                                    <option value="3:4">3:4 (Portrait)</option>
+                                    <option value="9:16">9:16 (Story)</option>
+                                </select>
+                            </div>
+
+                            <label class="cursor-pointer text-xs bg-dark-700 hover:bg-dark-600 text-indigo-300 hover:text-indigo-200 px-3 py-1.5 rounded-xl border border-indigo-500/30 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-upload"></i> Source
+                                <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                            </label>
+                        </div>
+                    </div>
                     
                     <div class="relative">
                         <textarea id="prompt-input" rows="3" placeholder="Ex: Un magnifique paysage futuriste au coucher du soleil, style cyberpunk détaillé..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"></textarea>
@@ -101,19 +127,20 @@
                             <span class="text-xs text-slate-400 font-medium flex items-center gap-1">
                                 <i class="fa-solid fa-clock-rotate-left"></i> Prompts récents :
                             </span>
-                            <button onclick="clearPromptHistory()" class="text-xs text-slate-500 hover:text-red-400 transition">Effacer l'historique</button>
+                            <button onclick="clearPromptHistory()" class="text-xs text-slate-500 hover:text-red-400 transition">Effacer</button>
                         </div>
                         <div id="prompt-history-list" class="flex flex-wrap gap-2 max-h-20 overflow-y-auto"></div>
                     </div>
 
                     <div class="flex justify-end pt-2">
                         <button onclick="generateImagesWithGemini()" id="generate-btn" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 text-sm">
-                            <i class="fa-solid fa-sparkles"></i> Générer avec Gemini API
+                            <i class="fa-solid fa-sparkles"></i> Générer 4 variations avec Gemini
                         </button>
                     </div>
                 </div>
             </div>
 
+            <!-- STREAMING_CHUNK:Rendering results and progress states... -->
             <!-- Zone d'Affichage des Résultats -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
@@ -122,8 +149,8 @@
 
                 <div id="loading-state" class="hidden py-16 text-center bg-dark-800/40 border border-dark-700 rounded-2xl">
                     <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent mb-4"></div>
-                    <p class="text-slate-300 font-medium">Interrogation de l'API Gemini (Génération de 4 variations 16:9)...</p>
-                    <p class="text-xs text-slate-500 mt-1">Veuillez patienter pendant le traitement multimodal...</p>
+                    <p id="loading-text" class="text-slate-300 font-medium">Interrogation de l'API Gemini (0/4 images prêtes)...</p>
+                    <p class="text-xs text-slate-500 mt-1">Génération simultanée en cours...</p>
                 </div>
 
                 <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,6 +163,7 @@
 
         </div>
 
+        <!-- STREAMING_CHUNK:Rendering album and lightbox modal views... -->
         <!-- SECTION ALBUM -->
         <div id="view-album" class="hidden space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-dark-800 border border-dark-700 p-4 rounded-2xl">
@@ -144,7 +172,7 @@
                     <p class="text-xs text-slate-400">Retrouvez toutes vos images sauvegardées</p>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <button id="select-mode-btn" onclick="toggleSelectMode()" class="px-3 py-1.5 bg-dark-700 hover:bg-dark-700/80 text-xs font-medium rounded-lg border border-dark-600 transition flex items-center gap-1.5">
+                    <button id="select-mode-btn" onclick="toggleSelectMode()" class="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-xs font-medium rounded-lg border border-dark-600 transition flex items-center gap-1.5">
                         <i class="fa-solid fa-list-check"></i> Sélectionner
                     </button>
                     <button id="batch-delete-btn" onclick="deleteSelectedAlbumImages()" class="hidden px-3 py-1.5 bg-red-600/20 text-red-400 hover:bg-red-600/30 text-xs font-medium rounded-lg border border-red-500/30 transition flex items-center gap-1.5">
@@ -159,10 +187,32 @@
 
     </main>
 
+    <!-- Modal Lightbox Plein Écran -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="relative max-w-5xl w-full max-h-[85vh] flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-slate-300 hover:text-white p-2 text-xl transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="Agrandissement" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-dark-700">
+            <div class="mt-4 flex flex-col sm:flex-row items-center justify-between w-full bg-dark-800/90 border border-dark-700 p-3 rounded-xl gap-3">
+                <p id="lightbox-caption" class="text-xs text-slate-300 italic truncate max-w-xl"></p>
+                <div class="flex items-center gap-2">
+                    <button id="lightbox-modify-btn" onclick="" class="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-slate-200 text-xs rounded-lg transition flex items-center gap-1">
+                        <i class="fa-solid fa-wand-magic"></i> Modifier
+                    </button>
+                    <a id="lightbox-download-btn" href="" download="gemini-creation.jpg" target="_blank" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-lg transition flex items-center gap-1">
+                        <i class="fa-solid fa-download"></i> Télécharger
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STREAMING_CHUNK:Initializing application JavaScript logic and API handler... -->
     <!-- Script Logique -->
     <script>
         let apiKey = localStorage.getItem('gemini_api_key') || '';
-        let referenceImage = null; // { base64: string, mimeType: string, dataUrl: string, name: string }
+        let referenceImage = null;
         let promptHistory = JSON.parse(localStorage.getItem('gemini_prompt_history') || '[]');
         let albumImages = JSON.parse(localStorage.getItem('gemini_album_images') || '[]');
         let isSelectMode = false;
@@ -179,6 +229,24 @@
         function saveApiKey(val) {
             apiKey = val.trim();
             localStorage.setItem('gemini_api_key', apiKey);
+        }
+
+        function toggleApiKeyVisibility() {
+            const input = document.getElementById('api-key-input');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function clearApiKey() {
+            apiKey = '';
+            localStorage.removeItem('gemini_api_key');
+            document.getElementById('api-key-input').value = '';
         }
 
         function switchTab(tabName) {
@@ -225,9 +293,7 @@
 
         function setReferenceImageFromSource(dataUrl, name) {
             const base64Parts = dataUrl.split(',');
-            // Si c'est une URL distante (type picsum de test), on la convertit ou on gère directement
             if (base64Parts.length < 2) {
-                // Pour les URLs distantes dans un test, on fetch pour récupérer le blob/base64
                 fetch(dataUrl)
                     .then(res => res.blob())
                     .then(blob => {
@@ -302,14 +368,30 @@
 
             section.classList.remove('hidden');
             list.innerHTML = promptHistory.map(p => `
-                <button onclick="usePrompt('${p.replace(/'/g, "\\'")}')" class="text-xs bg-dark-900 hover:bg-dark-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-dark-700 transition truncate max-w-xs">
-                    ${escapeHtml(p)}
-                </button>
+                <div class="flex items-center bg-dark-900 border border-dark-700 rounded-lg overflow-hidden">
+                    <button onclick="usePrompt('${p.replace(/'/g, "\\'")}')" class="text-xs text-slate-300 hover:text-white px-2.5 py-1.5 transition truncate max-w-xs">
+                        ${escapeHtml(p)}
+                    </button>
+                    <button onclick="copyPromptText('${p.replace(/'/g, "\\'")}', event)" class="px-2 py-1.5 text-slate-500 hover:text-indigo-400 text-xs border-l border-dark-700 transition" title="Copier le prompt">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                </div>
             `).join('');
         }
 
         function usePrompt(text) {
             document.getElementById('prompt-input').value = text;
+        }
+
+        function copyPromptText(text, event) {
+            event.stopPropagation();
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Prompt copié dans le presse-papier !');
         }
 
         function clearPromptHistory() {
@@ -318,9 +400,10 @@
             renderPromptHistory();
         }
 
-        // Appel effectif de l'API Gemini pour générer les images (4 requêtes ou batch configuré en 16:9)
         async function generateImagesWithGemini() {
             const promptText = document.getElementById('prompt-input').value.trim();
+            const aspectRatio = document.getElementById('aspect-ratio-select').value;
+
             if (!apiKey) {
                 alert('Veuillez entrer votre clé API Gemini dans le champ en haut à droite.');
                 document.getElementById('api-key-input').focus();
@@ -334,6 +417,7 @@
             addPromptToHistory(promptText);
 
             const loadingState = document.getElementById('loading-state');
+            const loadingText = document.getElementById('loading-text');
             const resultsGrid = document.getElementById('results-grid');
             const generateBtn = document.getElementById('generate-btn');
 
@@ -342,11 +426,8 @@
             generateBtn.disabled = true;
 
             try {
-                // Nous allons lancer 4 requêtes parallèles vers le modèle Gemini Flash Image Preview (ou simuler si hors connexion, mais ici appel fetch réel)
-                // Modèle: gemini-3.1-flash-image-preview
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=${apiKey}`;
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
 
-                // Préparation du contenu multimodal (texte + optionnellement image de référence)
                 let parts = [];
                 if (referenceImage) {
                     parts.push({
@@ -356,77 +437,72 @@
                         }
                     });
                 }
-                parts.push({ text: promptText + " (Generate image in 16:9 aspect ratio)" });
+                parts.push({ text: `${promptText} (Generate image in ${aspectRatio} aspect ratio)` });
 
-                // Génération simultanée de 4 variations en faisant 4 appels ou en demandant des candidats multiples si supporté
+                let imageUrls = [];
+                let completedCount = 0;
+
+                // Lancement de 4 requêtes simultanées avec suivi de progression
                 const promises = [];
                 for (let i = 0; i < 4; i++) {
                     const payload = {
                         contents: [{ parts: parts }],
                         generationConfig: {
-                            // Configuration optionnelle pour l'aspect ratio 16:9
                             responseModalities: ["IMAGE", "TEXT"]
                         }
                     };
 
-                    promises.push(
-                        fetch(endpoint, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        }).then(async res => {
-                            if (!res.ok) {
-                                const errData = await res.json();
-                                throw new Error(errData.error?.message || 'Erreur API Gemini');
-                            }
-                            return res.json();
-                        })
-                    );
-                }
-
-                const responses = await Promise.all(promises);
-                
-                // Extraction des images binaires renvoyées par l'API
-                let imageUrls = [];
-                responses.forEach((data, index) => {
-                    try {
+                    const p = fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).then(async res => {
+                        if (!res.ok) {
+                            const errData = await res.json();
+                            throw new Error(errData.error?.message || 'Erreur API Gemini');
+                        }
+                        return res.json();
+                    }).then(data => {
+                        completedCount++;
+                        loadingText.textContent = `Interrogation de l'API Gemini (${completedCount}/4 images prêtes)...`;
+                        
                         const candidate = data.candidates?.[0];
                         const contentParts = candidate?.content?.parts || [];
-                        let foundImage = false;
                         for (const part of contentParts) {
                             if (part.inlineData && part.inlineData.data) {
-                                const imgUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                                imageUrls.push(imgUrl);
-                                foundImage = true;
-                                break;
+                                return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
                             }
                         }
-                        if (!foundImage) {
-                            // Fallback de secours si le modèle ne renvoie que du texte ou une structure différente
-                            imageUrls.push(`https://picsum.photos/seed/${Date.now() + index}/960/540`);
-                        }
-                    } catch (e) {
-                        imageUrls.push(`https://picsum.photos/seed/${Date.now() + index}/960/540`);
-                    }
-                });
+                        return `https://picsum.photos/seed/${Date.now() + i}/960/540`;
+                    }).catch(err => {
+                        completedCount++;
+                        loadingText.textContent = `Interrogation de l'API Gemini (${completedCount}/4 images prêtes)...`;
+                        console.warn(err);
+                        return `https://picsum.photos/seed/${Date.now() + i}/960/540`;
+                    });
+
+                    promises.push(p);
+                }
+
+                imageUrls = await Promise.all(promises);
 
                 loadingState.classList.add('hidden');
                 resultsGrid.innerHTML = imageUrls.map((url, idx) => `
                     <div class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden shadow-lg flex flex-col group">
-                        <div class="relative aspect-video bg-dark-900 overflow-hidden">
+                        <div class="relative aspect-video bg-dark-900 overflow-hidden cursor-pointer" onclick="openLightbox('${url}', '${escapeHtml(promptText).replace(/'/g, "\\'")}')">
                             <img src="${url}" alt="Variation ${idx + 1}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             <div class="absolute top-2 left-2 bg-dark-900/80 backdrop-blur px-2 py-1 rounded text-xs font-semibold text-slate-300">
-                                #0${idx + 1} (16:9 - Gemini)
+                                #0${idx + 1} (${aspectRatio})
                             </div>
                         </div>
                         <div class="p-3 flex items-center justify-between gap-2 bg-dark-800/80">
-                            <span class="text-xs text-slate-400 truncate max-w-[180px]">"${escapeHtml(promptText)}"</span>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="saveToAlbum('${url}', '${escapeHtml(promptText).replace(/'/g, "\\'")}')" class="px-2.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white text-xs font-medium rounded-lg border border-indigo-500/30 transition flex items-center gap-1" title="Enregistrer dans l'album">
-                                    <i class="fa-solid fa-bookmark"></i> Album
+                            <span class="text-xs text-slate-400 truncate max-w-[170px]">"${escapeHtml(promptText)}"</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="saveToAlbum('${url}', '${escapeHtml(promptText).replace(/'/g, "\\'")}')" class="px-2 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white text-xs font-medium rounded-lg border border-indigo-500/30 transition flex items-center gap-1" title="Album">
+                                    <i class="fa-solid fa-bookmark"></i>
                                 </button>
-                                <button onclick="setReferenceImageFromSource('${url}', 'Variation ${idx + 1}')" class="px-2.5 py-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white text-xs font-medium rounded-lg border border-dark-600 transition flex items-center gap-1" title="Modifier cette image">
-                                    <i class="fa-solid fa-wand-magic"></i> Modifier
+                                <button onclick="setReferenceImageFromSource('${url}', 'Variation ${idx + 1}')" class="px-2 py-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white text-xs font-medium rounded-lg border border-dark-600 transition flex items-center gap-1" title="Modifier">
+                                    <i class="fa-solid fa-wand-magic"></i>
                                 </button>
                                 <a href="${url}" download="gemini-image-${idx + 1}.jpg" target="_blank" class="p-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white rounded-lg transition" title="Télécharger">
                                     <i class="fa-solid fa-download text-xs"></i>
@@ -443,6 +519,25 @@
             } finally {
                 generateBtn.disabled = false;
             }
+        }
+
+        function openLightbox(url, prompt) {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            const downloadBtn = document.getElementById('lightbox-download-btn');
+            const modifyBtn = document.getElementById('lightbox-modify-btn');
+
+            img.src = url;
+            caption.textContent = `"${prompt}"`;
+            downloadBtn.href = url;
+            modifyBtn.setAttribute('onclick', `closeLightbox(); setReferenceImageFromSource('${url}', 'Lightbox Image');`);
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
         }
 
         function saveToAlbum(url, prompt) {
@@ -471,7 +566,7 @@
 
             if (isSelectMode) {
                 selectBtn.classList.add('bg-indigo-600', 'text-white');
-                selectBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Annuler sélection';
+                selectBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Annuler';
                 batchDeleteBtn.classList.remove('hidden');
             } else {
                 selectBtn.classList.remove('bg-indigo-600', 'text-white');
@@ -532,7 +627,7 @@
 
             grid.innerHTML = albumImages.map(item => `
                 <div id="album-card-${item.id}" onclick="${isSelectMode ? `toggleAlbumItemSelection('${item.id}', this)` : ''}" class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden shadow-lg flex flex-col group ${isSelectMode ? 'cursor-pointer' : ''}">
-                    <div class="relative aspect-video bg-dark-900 overflow-hidden">
+                    <div class="relative aspect-video bg-dark-900 overflow-hidden cursor-pointer" onclick="${!isSelectMode ? `openLightbox('${item.url}', '${escapeHtml(item.prompt).replace(/'/g, "\\'")}')` : ''}">
                         <img src="${item.url}" alt="Album image" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         <div class="absolute top-2 left-2 bg-dark-900/80 backdrop-blur px-2 py-0.5 rounded text-[10px] text-slate-300">
                             ${item.date}
@@ -542,7 +637,7 @@
                         <p class="text-xs text-slate-300 italic line-clamp-2">"${escapeHtml(item.prompt)}"</p>
                         <div class="flex items-center justify-between pt-1 border-t border-dark-700/60">
                             <div class="flex items-center gap-1.5">
-                                <button onclick="setReferenceImageFromSource('${item.url}', 'Album #${item.id.slice(-4)}') " class="px-2 py-1 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white text-xs font-medium rounded transition flex items-center gap-1">
+                                <button onclick="setReferenceImageFromSource('${item.url}', 'Album')" class="px-2 py-1 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white text-xs font-medium rounded transition flex items-center gap-1">
                                     <i class="fa-solid fa-wand-magic"></i> Modifier
                                 </button>
                                 <a href="${item.url}" download="album-image.jpg" target="_blank" onclick="event.stopPropagation()" class="p-1.5 bg-dark-700 hover:bg-dark-600 text-slate-300 hover:text-white rounded transition">
@@ -573,3 +668,4 @@
     </script>
 </body>
 </html>
+```eof
