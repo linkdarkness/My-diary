@@ -68,7 +68,7 @@
     <!-- CONTENEUR PRINCIPAL -->
     <main class="flex-1 overflow-y-auto relative p-4 pb-24">
 
-        <!-- CONFIGURATION CLÉ API GEMINI -->
+        <!-- CONFIGURATION CLÉ API GEMINI & QUOTA RESTANT -->
         <div class="max-w-lg mx-auto mb-4 bg-dark-800 border border-dark-700 rounded-2xl p-3 shadow-md">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
@@ -77,6 +77,16 @@
                 </div>
                 <button onclick="toggleApiKeyInput()" class="text-xs text-indigo-400 hover:underline">Modifier</button>
             </div>
+            
+            <!-- Indicateur de Quota en temps réel -->
+            <div id="quota-status-bar" class="mt-2 text-xs flex items-center justify-between bg-dark-900/80 px-3 py-2 rounded-xl border border-dark-700">
+                <div class="flex items-center space-x-2">
+                    <span id="quota-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                    <span id="quota-text" class="text-gray-400">Aucune clé configurée</span>
+                </div>
+                <span id="quota-details" class="text-gray-500 text-[10px]"></span>
+            </div>
+
             <div id="api-key-container" class="mt-2 hidden">
                 <input type="password" id="api-key-input" placeholder="Entrez votre clé API Gemini (AIza...)" class="w-full bg-dark-900 border border-dark-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-indigo-500 mb-2">
                 <button onclick="saveApiKey()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium py-1.5 rounded-lg">Enregistrer la clé</button>
@@ -87,7 +97,7 @@
         <div id="error-banner" class="max-w-lg mx-auto mb-4 bg-red-950/80 border border-red-700/60 rounded-2xl p-3 text-red-200 text-xs shadow-lg hidden flex items-start space-x-2">
             <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5 text-sm shrink-0"></i>
             <div class="flex-1">
-                <span class="font-bold block mb-0.5">Erreur détectée :</span>
+                <span class="font-bold block mb-0.5">Erreur / Quota détecté :</span>
                 <span id="error-message-text">Une erreur est survenue.</span>
             </div>
             <button onclick="dismissError()" class="text-red-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -237,7 +247,7 @@
         let selectedEditImageBase64 = null;
         let isSelectMode = false;
         let selectedPhotoIds = new Set();
-        let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
+        let geminiApiKey = localStorage.getItem('gemini_api_key'] || '';
 
         const randomPrompts = [
             "Un paysage mystique de forêt de redwoods en Californie avec des rayons de soleil filtrant à travers la brume, photoréaliste 8k",
@@ -246,6 +256,32 @@
             "Une rue de Tokyo animée sous la pluie la nuit avec des reflets de néons colorés sur le bitume mouillé, ultra détaillé",
             "Un chalet en bois chaleureux isolé dans les montagnes enneigées sous une aurore boréale spectaculaire"
         ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (geminiApiKey) {
+                updateQuotaDisplay('active', 'Clé enregistrée & prête');
+            }
+        });
+
+        function updateQuotaDisplay(status, message, details = '') {
+            const dot = document.getElementById('quota-dot');
+            const text = document.getElementById('quota-text');
+            const det = document.getElementById('quota-details');
+            
+            text.textContent = message;
+            det.textContent = details;
+
+            if (status === 'active') {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                text.className = "text-emerald-400 font-medium";
+            } else if (status === 'exhausted') {
+                dot.className = "w-2 h-2 rounded-full bg-red-500";
+                text.className = "text-red-400 font-medium";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-gray-500";
+                text.className = "text-gray-400";
+            }
+        }
 
         function showError(message) {
             const banner = document.getElementById('error-banner');
@@ -274,10 +310,17 @@
                 return;
             }
             geminiApiKey = val;
-            localStorage.setItem('gemini_api_key', geminiApiKey);
+            localStorage.setItem('mon_studio_api_key', geminiApiKey);
             document.getElementById('api-key-container').classList.add('hidden');
             dismissError();
+            updateQuotaDisplay('active', 'Clé API active', 'Prêt à générer');
             alert("Clé API Gemini enregistrée avec succès !");
+        }
+
+        // Synchronisation de la clé stockée sous 'gemini_api_key'
+        if (localStorage.getItem('gemini_api_key')) {
+            geminiApiKey = localStorage.getItem('gemini_api_key');
+            updateQuotaDisplay('active', 'Clé API active', 'Prêt à générer');
         }
 
         function generateRandomPrompt() {
@@ -337,15 +380,22 @@
                     const errJson = await response.json().catch(() => ({}));
                     let errDesc = errJson.error?.message || `Erreur HTTP ${response.status}`;
                     
-                    // Détection et formatage intelligent du délai de réinitialisation du quota
+                    // Extraction précise du délai de réinitialisation du quota
                     const retryMatch = errDesc.match(/retry in\s+([0-9.]+)\s*s/i);
                     if (retryMatch && retryMatch[1]) {
                         const seconds = Math.ceil(parseFloat(retryMatch[1]));
-                        errDesc = `Quota Gemini dépassé. Votre quota sera réinitialisé et vous pourrez réessayer dans environ ${seconds} secondes.`;
+                        const resetTime = new Date(Date.now() + seconds * 1000).toLocaleTimeString('fr-FR');
+                        errDesc = `Quota Gemini atteint. Réinitialisation automatique dans ${seconds} secondes (vers ${resetTime}).`;
+                        updateQuotaDisplay('exhausted', 'Quota épuisé', `Réinitialisation à ${resetTime}`);
+                    } else {
+                        updateQuotaDisplay('active', 'Erreur de quota/requête', '');
                     }
 
                     throw new Error(errDesc);
                 }
+
+                // Succès de la requête, le quota est valide
+                updateQuotaDisplay('active', 'Clé API active', 'Quota opérationnel');
 
                 const data = await response.json();
                 let imageUrls = [];
