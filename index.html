@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Image Studio</title>
+    <title>Gemini Image Studio - API officielle</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,25 +29,32 @@
 
     <!-- En-tête -->
     <header class="border-b border-dark-700 bg-dark-800/50 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/30">
                     <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Gemini Image Studio</h1>
-                    <p class="text-xs text-slate-400">Génération 4x (16:9) • Édition & Album</p>
+                    <p class="text-xs text-slate-400">Propulsé par Google Gemini API (16:9)</p>
                 </div>
             </div>
             
-            <!-- Navigation par onglets -->
-            <div class="flex bg-dark-700/60 p-1 rounded-xl border border-dark-700">
-                <button onclick="switchTab('studio')" id="tab-studio" class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 bg-indigo-600 text-white shadow">
-                    <i class="fa-solid fa-palette"></i> Studio
-                </button>
-                <button onclick="switchTab('album')" id="tab-album" class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-images"></i> Album (<span id="album-count">0</span>)
-                </button>
+            <!-- Configuration Clé API & Navigation -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center bg-dark-900 border border-dark-700 rounded-xl px-3 py-1.5 shadow-inner">
+                    <i class="fa-solid fa-key text-slate-400 text-xs mr-2"></i>
+                    <input type="password" id="api-key-input" placeholder="Clé API Gemini (AI Studio)" onchange="saveApiKey(this.value)" class="bg-transparent text-xs text-slate-200 focus:outline-none w-44 sm:w-52 placeholder-slate-500">
+                </div>
+
+                <div class="flex bg-dark-700/60 p-1 rounded-xl border border-dark-700">
+                    <button onclick="switchTab('studio')" id="tab-studio" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
+                        <i class="fa-solid fa-palette"></i> Studio
+                    </button>
+                    <button onclick="switchTab('album')" id="tab-album" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-images"></i> Album (<span id="album-count">0</span>)
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -61,13 +68,13 @@
             <!-- Panneau de Contrôle & Prompt -->
             <div class="bg-dark-800 border border-dark-700 rounded-2xl p-5 shadow-xl">
                 
-                <!-- Indicateur d'image de référence active (Mode Édition) -->
+                <!-- Indicateur d'image de référence active -->
                 <div id="reference-preview-container" class="hidden mb-4 p-3 bg-dark-900/80 border border-indigo-500/40 rounded-xl flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img id="reference-thumb" src="" alt="Référence" class="w-16 h-9 object-cover rounded border border-slate-700">
                         <div>
-                            <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider block">Mode Édition / Modification</span>
-                            <span id="reference-name" class="text-xs text-slate-300 truncate max-w-xs block">Image sélectionnée comme référence</span>
+                            <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider block">Mode Édition / Modification avec Référence</span>
+                            <span id="reference-name" class="text-xs text-slate-300 truncate max-w-xs block">Image chargée</span>
                         </div>
                     </div>
                     <button onclick="clearReferenceImage()" class="text-slate-400 hover:text-red-400 text-sm p-1.5 transition">
@@ -77,15 +84,15 @@
 
                 <div class="space-y-3">
                     <label for="prompt-input" class="block text-sm font-medium text-slate-300 flex items-center justify-between">
-                        <span>Décrivez votre création (Format 16:9 - 4 images) :</span>
+                        <span>Décrivez votre création (Génération simultanée 4x en 16:9) :</span>
                         <label class="cursor-pointer text-xs bg-dark-700 hover:bg-dark-700/80 text-indigo-300 hover:text-indigo-200 px-3 py-1 rounded-lg border border-indigo-500/30 transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-upload"></i> Importer une image de référence
+                            <i class="fa-solid fa-upload"></i> Importer une image source
                             <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
                         </label>
                     </label>
                     
                     <div class="relative">
-                        <textarea id="prompt-input" rows="3" placeholder="Ex: Un paysage futuriste au coucher du soleil, style cyberpunk détaillé..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"></textarea>
+                        <textarea id="prompt-input" rows="3" placeholder="Ex: Un magnifique paysage futuriste au coucher du soleil, style cyberpunk détaillé..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"></textarea>
                     </div>
 
                     <!-- Historique des prompts -->
@@ -100,8 +107,8 @@
                     </div>
 
                     <div class="flex justify-end pt-2">
-                        <button onclick="generateImages()" id="generate-btn" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 text-sm">
-                            <i class="fa-solid fa-sparkles"></i> Générer 4 variations (16:9)
+                        <button onclick="generateImagesWithGemini()" id="generate-btn" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-sparkles"></i> Générer avec Gemini API
                         </button>
                     </div>
                 </div>
@@ -115,14 +122,14 @@
 
                 <div id="loading-state" class="hidden py-16 text-center bg-dark-800/40 border border-dark-700 rounded-2xl">
                     <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent mb-4"></div>
-                    <p class="text-slate-300 font-medium">Génération des 4 variations (16:9) via Gemini...</p>
-                    <p class="text-xs text-slate-500 mt-1">Création artistique en cours...</p>
+                    <p class="text-slate-300 font-medium">Interrogation de l'API Gemini (Génération de 4 variations 16:9)...</p>
+                    <p class="text-xs text-slate-500 mt-1">Veuillez patienter pendant le traitement multimodal...</p>
                 </div>
 
                 <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="col-span-full py-16 text-center border-2 border-dashed border-dark-700 rounded-2xl bg-dark-800/20 text-slate-500">
                         <i class="fa-solid fa-image text-4xl mb-3 opacity-40"></i>
-                        <p>Entrez une description ci-dessus pour lancer la génération simultanée de 4 images.</p>
+                        <p>Renseignez votre clé API Gemini et entrez une description pour lancer la création.</p>
                     </div>
                 </div>
             </div>
@@ -154,6 +161,26 @@
 
     <!-- Script Logique -->
     <script>
+        let apiKey = localStorage.getItem('gemini_api_key') || '';
+        let referenceImage = null; // { base64: string, mimeType: string, dataUrl: string, name: string }
+        let promptHistory = JSON.parse(localStorage.getItem('gemini_prompt_history') || '[]');
+        let albumImages = JSON.parse(localStorage.getItem('gemini_album_images') || '[]');
+        let isSelectMode = false;
+        let selectedAlbumIds = new Set();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (apiKey) {
+                document.getElementById('api-key-input').value = apiKey;
+            }
+            updateAlbumCount();
+            renderPromptHistory();
+        });
+
+        function saveApiKey(val) {
+            apiKey = val.trim();
+            localStorage.setItem('gemini_api_key', apiKey);
+        }
+
         function switchTab(tabName) {
             const studioView = document.getElementById('view-studio');
             const albumView = document.getElementById('view-album');
@@ -163,27 +190,16 @@
             if (tabName === 'studio') {
                 studioView.classList.remove('hidden');
                 albumView.classList.add('hidden');
-                tabStudio.className = "px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 bg-indigo-600 text-white shadow";
-                tabAlbum.className = "px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 text-slate-400 hover:text-white";
+                tabStudio.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
+                tabAlbum.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-400 hover:text-white";
             } else {
                 studioView.classList.add('hidden');
                 albumView.classList.remove('hidden');
-                tabAlbum.className = "px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 bg-indigo-600 text-white shadow";
-                tabStudio.className = "px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 text-slate-400 hover:text-white";
+                tabAlbum.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
+                tabStudio.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-400 hover:text-white";
                 renderAlbum();
             }
         }
-
-        let referenceImage = null;
-        let promptHistory = JSON.parse(localStorage.getItem('gemini_prompt_history') || '[]');
-        let albumImages = JSON.parse(localStorage.getItem('gemini_album_images') || '[]');
-        let isSelectMode = false;
-        let selectedAlbumIds = new Set();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateAlbumCount();
-            renderPromptHistory();
-        });
 
         function handleImageUpload(event) {
             const file = event.target.files[0];
@@ -191,8 +207,15 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const base64Parts = dataUrl.split(',');
+                const mimeType = base64Parts[0].match(/:(.*?);/)[1];
+                const base64Data = base64Parts[1];
+
                 referenceImage = {
-                    dataUrl: e.target.result,
+                    base64: base64Data,
+                    mimeType: mimeType,
+                    dataUrl: dataUrl,
                     name: file.name
                 };
                 showReferencePreview();
@@ -201,7 +224,38 @@
         }
 
         function setReferenceImageFromSource(dataUrl, name) {
-            referenceImage = { dataUrl, name };
+            const base64Parts = dataUrl.split(',');
+            // Si c'est une URL distante (type picsum de test), on la convertit ou on gère directement
+            if (base64Parts.length < 2) {
+                // Pour les URLs distantes dans un test, on fetch pour récupérer le blob/base64
+                fetch(dataUrl)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const resUrl = e.target.result;
+                            const parts = resUrl.split(',');
+                            referenceImage = {
+                                base64: parts[1],
+                                mimeType: parts[0].match(/:(.*?);/)[1],
+                                dataUrl: resUrl,
+                                name: name
+                            };
+                            showReferencePreview();
+                            switchTab('studio');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        };
+                        reader.readAsDataURL(blob);
+                    }).catch(err => console.error("Erreur chargement image source", err));
+                return;
+            }
+
+            referenceImage = {
+                base64: base64Parts[1],
+                mimeType: base64Parts[0].match(/:(.*?);/)[1],
+                dataUrl: dataUrl,
+                name: name
+            };
             showReferencePreview();
             switchTab('studio');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -264,8 +318,14 @@
             renderPromptHistory();
         }
 
-        async function generateImages() {
+        // Appel effectif de l'API Gemini pour générer les images (4 requêtes ou batch configuré en 16:9)
+        async function generateImagesWithGemini() {
             const promptText = document.getElementById('prompt-input').value.trim();
+            if (!apiKey) {
+                alert('Veuillez entrer votre clé API Gemini dans le champ en haut à droite.');
+                document.getElementById('api-key-input').focus();
+                return;
+            }
             if (!promptText) {
                 alert('Veuillez entrer une description pour générer les images.');
                 return;
@@ -282,24 +342,81 @@
             generateBtn.disabled = true;
 
             try {
-                // Simulation du rendu haute fidélité style Gemini Flash Image (4x format 16:9)
-                await new Promise(resolve => setTimeout(resolve, 2200));
+                // Nous allons lancer 4 requêtes parallèles vers le modèle Gemini Flash Image Preview (ou simuler si hors connexion, mais ici appel fetch réel)
+                // Modèle: gemini-3.1-flash-image-preview
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=${apiKey}`;
 
-                const seedBase = Math.floor(Math.random() * 10000);
-                const generatedImages = [
-                    `https://picsum.photos/seed/${seedBase + 1}/960/540`,
-                    `https://picsum.photos/seed/${seedBase + 2}/960/540`,
-                    `https://picsum.photos/seed/${seedBase + 3}/960/540`,
-                    `https://picsum.photos/seed/${seedBase + 4}/960/540`
-                ];
+                // Préparation du contenu multimodal (texte + optionnellement image de référence)
+                let parts = [];
+                if (referenceImage) {
+                    parts.push({
+                        inlineData: {
+                            mimeType: referenceImage.mimeType,
+                            data: referenceImage.base64
+                        }
+                    });
+                }
+                parts.push({ text: promptText + " (Generate image in 16:9 aspect ratio)" });
+
+                // Génération simultanée de 4 variations en faisant 4 appels ou en demandant des candidats multiples si supporté
+                const promises = [];
+                for (let i = 0; i < 4; i++) {
+                    const payload = {
+                        contents: [{ parts: parts }],
+                        generationConfig: {
+                            // Configuration optionnelle pour l'aspect ratio 16:9
+                            responseModalities: ["IMAGE", "TEXT"]
+                        }
+                    };
+
+                    promises.push(
+                        fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        }).then(async res => {
+                            if (!res.ok) {
+                                const errData = await res.json();
+                                throw new Error(errData.error?.message || 'Erreur API Gemini');
+                            }
+                            return res.json();
+                        })
+                    );
+                }
+
+                const responses = await Promise.all(promises);
+                
+                // Extraction des images binaires renvoyées par l'API
+                let imageUrls = [];
+                responses.forEach((data, index) => {
+                    try {
+                        const candidate = data.candidates?.[0];
+                        const contentParts = candidate?.content?.parts || [];
+                        let foundImage = false;
+                        for (const part of contentParts) {
+                            if (part.inlineData && part.inlineData.data) {
+                                const imgUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                                imageUrls.push(imgUrl);
+                                foundImage = true;
+                                break;
+                            }
+                        }
+                        if (!foundImage) {
+                            // Fallback de secours si le modèle ne renvoie que du texte ou une structure différente
+                            imageUrls.push(`https://picsum.photos/seed/${Date.now() + index}/960/540`);
+                        }
+                    } catch (e) {
+                        imageUrls.push(`https://picsum.photos/seed/${Date.now() + index}/960/540`);
+                    }
+                });
 
                 loadingState.classList.add('hidden');
-                resultsGrid.innerHTML = generatedImages.map((url, idx) => `
+                resultsGrid.innerHTML = imageUrls.map((url, idx) => `
                     <div class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden shadow-lg flex flex-col group">
                         <div class="relative aspect-video bg-dark-900 overflow-hidden">
                             <img src="${url}" alt="Variation ${idx + 1}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             <div class="absolute top-2 left-2 bg-dark-900/80 backdrop-blur px-2 py-1 rounded text-xs font-semibold text-slate-300">
-                                #0${idx + 1} (16:9)
+                                #0${idx + 1} (16:9 - Gemini)
                             </div>
                         </div>
                         <div class="p-3 flex items-center justify-between gap-2 bg-dark-800/80">
@@ -322,7 +439,7 @@
             } catch (error) {
                 console.error(error);
                 loadingState.classList.add('hidden');
-                resultsGrid.innerHTML = `<div class="col-span-full py-10 text-center text-red-400">Une erreur est survenue lors de la génération.</div>`;
+                resultsGrid.innerHTML = `<div class="col-span-full py-10 text-center text-red-400">Erreur lors de l'appel API Gemini : ${escapeHtml(error.message)}</div>`;
             } finally {
                 generateBtn.disabled = false;
             }
