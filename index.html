@@ -1,156 +1,570 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mon AI Girlfriend</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4effa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .chat-container {
-      width: 360px;
-      height: 550px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0,1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .chat-header {
-      background: #e91e63;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
-    .chat-messages {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .message {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    .bot {
-      background-color: #f1f1f1;
-      align-self: flex-start;
-      border-bottom-left-radius: 2px;
-    }
-    .user {
-      background-color: #e91e63;
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 2px;
-    }
-    .chat-input {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #eee;
-    }
-    .chat-input input {
-      flex: 1;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 20px;
-      outline: none;
-    }
-    .chat-input button {
-      background: #e91e63;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      margin-left: 8px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aperture AI - Générateur Photo-Réaliste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        photo: {
+                            50: '#f6f6f7',
+                            100: '#e1e2e5',
+                            800: '#1e2024',
+                            900: '#121316',
+                            950: '#0a0b0d',
+                            accent: '#38bdf8',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0b0d;
+            color: #e1e2e5;
+        }
+        .studio-card {
+            background: rgba(18, 19, 22, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .lens-ring {
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0b0d;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #272a30;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b3e45;
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen font-sans flex flex-col justify-between antialiased selection:bg-sky-500 selection:text-black">
 
-<div class="chat-container">
-  <div class="chat-header">❤️ Maya</div>
-  <div class="chat-messages" id="messages">
-    <div class="message bot">Coucou ! Comment s'est passée ta journée ? 💕</div>
-  </div>
-  <div class="chat-input">
-    <input type="text" id="userInput" placeholder="Écris un message..." onkeypress="handleKeyPress(event)">
-    <button onclick="sendMessage()">➔</button>
-  </div>
-</div>
+    <header class="sticky top-0 z-40 studio-card border-b border-neutral-800/80 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700/80 flex items-center justify-center shadow-lg lens-ring">
+                    <i class="fa-solid fa-camera-retro text-sky-400 text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        <span>Aperture</span>
+                        <span class="text-sky-400 font-light text-xs px-2 py-0.5 rounded bg-sky-950/60 border border-sky-800/50 uppercase tracking-widest">16:9 PRO</span>
+                    </h1>
+                    <p class="text-[11px] text-neutral-400 font-medium hidden sm:block">Générateur d'images photo-réalistes haute définition</p>
+                </div>
+            </div>
 
-<script>
-  // Remplace par ta clé API (attention : ne pas publier cette clé en ligne)
-  const API_KEY = "TA_CLE_API_ICI";
+            <div class="flex items-center gap-3">
+                <button id="btn-show-gallery" class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-medium text-neutral-200 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-images text-sky-400"></i>
+                    <span>Galerie Photo</span>
+                    <span id="gallery-badge" class="ml-1 bg-sky-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
-  // Prompt système définissant le rôle et la personnalité
-  const systemPrompt = "Tu es Maya, une petite amie attentionnée, douce et chaleureuse. Tu parles de manière naturelle, affectueuse et engageante, en utilisant parfois quelques émojis. Tu réponds toujours en français.";
+    <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-  let conversationHistory = [
-    { role: "system", content: systemPrompt },
-    { role: "assistant", content: "Coucou ! Comment s'est passée ta journée ? 💕" }
-  ];
+        <!-- LEFT PANEL: Prompt Input Only -->
+        <section class="lg:col-span-5 flex flex-col gap-5">
+            <div class="studio-card p-5 lg:p-6 rounded-2xl shadow-2xl space-y-5">
+                
+                <!-- Prompt Input Area -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="prompt-input" class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-quote-left text-sky-400"></i>
+                            <span>Description de la scène</span>
+                        </label>
+                        <button id="btn-enhance-photo" class="text-[11px] font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1.5 transition-colors bg-sky-950/50 hover:bg-sky-900/50 px-2.5 py-1 rounded-lg border border-sky-800/40">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                            <span>Booster le réalisme</span>
+                        </button>
+                    </div>
 
-  async function sendMessage() {
-    const input = document.getElementById('userInput');
-    const text = input.value.trim();
-    if (!text) return;
+                    <div class="relative">
+                        <textarea id="prompt-input" rows="5" 
+                            class="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl p-3.5 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all resize-none shadow-inner"
+                            placeholder="Ex: Portrait d'un surfeur au coucher du soleil sur une plage sauvage, embruns dorés, textures de peau détaillées, style reflex numérique..."></textarea>
+                        
+                        <button id="btn-clear-prompt" title="Effacer" class="absolute bottom-2.5 right-2.5 text-neutral-500 hover:text-neutral-300 p-1.5 rounded-md hover:bg-neutral-800 transition-colors">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
+                    </div>
+                </div>
 
-    appendMessage(text, 'user');
-    input.value = '';
-    conversationHistory.push({ role: "user", content: text });
+                <!-- Hidden default ratio / config info -->
+                <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-3 flex items-center justify-between text-neutral-400 text-xs">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-display text-sky-400"></i>
+                        <span>Format par défaut</span>
+                    </span>
+                    <span class="font-semibold text-white bg-neutral-800 px-2.5 py-1 rounded-lg border border-neutral-700">16:9 • Photo Réaliste HD</span>
+                </div>
 
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: conversationHistory
-        })
-      });
+                <!-- Generate Photo Button -->
+                <button id="btn-generate" class="w-full py-3.5 rounded-xl font-semibold text-black bg-sky-400 hover:bg-sky-300 shadow-lg shadow-sky-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm mt-2">
+                    <i class="fa-solid fa-aperture text-base animate-spin" style="animation-duration: 10s;"></i>
+                    <span>Générer l'Image Photo-Réaliste</span>
+                </button>
 
-      const data = await response.json();
-      const botReply = data.choices[0].message.content;
+            </div>
+        </section>
 
-      conversationHistory.push({ role: "assistant", content: botReply });
-      appendMessage(botReply, 'bot');
-    } catch (error) {
-      appendMessage("Désolée, j'ai eu un petit souci de connexion...", 'bot');
-      console.error(error);
-    }
-  }
+        <!-- RIGHT PANEL: Display / Darkroom Canvas -->
+        <section class="lg:col-span-7 flex flex-col gap-6">
+            <div class="studio-card p-4 sm:p-6 rounded-2xl shadow-2xl min-h-[520px] flex flex-col justify-between relative overflow-hidden">
+                
+                <!-- Display Header -->
+                <div class="flex justify-between items-center pb-3 border-b border-neutral-800">
+                    <h2 class="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-sky-400"></i>
+                        <span>Viseur Studio</span>
+                    </h2>
+                    <span id="photo-spec-tag" class="text-[10px] text-neutral-400 bg-neutral-900 px-2.5 py-1 rounded-full border border-neutral-800 hidden">
+                        16:9 • Ultra HD
+                    </span>
+                </div>
 
-  function appendMessage(text, sender) {
-    const messagesDiv = document.getElementById('messages');
-    const msg = document.createElement('div');
-    msg.classList.add('message', sender);
-    msg.textContent = text;
-    messagesDiv.appendChild(msg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
+                <!-- Main Display Canvas -->
+                <div class="my-auto py-4 flex flex-col items-center justify-center min-h-[400px] relative">
 
-  function handleKeyPress(e) {
-    if (e.key === 'Enter') sendMessage();
-  }
-</script>
+                    <!-- Placeholder State -->
+                    <div id="state-placeholder" class="text-center p-8 max-w-sm flex flex-col items-center">
+                        <div class="w-16 h-16 mb-4 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-600 shadow-inner">
+                            <i class="fa-solid fa-camera-viewfinder text-2xl text-sky-400/60"></i>
+                        </div>
+                        <h3 class="text-neutral-200 font-medium text-sm mb-1">Prêt pour la création</h3>
+                        <p class="text-xs text-neutral-500 leading-relaxed">Saisissez votre description et lancez la génération pour obtenir votre photo 16:9.</p>
+                    </div>
 
+                    <!-- Loading State -->
+                    <div id="state-loading" class="hidden text-center p-8 flex flex-col items-center justify-center space-y-4">
+                        <div class="relative w-20 h-20 flex items-center justify-center">
+                            <div class="absolute inset-0 rounded-full border-2 border-sky-500/20 border-t-sky-400 animate-spin"></div>
+                            <i class="fa-solid fa-aperture text-xl text-sky-400 animate-pulse"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-neutral-200 font-medium text-sm">Génération 16:9 en cours...</h3>
+                            <p class="text-[11px] text-neutral-500 italic">Rendu de la lumière, piqué optique et micro-détails...</p>
+                        </div>
+                    </div>
+
+                    <!-- Image Display Container -->
+                    <div id="state-result" class="hidden w-full flex flex-col items-center">
+                        <div class="relative group max-w-full rounded-xl overflow-hidden border border-neutral-800 shadow-2xl bg-black">
+                            <img id="generated-image" src="" alt="Cliché Photo-Réaliste IA" class="max-h-[520px] w-auto object-contain" />
+                        </div>
+
+                        <!-- Action Toolbar -->
+                        <div class="flex flex-wrap items-center justify-center gap-2.5 mt-5 w-full">
+                            <button id="btn-download" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-black font-semibold text-xs transition-all flex items-center gap-2 shadow-md shadow-sky-500/10">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Télécharger (HD)</span>
+                            </button>
+                            <button id="btn-fullscreen" class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-medium text-xs border border-neutral-800 transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-expand text-sky-400"></i>
+                                <span>Plein Écran</span>
+                            </button>
+                            <button id="btn-copy-prompt" class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-medium text-xs border border-neutral-800 transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-copy text-amber-400"></i>
+                                <span>Copier le Prompt</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="state-error" class="hidden text-center p-6 max-w-md bg-red-950/30 border border-red-900/40 rounded-2xl">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 text-2xl mb-2"></i>
+                        <h3 class="text-red-200 font-medium text-xs mb-1">Erreur de génération</h3>
+                        <p id="error-message-text" class="text-[11px] text-red-300/70 mb-3">La génération a échoué. Veuillez réessayer.</p>
+                        <button id="btn-retry" class="px-3 py-1 rounded bg-red-900/80 hover:bg-red-800 text-white text-[11px] transition-all">
+                            Réessayer
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Gallery Modal -->
+    <div id="gallery-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-neutral-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-box-archive text-sky-400"></i>
+                    <h3 class="font-semibold text-neutral-200 text-sm">Galerie Photo Réaliste (16:9)</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="btn-clear-gallery" class="text-[11px] text-red-400 hover:text-red-300 font-medium px-2.5 py-1 rounded bg-red-950/40 border border-red-900/40">
+                        Purger la galerie
+                    </button>
+                    <button id="btn-close-gallery" class="text-neutral-400 hover:text-neutral-200 p-1">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1">
+                <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+                <div id="gallery-empty" class="text-center py-12 text-neutral-500">
+                    <i class="fa-regular fa-images text-3xl mb-2 text-neutral-600"></i>
+                    <p class="text-xs">Aucune photographie enregistrée dans votre studio.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Modal -->
+    <div id="fullscreen-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <button id="btn-close-fullscreen" class="absolute top-6 right-6 text-white text-xl p-3 hover:text-sky-400">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <img id="fullscreen-image" src="" class="max-w-full max-h-[92vh] object-contain rounded shadow-2xl" alt="Agrandi">
+    </div>
+
+    <script>
+        const STATE = {
+            apiKey: "",
+            ratio: "16:9", // Fixé par défaut en 16:9
+            currentFullPrompt: "",
+            currentImageBase64: null,
+            gallery: []
+        };
+
+        const DOM = {
+            promptInput: document.getElementById('prompt-input'),
+            btnEnhance: document.getElementById('btn-enhance-photo'),
+            btnClearPrompt: document.getElementById('btn-clear-prompt'),
+            btnGenerate: document.getElementById('btn-generate'),
+
+            // Display states
+            statePlaceholder: document.getElementById('state-placeholder'),
+            stateLoading: document.getElementById('state-loading'),
+            stateResult: document.getElementById('state-result'),
+            stateError: document.getElementById('state-error'),
+            errorMessageText: document.getElementById('error-message-text'),
+            btnRetry: document.getElementById('btn-retry'),
+
+            // Outputs
+            generatedImage: document.getElementById('generated-image'),
+            photoSpecTag: document.getElementById('photo-spec-tag'),
+            btnDownload: document.getElementById('btn-download'),
+            btnFullscreen: document.getElementById('btn-fullscreen'),
+            btnCopyPrompt: document.getElementById('btn-copy-prompt'),
+
+            // Gallery & Fullscreen
+            btnShowGallery: document.getElementById('btn-show-gallery'),
+            galleryBadge: document.getElementById('gallery-badge'),
+            galleryModal: document.getElementById('gallery-modal'),
+            btnCloseGallery: document.getElementById('btn-close-gallery'),
+            btnClearGallery: document.getElementById('btn-clear-gallery'),
+            galleryGrid: document.getElementById('gallery-grid'),
+            galleryEmpty: document.getElementById('gallery-empty'),
+
+            fullscreenModal: document.getElementById('fullscreen-modal'),
+            fullscreenImage: document.getElementById('fullscreen-image'),
+            btnCloseFullscreen: document.getElementById('btn-close-fullscreen')
+        };
+
+        window.onload = function() {
+            loadGalleryFromStorage();
+            bindEvents();
+        };
+
+        function bindEvents() {
+            DOM.btnClearPrompt.addEventListener('click', () => {
+                DOM.promptInput.value = '';
+                DOM.promptInput.focus();
+            });
+
+            DOM.btnEnhance.addEventListener('click', boostPhotoRealism);
+            DOM.btnGenerate.addEventListener('click', generatePhoto);
+            DOM.btnRetry.addEventListener('click', generatePhoto);
+
+            DOM.btnDownload.addEventListener('click', downloadPhoto);
+            DOM.btnFullscreen.addEventListener('click', openFullscreen);
+            DOM.btnCopyPrompt.addEventListener('click', copyFullPrompt);
+
+            DOM.btnShowGallery.addEventListener('click', openGallery);
+            DOM.btnCloseGallery.addEventListener('click', closeGallery);
+            DOM.btnClearGallery.addEventListener('click', clearGallery);
+
+            DOM.btnCloseFullscreen.addEventListener('click', closeFullscreen);
+            DOM.fullscreenModal.addEventListener('click', (e) => {
+                if (e.target === DOM.fullscreenModal) closeFullscreen();
+            });
+        }
+
+        function setDisplayState(state) {
+            DOM.statePlaceholder.classList.add('hidden');
+            DOM.stateLoading.classList.add('hidden');
+            DOM.stateResult.classList.add('hidden');
+            DOM.stateError.classList.add('hidden');
+
+            if (state === 'loading') DOM.stateLoading.classList.remove('hidden');
+            if (state === 'result') DOM.stateResult.classList.remove('hidden');
+            if (state === 'error') DOM.stateError.classList.remove('hidden');
+            if (state === 'placeholder') DOM.statePlaceholder.classList.remove('hidden');
+        }
+
+        function showNotification(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 z-50 bg-neutral-900 text-sky-400 px-4 py-2 rounded-xl border border-neutral-800 text-xs font-medium shadow-2xl flex items-center gap-2';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-sky-400"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2800);
+        }
+
+        async function boostPhotoRealism() {
+            const raw = DOM.promptInput.value.trim();
+            if (!raw) {
+                showNotification("Indiquez un sujet d'abord.");
+                return;
+            }
+
+            DOM.btnEnhance.disabled = true;
+            DOM.btnEnhance.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-amber-400"></i><span>Optimisation...</span>`;
+
+            try {
+                const sysPrompt = "Vous êtes un directeur de la photographie professionnel. Améliorez le prompt utilisateur pour obtenir une photographie 16:9 d'un réalisme absolu. Ajoutez des précisions sur les textures, les micro-détails, le grain naturel, la réfraction de la lumière et la profondeur de champ. Répondez uniquement avec le prompt amélioré en français, sans aucun commentaire.";
+                const userQuery = `Conserve exactement l'idée principale mais rends ce sujet ultra photo-réaliste : "${raw}"`;
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${STATE.apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: sysPrompt }] }
+                    })
+                });
+
+                const data = await response.json();
+                const enhanced = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (enhanced) {
+                    DOM.promptInput.value = enhanced.trim();
+                    showNotification("Prompt enrichi avec des détails photographiques professionnels !");
+                }
+            } catch (e) {
+                console.error("Erreur d'amélioration:", e);
+                showNotification("Impossible d'optimiser le prompt.");
+            } finally {
+                DOM.btnEnhance.disabled = false;
+                DOM.btnEnhance.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i><span>Booster le réalisme</span>`;
+            }
+        }
+
+        async function generatePhoto() {
+            const subject = DOM.promptInput.value.trim();
+            if (!subject) {
+                showNotification("Veuillez inscrire une description pour votre photo.");
+                DOM.promptInput.focus();
+                return;
+            }
+
+            // Construction automatique du prompt optimisé photo-réaliste 16:9
+            const fullPhotoPrompt = `Photographie professionnelle hyper-réaliste en format 16:9, ${subject}. Prise de vue reflex haut de gamme, piqué d'image exceptionnel, éclairage naturel soigné, micro-détails parfaits, nuances de couleurs subtiles, profondeur de champ cinématographique, qualité HD 8k.`;
+
+            STATE.currentFullPrompt = fullPhotoPrompt;
+            setDisplayState('loading');
+
+            const model = "gemini-3.1-flash-image";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${STATE.apiKey}`;
+
+            const payload = {
+                contents: [{
+                    role: 'user',
+                    parts: [{ text: fullPhotoPrompt }]
+                }],
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: {
+                        aspectRatio: STATE.ratio
+                    }
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`Erreur réseau (${response.status})`);
+
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+                if (part && part.inlineData) {
+                    const mime = part.inlineData.mimeType || 'image/png';
+                    const base64Url = `data:${mime};base64,${part.inlineData.data}`;
+
+                    STATE.currentImageBase64 = base64Url;
+                    DOM.generatedImage.src = base64Url;
+
+                    DOM.photoSpecTag.innerText = `16:9 • Ultra HD`;
+                    DOM.photoSpecTag.classList.remove('hidden');
+
+                    setDisplayState('result');
+                    saveToGallery(base64Url, subject, fullPhotoPrompt);
+                } else {
+                    throw new Error("Format de réponse image non valide.");
+                }
+
+            } catch (err) {
+                console.error("Erreur de génération photo:", err);
+                DOM.errorMessageText.innerText = err.message || "Erreur lors de la capture photo.";
+                setDisplayState('error');
+            }
+        }
+
+        function downloadPhoto() {
+            if (!STATE.currentImageBase64) return;
+            const a = document.createElement('a');
+            a.href = STATE.currentImageBase64;
+            a.download = `aperture-photo-16-9-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showNotification("Photo 16:9 téléchargée en HD.");
+        }
+
+        function openFullscreen() {
+            if (!STATE.currentImageBase64) return;
+            DOM.fullscreenImage.src = STATE.currentImageBase64;
+            DOM.fullscreenModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeFullscreen() {
+            DOM.fullscreenModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function copyFullPrompt() {
+            if (!STATE.currentFullPrompt) return;
+            navigator.clipboard.writeText(STATE.currentFullPrompt).then(() => {
+                showNotification("Prompt photo copié dans le presse-papier !");
+            }).catch(() => {
+                const area = document.createElement('textarea');
+                area.value = STATE.currentFullPrompt;
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                document.body.removeChild(area);
+                showNotification("Prompt photo copié !");
+            });
+        }
+
+        function saveToGallery(img, subject, fullPrompt) {
+            const item = {
+                id: Date.now(),
+                img,
+                subject,
+                fullPrompt
+            };
+            STATE.gallery.unshift(item);
+            if (STATE.gallery.length > 12) STATE.gallery.pop();
+
+            try {
+                localStorage.setItem('aperture_photos_169_gallery', JSON.stringify(STATE.gallery));
+            } catch (e) {
+                console.warn("Stockage local plein.");
+            }
+            updateGalleryBadge();
+        }
+
+        function loadGalleryFromStorage() {
+            try {
+                const stored = localStorage.getItem('aperture_photos_169_gallery');
+                if (stored) STATE.gallery = JSON.parse(stored);
+            } catch (e) {
+                STATE.gallery = [];
+            }
+            updateGalleryBadge();
+        }
+
+        function updateGalleryBadge() {
+            DOM.galleryBadge.innerText = STATE.gallery.length;
+        }
+
+        function openGallery() {
+            renderGallery();
+            DOM.galleryModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeGallery() {
+            DOM.galleryModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function clearGallery() {
+            STATE.gallery = [];
+            localStorage.removeItem('aperture_photos_169_gallery');
+            updateGalleryBadge();
+            renderGallery();
+            showNotification("Galerie vidée.");
+        }
+
+        function renderGallery() {
+            if (STATE.gallery.length === 0) {
+                DOM.galleryGrid.innerHTML = '';
+                DOM.galleryEmpty.classList.remove('hidden');
+                return;
+            }
+            DOM.galleryEmpty.classList.add('hidden');
+            DOM.galleryGrid.innerHTML = STATE.gallery.map(item => `
+                <div class="group relative rounded-xl overflow-hidden bg-black border border-neutral-800 aspect-video">
+                    <img src="${item.img}" class="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Cliché 16:9">
+                    <div class="absolute inset-0 bg-neutral-950/85 opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-between">
+                        <p class="text-[11px] text-neutral-300 line-clamp-3">${item.subject}</p>
+                        <button onclick="loadPhotoFromGallery(${item.id})" class="text-[11px] bg-sky-400 hover:bg-sky-300 text-black font-semibold px-2 py-1.5 rounded transition-colors w-full">
+                            Afficher dans le viseur
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.loadPhotoFromGallery = function(id) {
+            const item = STATE.gallery.find(g => g.id === id);
+            if (!item) return;
+
+            STATE.currentImageBase64 = item.img;
+            STATE.currentFullPrompt = item.fullPrompt;
+            DOM.generatedImage.src = item.img;
+            DOM.promptInput.value = item.subject;
+
+            setDisplayState('result');
+            closeGallery();
+            showNotification("Cliché chargé dans le viseur.");
+        };
+    </script>
 </body>
 </html>
