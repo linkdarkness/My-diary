@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mon Studio</title>
+    <title>Mon Studio - Gemini</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -42,18 +42,17 @@
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
 
-    <!-- EN-TÊTE ÉPURÉ -->
     <header class="bg-dark-800/80 backdrop-blur-md border-b border-dark-700 px-4 py-3 flex items-center justify-between shrink-0 z-20">
         <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-microchip text-sm"></i>
             </div>
             <h1 class="text-lg font-bold tracking-tight text-white">Mon Studio</h1>
         </div>
 
         <!-- NAVIGATION PAR ICÔNES -->
         <nav class="flex items-center space-x-1 bg-dark-900 p-1 rounded-xl border border-dark-700">
-            <button onclick="switchTab('generator')" id="nav-generator" class="w-10 h-10 rounded-lg flex items-center justify-center text-indigo-400 bg-dark-700 transition-all">
+            <button onclick="switchTab('generator')" id="nav-generator" class="w-10 h-10 rounded-lg flex items-center justify-center text-blue-400 bg-dark-700 transition-all">
                 <i class="fa-solid fa-paintbrush text-base"></i>
             </button>
             <button onclick="switchTab('edit')" id="nav-edit" class="w-10 h-10 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-all">
@@ -65,34 +64,33 @@
         </nav>
     </header>
 
-    <!-- CONTENEUR PRINCIPAL -->
     <main class="flex-1 overflow-y-auto relative p-4 pb-24">
 
-        <!-- ONGLET 1 : GÉNÉRATEUR -->
+        <!-- ONGLET 1 : GÉNÉRATEUR GEMINI -->
         <section id="tab-generator" class="space-y-4 max-w-lg mx-auto">
             <div class="bg-dark-800 border border-dark-700 rounded-2xl p-4 shadow-xl">
                 <div class="flex justify-between items-center mb-2">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Description (16:9)</label>
-                    <button onclick="generateRandomPrompt()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center space-x-1">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Description (Format 16:9)</label>
+                    <button onclick="generateRandomPrompt()" class="text-xs text-blue-400 hover:text-blue-300 flex items-center space-x-1">
                         <i class="fa-solid fa-dice"></i>
                         <span>Idée aléatoire</span>
                     </button>
                 </div>
                 
                 <div class="relative">
-                    <textarea id="prompt-input" rows="3" placeholder="Décrivez votre image réaliste..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                    <textarea id="prompt-input" rows="3" placeholder="Décrivez votre visuel pour Gemini..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"></textarea>
                     <button onclick="document.getElementById('prompt-input').value = ''" class="absolute bottom-3 right-3 text-xs text-gray-500 hover:text-gray-300 bg-dark-800 px-2 py-1 rounded">Effacer</button>
                 </div>
 
-                <button onclick="generateImages()" id="generate-btn" class="w-full mt-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
+                <button onclick="generateImagesGemini()" id="generate-btn" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>Générer les 4 images 16:9</span>
+                    <span>Générer avec Gemini Flash Image</span>
                 </button>
             </div>
 
             <!-- ZONE DE RÉSULTATS -->
             <div id="results-container" class="space-y-4 hidden">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Résultats récents</h3>
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Créations Gemini récentes</h3>
                 <div id="results-grid" class="grid grid-cols-1 gap-4">
                     <!-- Les images générées apparaîtront ici -->
                 </div>
@@ -100,17 +98,17 @@
 
             <!-- CHARGEMENT -->
             <div id="loading-container" class="hidden flex flex-col items-center justify-center py-12 space-y-4">
-                <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-sm text-gray-400 font-medium">Génération des 4 clichés réalistes en cours...</p>
+                <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <p id="loading-text" class="text-sm text-gray-400 font-medium">Génération en cours via Gemini...</p>
             </div>
         </section>
 
         <!-- ONGLET 2 : RETOUCHE / IMAGE-TO-IMAGE -->
         <section id="tab-edit" class="space-y-4 max-w-lg mx-auto hidden">
             <div class="bg-dark-800 border border-dark-700 rounded-2xl p-4 shadow-xl">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Source pour retouche</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Source pour retouche IA</h3>
                 
-                <div id="edit-preview-container" class="border-2 border-dashed border-dark-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-500 transition-colors relative overflow-hidden" onclick="document.getElementById('file-input').click()">
+                <div id="edit-preview-container" class="border-2 border-dashed border-dark-600 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition-colors relative overflow-hidden" onclick="document.getElementById('file-input').click()">
                     <div id="edit-placeholder" class="space-y-2">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400"></i>
                         <p class="text-xs text-gray-400">Appuyez pour importer une image ou choisissez depuis l'album</p>
@@ -120,13 +118,13 @@
                 <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
 
                 <div class="mt-4 space-y-2">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Modifications souhaitées</label>
-                    <textarea id="edit-prompt-input" rows="2" placeholder="Ex: Transformer en coucher de soleil dramatique..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Instructions de modification</label>
+                    <textarea id="edit-prompt-input" rows="2" placeholder="Ex: Transformer en style peinture à l'huile..." class="w-full bg-dark-900 border border-dark-700 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"></textarea>
                 </div>
 
-                <button onclick="applyAuraEdit()" class="w-full mt-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
+                <button onclick="applyGeminiEdit()" id="edit-btn" class="w-full mt-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
                     <i class="fa-solid fa-wand-sparkles"></i>
-                    <span>Appliquer la retouche IA</span>
+                    <span>Modifier l'image avec Gemini</span>
                 </button>
             </div>
         </section>
@@ -137,14 +135,14 @@
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Mon Album</h3>
                 <!-- FILTRES ALBUM -->
                 <div class="flex bg-dark-800 p-1 rounded-lg border border-dark-700 text-xs">
-                    <button onclick="filterAlbum('all')" id="filter-all" class="px-3 py-1.5 rounded-md bg-indigo-600 text-white font-medium transition-all">Tous</button>
+                    <button onclick="filterAlbum('all')" id="filter-all" class="px-3 py-1.5 rounded-md bg-blue-600 text-white font-medium transition-all">Tous</button>
                     <button onclick="filterAlbum('favorites')" id="filter-favorites" class="px-3 py-1.5 rounded-md text-gray-400 hover:text-white transition-all">Favoris ⭐</button>
                 </div>
             </div>
 
             <!-- BOUTON SÉLECTION / SUPPRESSION MULTIPLE -->
             <div class="flex items-center justify-between bg-dark-800 border border-dark-700 p-2.5 rounded-xl">
-                <button onclick="toggleSelectMode()" id="select-mode-btn" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center space-x-1.5">
+                <button onclick="toggleSelectMode()" id="select-mode-btn" class="text-xs font-medium text-blue-400 hover:text-blue-300 flex items-center space-x-1.5">
                     <i class="fa-solid fa-list-check"></i>
                     <span id="select-mode-text">Sélectionner des photos</span>
                 </button>
@@ -185,11 +183,11 @@
                 <i class="fa-regular fa-star text-lg" id="modal-fav-icon"></i>
                 <span>Favori</span>
             </button>
-            <button onclick="modalVariant()" class="flex flex-col items-center text-gray-400 hover:text-indigo-400 text-xs space-y-1">
+            <button onclick="modalVariant()" class="flex flex-col items-center text-gray-400 hover:text-blue-400 text-xs space-y-1">
                 <i class="fa-solid fa-arrows-rotate text-lg"></i>
                 <span>Variante</span>
             </button>
-            <button onclick="modalSendToEdit()" class="flex flex-col items-center text-gray-400 hover:text-purple-400 text-xs space-y-1">
+            <button onclick="modalSendToEdit()" class="flex flex-col items-center text-gray-400 hover:text-indigo-400 text-xs space-y-1">
                 <i class="fa-solid fa-wand-magic text-lg"></i>
                 <span>Retoucher</span>
             </button>
@@ -204,9 +202,9 @@
         </div>
     </div>
 
-    <!-- LOGIQUE JAVASCRIPT -->
+    <!-- LOGIQUE JAVASCRIPT GEMINI API -->
     <script>
-        let album = JSON.parse(localStorage.getItem('mon_studio_album') || '[]');
+        let album = JSON.parse(localStorage.getItem('mon_studio_gemini_album') || '[]');
         let currentModalIndex = null;
         let currentFilter = 'all';
         let selectedEditImageBase64 = null;
@@ -214,10 +212,10 @@
         let selectedPhotoIds = new Set();
 
         const randomPrompts = [
-            "Un paysage mystique de forêt de redwoods en Californie avec des rayons de soleil filtrant à travers la brume, photoréaliste 8k",
-            "Une vue panoramique d'un lagon tropical turquoise avec des bungalows sur l'eau au coucher du soleil, style cinématographique",
+            "Un paysage mystique de forêt de redwoods en Californie avec des rayons de soleil filtrant à travers la brume, style cinématique",
+            "Une vue panoramique d'un lagon tropical turquoise avec des bungalows sur l'eau au coucher du soleil",
             "Un portrait rapproché d'un chat majestueux portant un casque d'astronaute futuriste, nébuleuse spatiale en arrière-plan",
-            "Une rue de Tokyo animée sous la pluie la nuit avec des reflets de néons colorés sur le bitume mouillé, ultra détaillé",
+            "Une rue de Tokyo animée sous la pluie la nuit avec des reflets de néons colorés sur le bitume mouillé",
             "Un chalet en bois chaleureux isolé dans les montagnes enneigées sous une aurore boréale spectaculaire"
         ];
 
@@ -232,7 +230,7 @@
                 document.getElementById(`nav-${id}`).className = "w-10 h-10 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-all";
             });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabId}`).className = "w-10 h-10 rounded-lg flex items-center justify-center text-indigo-400 bg-dark-700 transition-all";
+            document.getElementById(`nav-${tabId}`).className = "w-10 h-10 rounded-lg flex items-center justify-center text-blue-400 bg-dark-700 transition-all";
             
             if (tabId === 'album') {
                 resetSelectMode();
@@ -240,7 +238,52 @@
             }
         }
 
-        function generateImages() {
+        // Appel API Gemini 3.1 Flash Image pour générer 1 image (format 16:9)
+        async function callGeminiImageAPI(promptText, inputBase64 = null) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+            
+            let parts = [{ text: promptText }];
+            if (inputBase64) {
+                // Nettoyage éventuel du préfixe data URL
+                const base64Data = inputBase64.includes(',') ? inputBase64.split(',')[1] : inputBase64;
+                parts.push({
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: base64Data
+                    }
+                });
+            }
+
+            const payload = {
+                contents: [{ role: 'user', parts: parts }],
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: { aspectRatio: "16:9" }
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+            if (!part) {
+                throw new Error("Aucune image n'a pu être générée par le modèle.");
+            }
+
+            return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        }
+
+        // Génération de 4 images successives pour remplir le lot
+        async function generateImagesGemini() {
             const prompt = document.getElementById('prompt-input').value.trim();
             if (!prompt) {
                 alert("Veuillez saisir une description.");
@@ -254,19 +297,17 @@
             const resultsGrid = document.getElementById('results-grid');
             resultsGrid.innerHTML = '';
 
-            const imageUrls = [];
-            for (let i = 0; i < 4; i++) {
-                const seed = Math.floor(Math.random() * 1000000);
-                // Utilisation d'une alternative Hugging Face (flux-schnell / stable-diffusion via proxy public open-source)
-                const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + ", photorealistic, cinematic lighting, 8k resolution")}?width=1280&height=720&seed=${seed}&nologo=true`;
-                imageUrls.push(url);
-            }
-
-            setTimeout(() => {
-                imageUrls.forEach(url => {
+            try {
+                // Génération séquentielle ou parallèle de 4 images distinctes via des variations de graines / seeds textuelles
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById('loading-text').textContent = `Génération de la photo ${i}/4 via Gemini...`;
+                    const variantPrompt = `${prompt} (variation unique #${i}, qualité photoréaliste)`;
+                    
+                    const imageUrl = await callGeminiImageAPI(variantPrompt);
+                    
                     const item = {
                         id: Date.now() + Math.random(),
-                        url: url,
+                        url: imageUrl,
                         prompt: prompt,
                         date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                         favorite: false
@@ -276,38 +317,99 @@
                     const card = document.createElement('div');
                     card.className = "relative rounded-xl overflow-hidden bg-dark-800 border border-dark-700 shadow-md aspect-video group";
                     card.innerHTML = `
-                        <img src="${url}" loading="lazy" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
+                        <img src="${imageUrl}" loading="lazy" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
                         <div class="absolute bottom-2 right-2 flex space-x-1 bg-black/60 backdrop-blur-md p-1 rounded-lg">
                             <button onclick="toggleFavorite('${item.id}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-amber-400">
                                 <i class="${item.favorite ? 'fa-solid text-amber-400' : 'fa-regular'} fa-star"></i>
                             </button>
-                            <button onclick="downloadImage('${url}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-green-400">
+                            <button onclick="downloadImage('${imageUrl}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-green-400">
                                 <i class="fa-solid fa-download"></i>
                             </button>
-                            <button onclick="replicateVariant('${encodeURIComponent(prompt)}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-indigo-400" title="Variante">
+                            <button onclick="replicateVariant('${encodeURIComponent(prompt)}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-blue-400" title="Variante">
                                 <i class="fa-solid fa-arrows-rotate"></i>
                             </button>
                         </div>
                     `;
                     resultsGrid.appendChild(card);
-                });
+                }
 
                 saveAlbum();
+                document.getElementById('results-container').classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                alert("Erreur lors de la communication avec l'API Gemini : " + error.message);
+            } finally {
                 document.getElementById('generate-btn').disabled = false;
                 document.getElementById('loading-container').classList.add('hidden');
+            }
+        }
+
+        async function applyGeminiEdit() {
+            const prompt = document.getElementById('edit-prompt-input').value.trim();
+            if (!selectedEditImageBase64) {
+                alert("Veuillez d'abord importer ou sélectionner une image à retoucher.");
+                return;
+            }
+            if (!prompt) {
+                alert("Veuillez décrire les modifications souhaitées.");
+                return;
+            }
+
+            document.getElementById('edit-btn').disabled = true;
+            document.getElementById('loading-container').classList.remove('hidden');
+            document.getElementById('tab-edit').classList.add('hidden');
+
+            try {
+                document.getElementById('loading-text').textContent = "Application de la retouche IA via Gemini...";
+                const editedImageUrl = await callGeminiImageAPI(prompt, selectedEditImageBase64);
+
+                const item = {
+                    id: Date.now() + Math.random(),
+                    url: editedImageUrl,
+                    prompt: `Retouche: ${prompt}`,
+                    date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                    favorite: false
+                };
+                album.unshift(item);
+                saveAlbum();
+
+                // Afficher le résultat dans le générateur
+                const resultsGrid = document.getElementById('results-grid');
+                resultsGrid.innerHTML = `
+                    <div class="relative rounded-xl overflow-hidden bg-dark-800 border border-dark-700 shadow-md aspect-video group">
+                        <img src="${editedImageUrl}" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
+                        <div class="absolute bottom-2 right-2 flex space-x-1 bg-black/60 backdrop-blur-md p-1 rounded-lg">
+                            <button onclick="toggleFavorite('${item.id}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-amber-400">
+                                <i class="fa-regular fa-star"></i>
+                            </button>
+                            <button onclick="downloadImage('${editedImageUrl}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-green-400">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                switchTab('generator');
                 document.getElementById('results-container').classList.remove('hidden');
-            }, 800);
+            } catch (error) {
+                console.error(error);
+                alert("Erreur lors de la retouche : " + error.message);
+                switchTab('edit');
+            } finally {
+                document.getElementById('edit-btn').disabled = false;
+                document.getElementById('loading-container').classList.add('hidden');
+            }
         }
 
         function replicateVariant(encodedPrompt) {
             document.getElementById('prompt-input').value = decodeURIComponent(encodedPrompt);
             switchTab('generator');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            generateImages();
+            generateImagesGemini();
         }
 
         function saveAlbum() {
-            localStorage.setItem('mon_studio_album', JSON.stringify(album));
+            localStorage.setItem('mon_studio_gemini_album', JSON.stringify(album));
         }
 
         function renderAlbum() {
@@ -330,7 +432,7 @@
             filtered.forEach(item => {
                 const isSelected = selectedPhotoIds.has(item.id);
                 const card = document.createElement('div');
-                card.className = `relative rounded-xl overflow-hidden bg-dark-800 border ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/50' : 'border-dark-700'} shadow-md aspect-video group cursor-pointer`;
+                card.className = `relative rounded-xl overflow-hidden bg-dark-800 border ${isSelected ? 'border-blue-500 ring-2 ring-blue-500/50' : 'border-dark-700'} shadow-md aspect-video group cursor-pointer`;
                 
                 card.onclick = () => {
                     if (isSelectMode) {
@@ -343,7 +445,7 @@
                 card.innerHTML = `
                     <img src="${item.url}" loading="lazy" class="w-full h-full object-cover">
                     ${isSelectMode ? `
-                        <div class="absolute top-2 left-2 w-6 h-6 rounded-full ${isSelected ? 'bg-indigo-600 text-white' : 'bg-black/60 border border-white/40'} flex items-center justify-center text-xs">
+                        <div class="absolute top-2 left-2 w-6 h-6 rounded-full ${isSelected ? 'bg-blue-600 text-white' : 'bg-black/60 border border-white/40'} flex items-center justify-center text-xs">
                             ${isSelected ? '<i class="fa-solid fa-check"></i>' : ''}
                         </div>
                     ` : `
@@ -423,8 +525,8 @@
 
         function filterAlbum(filter) {
             currentFilter = filter;
-            document.getElementById('filter-all').className = `px-3 py-1.5 rounded-md transition-all ${filter === 'all' ? 'bg-indigo-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`;
-            document.getElementById('filter-favorites').className = `px-3 py-1.5 rounded-md transition-all ${filter === 'favorites' ? 'bg-indigo-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`;
+            document.getElementById('filter-all').className = `px-3 py-1.5 rounded-md transition-all ${filter === 'all' ? 'bg-blue-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`;
+            document.getElementById('filter-favorites').className = `px-3 py-1.5 rounded-md transition-all ${filter === 'favorites' ? 'bg-blue-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`;
             resetSelectMode();
             renderAlbum();
         }
@@ -508,7 +610,7 @@
             const a = document.createElement('a');
             a.href = url;
             a.target = '_blank';
-            a.download = `mon-studio-${Date.now()}.jpg`;
+            a.download = `mon-studio-gemini-${Date.now()}.jpg`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -526,21 +628,6 @@
                 };
                 reader.readAsDataURL(file);
             }
-        }
-
-        function applyAuraEdit() {
-            const prompt = document.getElementById('edit-prompt-input').value.trim();
-            if (!selectedEditImageBase64) {
-                alert("Veuillez d'abord importer ou sélectionner une image à retoucher.");
-                return;
-            }
-            if (!prompt) {
-                alert("Veuillez décrire les modifications souhaitées.");
-                return;
-            }
-            document.getElementById('prompt-input').value = `Modification réaliste de l'image précédente: ${prompt}`;
-            switchTab('generator');
-            generateImages();
         }
     </script>
 </body>
