@@ -257,6 +257,7 @@
             const imageUrls = [];
             for (let i = 0; i < 4; i++) {
                 const seed = Math.floor(Math.random() * 1000000);
+                // Utilisation d'une alternative Hugging Face (flux-schnell / stable-diffusion via proxy public open-source)
                 const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + ", photorealistic, cinematic lighting, 8k resolution")}?width=1280&height=720&seed=${seed}&nologo=true`;
                 imageUrls.push(url);
             }
