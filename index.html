@@ -89,19 +89,6 @@
             letter-spacing: 0.5px;
         }
 
-        .settings-btn {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
         .gallery-btn-header {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -135,64 +122,6 @@
             gap: 20px;
         }
 
-        /* Modal Paramètres Clé API */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .modal-content h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .modal-content input {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            color: white;
-            font-size: 0.9rem;
-            width: 100%;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .modal-buttons button {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-cancel { background: #374151; color: white; }
-        .btn-save { background: var(--accent-gradient); color: white; }
-
-        /* Studio Panel */
         .studio-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -215,7 +144,6 @@
             gap: 6px;
         }
 
-        /* Source Image Area (Img2Img) */
         .source-container {
             display: flex;
             flex-direction: column;
@@ -267,7 +195,6 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Prompt Input */
         .prompt-box {
             position: relative;
             background: var(--bg-color);
@@ -308,7 +235,6 @@
             padding: 4px;
         }
 
-        /* Options de Propositions (Multi) */
         .propositions-selector {
             display: flex;
             flex-direction: column;
@@ -340,7 +266,6 @@
             color: #f59e0b;
         }
 
-        /* Bouton de génération principal */
         .generate-btn {
             background: var(--accent-gradient);
             color: white;
@@ -368,7 +293,6 @@
             transform: none;
         }
 
-        /* Viseur / Affichage résultats */
         .viewer-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -528,28 +452,12 @@
         </div>
         <div class="header-badges">
             <span class="badge-169">16:9 PRO</span>
-            <button class="settings-btn" id="open-settings-btn" title="Paramètres API">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
             <button class="gallery-btn-header" id="open-gallery-btn">
                 <span>Galerie</span>
                 <span class="gallery-badge" id="gallery-count">0</span>
             </button>
         </div>
     </header>
-
-    <!-- Modal Configuration Clé API -->
-    <div class="modal-overlay" id="settings-modal">
-        <div class="modal-content">
-            <h3>Configuration Clé API Cloud</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Entrez votre clé d'accès API (ex: Replicate ou autre service compatible) pour exécuter les générations depuis votre mobile.</p>
-            <input type="password" id="api-key-input" placeholder="Entrez votre clé API...">
-            <div class="modal-buttons">
-                <button class="btn-cancel" id="close-settings-btn">Annuler</button>
-                <button class="btn-save" id="save-settings-btn">Enregistrer</button>
-            </div>
-        </div>
-    </div>
 
     <input type="file" id="file-input" accept="image/*">
 
@@ -625,18 +533,11 @@
 
     <script>
         let state = {
-            apiKey: localStorage.getItem('aperture_api_key') || '',
             selectedSourceImage: null,
             propositionsCount: 4,
             isGenerating: false,
             gallery: JSON.parse(localStorage.getItem('aperture_gallery') || '[]')
         };
-
-        const apiKeyInput = document.getElementById('api-key-input');
-        const settingsModal = document.getElementById('settings-modal');
-        const openSettingsBtn = document.getElementById('open-settings-btn');
-        const closeSettingsBtn = document.getElementById('close-settings-btn');
-        const saveSettingsBtn = document.getElementById('save-settings-btn');
 
         const promptInput = document.getElementById('prompt-input');
         const clearPromptBtn = document.getElementById('clear-prompt-btn');
@@ -652,22 +553,6 @@
         const toastMessage = document.getElementById('toast-message');
 
         updateGalleryCount();
-
-        openSettingsBtn.addEventListener('click', () => {
-            apiKeyInput.value = state.apiKey;
-            settingsModal.style.display = 'flex';
-        });
-
-        closeSettingsBtn.addEventListener('click', () => {
-            settingsModal.style.display = 'none';
-        });
-
-        saveSettingsBtn.addEventListener('click', () => {
-            state.apiKey = apiKeyInput.value.trim();
-            localStorage.setItem('aperture_api_key', state.apiKey);
-            settingsModal.style.display = 'none';
-            showToast("Clé API enregistrée avec succès.", "success");
-        });
 
         document.querySelectorAll('.prop-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -720,12 +605,6 @@
                 return;
             }
 
-            if (!state.apiKey) {
-                showToast("Veuillez configurer votre clé API dans les paramètres.", "error");
-                settingsModal.style.display = 'flex';
-                return;
-            }
-
             setGenerating(true);
 
             try {
@@ -733,11 +612,9 @@
                 for (let i = 0; i < state.propositionsCount; i++) {
                     showToast(`Génération de la proposition ${i + 1}/${state.propositionsCount}...`, "info");
                     
-                    // Simulation ou appel API cloud direct configuré ici
-                    // (Exemple d'appel fetch vers un service cloud compatible)
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulation de rendu cloud
+                    // Simulation locale fluide intégrée (sans clé API ni serveur)
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                     
-                    // Image de démonstration haute qualité photo-réaliste 16:9
                     const demoImage = `https://picsum.photos/seed/${Date.now() + i}/1280/720`;
                     results.push(demoImage);
                 }
@@ -748,7 +625,7 @@
 
             } catch (error) {
                 console.error(error);
-                showToast(`Erreur lors de la génération : ${error.message}`, "error");
+                showToast("Erreur lors de la génération.", "error");
             } finally {
                 setGenerating(false);
             }
