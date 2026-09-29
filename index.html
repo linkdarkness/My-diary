@@ -1,728 +1,744 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aperture Studio Pro</title>
-    <style>
-        :root {
-            --bg-color: #0b0b0f;
-            --surface-color: #16161f;
-            --surface-glass: rgba(22, 22, 31, 0.85);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-color: #d97706; /* Ambre studio */
-            --accent-gradient: linear-gradient(135deg, #f59e0b, #b45309);
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger-color: #ef4444;
-            --success-color: #10b981;
+    <title>Mon Studio - IA Vision & Photo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#090d16',
+                            card: '#131c2e',
+                            border: '#1e293b',
+                            accent: '#3b82f6'
+                        }
+                    }
+                }
+            }
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            padding-bottom: 30px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background: var(--surface-glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            background: var(--accent-gradient);
-            padding: 8px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
-        }
-
-        .logo-text h1 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
-
-        .header-badges {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .badge-169 {
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 4px 8px;
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            border-radius: 6px;
-            color: #f59e0b;
-            background: rgba(245, 158, 11, 0.08);
-            letter-spacing: 0.5px;
-        }
-
-        .gallery-btn-header {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .gallery-badge {
-            background: var(--accent-color);
-            color: white;
-            font-size: 0.7rem;
-            padding: 1px 6px;
-            border-radius: 10px;
-        }
-
-        main {
-            flex: 1;
-            padding: 16px;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .studio-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        .section-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-muted);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .source-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border: 1px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            background: rgba(0,0,0,0.2);
-            position: relative;
-        }
-
-        .source-preview-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .source-thumb {
-            width: 70px;
-            height: 40px;
-            border-radius: 6px;
-            object-fit: cover;
-            border: 1px solid var(--border-color);
-            background: #000;
-        }
-
-        .source-info {
-            flex: 1;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            word-break: break-all;
-        }
-
-        .action-chip {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .action-chip:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .prompt-box {
-            position: relative;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            transition: border-color 0.2s;
-        }
-
-        .prompt-box:focus-within {
-            border-color: var(--accent-color);
-        }
-
-        textarea {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            resize: none;
-            outline: none;
-            min-height: 75px;
-            line-height: 1.4;
-        }
-
-        textarea::placeholder {
-            color: #4b5563;
-        }
-
-        .clear-prompt {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .propositions-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .prop-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .prop-btn {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .prop-btn.active {
-            background: rgba(217, 119, 6, 0.15);
-            border-color: var(--accent-color);
-            color: #f59e0b;
-        }
-
-        .generate-btn {
-            background: var(--accent-gradient);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(217, 119, 6, 0.35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: transform 0.1s;
-        }
-
-        .generate-btn:active {
-            transform: scale(0.98);
-        }
-
-        .generate-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .viewer-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            min-height: 250px;
-        }
-
-        .viewer-screen {
-            background: #000;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            aspect-ratio: 16/9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .viewer-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .shutter-ring {
-            width: 50px;
-            height: 50px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .shutter-dot {
-            width: 16px;
-            height: 16px;
-            background: var(--text-muted);
-            border-radius: 50%;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            width: 100%;
-        }
-
-        .result-item {
-            position: relative;
-            aspect-ratio: 16/9;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: #000;
-        }
-
-        .result-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .result-actions {
-            position: absolute;
-            bottom: 6px;
-            right: 6px;
-            display: flex;
-            gap: 4px;
-        }
-
-        .img-action-btn {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .loading-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(11, 11, 15, 0.85);
-            backdrop-filter: blur(6px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            z-index: 10;
-        }
-
-        .spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--accent-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 0.85rem;
-            color: var(--text-main);
-            font-weight: 500;
-        }
-
-        .toast {
-            background: rgba(22, 22, 31, 0.95);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .toast.error { border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; }
-        .toast.success { border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; }
-
-        #file-input { display: none; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
-    <header>
-        <div class="logo-area">
-            <div class="logo-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    <header class="sticky top-0 z-40 bg-[#090d16]/90 backdrop-blur-md border-b border-dark-border px-4 py-3.5 flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-sm"></i>
             </div>
-            <div class="logo-text">
-                <h1>Aperture Studio</h1>
-            </div>
+            <h1 class="font-bold text-base tracking-tight text-white">Mon Studio</h1>
         </div>
-        <div class="header-badges">
-            <span class="badge-169">16:9 PRO</span>
-            <button class="gallery-btn-header" id="open-gallery-btn">
-                <span>Galerie</span>
-                <span class="gallery-badge" id="gallery-count">0</span>
+        <div class="flex items-center space-x-2">
+            <button onclick="switchTab('generate')" id="tab-gen-btn" class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white transition shadow-sm" title="Générer">
+                <i class="fa-solid fa-palette text-sm"></i>
+            </button>
+            <button onclick="switchTab('edit')" id="tab-edit-btn" class="w-10 h-10 rounded-xl flex items-center justify-center bg-dark-card border border-dark-border hover:bg-slate-800 transition text-slate-300 shadow-sm" title="Retoucher">
+                <i class="fa-solid fa-paintbrush text-sm text-indigo-400"></i>
+            </button>
+            <button onclick="switchTab('album')" id="tab-album-btn" class="w-10 h-10 rounded-xl flex items-center justify-center bg-dark-card border border-dark-border hover:bg-slate-800 transition text-slate-300 shadow-sm relative" title="Album">
+                <i class="fa-solid fa-images text-sm text-blue-400"></i>
+                <span id="album-badge" class="absolute -top-1 -right-1 bg-blue-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
             </button>
         </div>
     </header>
 
-    <input type="file" id="file-input" accept="image/*">
-
-    <main>
-        <section class="studio-card">
-            <div class="source-container" id="source-container" style="display: none;">
-                <div class="section-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                    Mode Retouche Actif
+    <main class="flex-1 max-w-lg w-full mx-auto p-4 flex flex-col space-y-4 pb-24">
+        
+        <div id="view-generate" class="flex flex-col space-y-4">
+            <div class="bg-dark-card border border-dark-border rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
+                <label for="prompt-input" class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                    <span>Décrivez votre scène réaliste (4 clichés)</span>
+                    <span id="char-count" class="text-[10px] text-slate-500">0/500</span>
+                </label>
+                <div class="relative">
+                    <textarea id="prompt-input" rows="4" maxlength="500" placeholder="Ex: Une vue panoramique sur les Dolomites au lever du soleil, brume matinale..." class="w-full bg-[#090d16] border border-dark-border rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition resize-none"></textarea>
+                    <button onclick="clearPrompt()" class="absolute bottom-3 right-3 text-slate-500 hover:text-slate-300 text-xs px-2 py-1 bg-slate-800 rounded-md transition">Effacer</button>
                 </div>
-                <div class="source-preview-row">
-                    <img id="source-preview-thumb" class="source-thumb" src="" alt="Source">
-                    <div class="source-info" id="source-info-text">Image source chargée</div>
-                    <button class="action-chip" id="clear-source-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">Retirer</button>
-                </div>
-            </div>
 
-            <div class="section-title">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                Instruction & Prompt Studio
-            </div>
-
-            <div style="display: flex; gap: 8px;">
-                <button class="action-chip" id="import-file-btn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    Importer une photo
+                <button onclick="generateMultipleImages()" id="generate-btn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 hover:opacity-95 active:scale-[0.99] transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Générer les 4 images 16:9</span>
                 </button>
             </div>
 
-            <div class="prompt-box">
-                <button class="clear-prompt" id="clear-prompt-btn" title="Effacer">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-                <textarea id="prompt-input" placeholder="Décrivez votre prise de vue photo-réaliste (ex: Portrait cinématographique, éclairage dramatique, 8k...)"></textarea>
-            </div>
-
-            <div class="propositions-selector">
-                <div class="section-title">Nombre de propositions (16:9)</div>
-                <div class="prop-buttons">
-                    <button class="prop-btn" data-count="1">1</button>
-                    <button class="prop-btn" data-count="2">2</button>
-                    <button class="prop-btn" data-count="3">3</button>
-                    <button class="prop-btn active" data-count="4">4</button>
-                </div>
-            </div>
-
-            <button class="generate-btn" id="generate-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Lancer les propositions Studio
-            </button>
-        </section>
-
-        <section class="viewer-card">
-            <div class="section-title">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-                Viseur Studio (16:9)
-            </div>
-            
-            <div class="viewer-screen" id="viewer-screen">
-                <div class="viewer-placeholder" id="viewer-placeholder">
-                    <div class="shutter-ring">
-                        <div class="shutter-dot"></div>
+            <!-- Loading indicator -->
+            <div id="loading-container" class="hidden bg-dark-card border border-dark-border rounded-2xl p-8 flex flex-col items-center justify-center space-y-4 shadow-xl">
+                <div class="relative w-16 h-16 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-2xl bg-blue-500/20 animate-ping"></div>
+                    <div class="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xl shadow-lg relative z-10">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
                     </div>
-                    <span>Studio Prêt</span>
+                </div>
+                <div class="text-center space-y-1">
+                    <p id="loading-msg" class="text-xs font-medium text-slate-200">Génération des 4 variations réalistes...</p>
+                    <p class="text-[10px] text-slate-400">Rendu simultané en cours (Format 16:9)</p>
                 </div>
             </div>
-        </section>
 
-        <div class="toast" id="status-toast" style="display: none;">
-            <span id="toast-message">Message d'information</span>
+            <!-- Results container -->
+            <div id="results-container" class="hidden flex flex-col space-y-3">
+                <div class="flex items-center justify-between px-1">
+                    <span class="text-xs font-semibold text-slate-300">Derniers clichés générés (Enregistrés dans l'Album)</span>
+                </div>
+                <div id="images-grid" class="grid grid-cols-1 gap-4">
+                    <!-- Dynamic cards inserted here -->
+                </div>
+            </div>
         </div>
+
+        <div id="view-edit" class="hidden flex flex-col space-y-4">
+            <div class="bg-dark-card border border-dark-border rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
+                <span class="text-xs font-semibold text-slate-300">1. Sélectionner l'image à retoucher</span>
+                
+                <!-- Image dropzone / preview -->
+                <div id="edit-dropzone" class="border-2 border-dashed border-dark-border rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-indigo-500 transition bg-[#090d16] relative overflow-hidden min-h-[160px]" onclick="document.getElementById('file-input').click()">
+                    <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelected(event)">
+                    <div id="dropzone-placeholder" class="flex flex-col items-center space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-indigo-400">
+                            <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                        </div>
+                        <div class="space-y-0.5">
+                            <p class="text-xs font-medium text-slate-300">Importer une image locale</p>
+                            <p class="text-[10px] text-slate-500">ou choisissez depuis l'album ci-dessous</p>
+                        </div>
+                    </div>
+                    <img id="edit-preview-img" src="" alt="Image source" class="absolute inset-0 w-full h-full object-contain bg-black/60 hidden">
+                </div>
+
+                <!-- Quick pick from album button -->
+                <button onclick="openAlbumPicker()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-images text-indigo-400"></i>
+                    <span>Choisir une image depuis l'album</span>
+                </button>
+            </div>
+
+            <div class="bg-dark-card border border-dark-border rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
+                <label for="edit-prompt-input" class="text-xs font-semibold text-slate-300">
+                    2. Décrivez les modifications souhaitées
+                </label>
+                <textarea id="edit-prompt-input" rows="3" placeholder="Ex: Transformer le paysage en coucher de soleil orangé, rajouter des éclats de lumière..." class="w-full bg-[#090d16] border border-dark-border rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+
+                <button onclick="retouchImage()" id="retouch-btn" disabled class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 opacity-50 cursor-not-allowed transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wand-magic"></i>
+                    <span>Appliquer la retouche IA</span>
+                </button>
+            </div>
+
+            <!-- Edit loading -->
+            <div id="edit-loading" class="hidden bg-dark-card border border-dark-border rounded-2xl p-6 flex flex-col items-center justify-center space-y-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg animate-spin">
+                    <i class="fa-solid fa-spinner"></i>
+                </div>
+                <p class="text-xs font-medium text-slate-300">Retouche de l'image par l'IA en cours...</p>
+            </div>
+
+            <!-- Edit Result -->
+            <div id="edit-result-container" class="hidden bg-dark-card border border-dark-border rounded-2xl p-4 shadow-xl flex flex-col space-y-3">
+                <span class="text-xs font-semibold text-slate-300">Résultat de la retouche</span>
+                <div class="relative w-full aspect-video bg-slate-900 rounded-xl overflow-hidden">
+                    <img id="edit-result-img" src="" alt="Image retouchée" class="w-full h-full object-cover">
+                </div>
+                <button id="save-retouched-btn" onclick="saveRetouchedToAlbum()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition flex items-center justify-center space-x-1.5 shadow-md">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Enregistrer dans l'Album</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="view-album" class="hidden flex flex-col space-y-4">
+            <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-semibold text-slate-300">Album Persistant (<span id="album-count">0</span> images)</span>
+                <button onclick="clearAlbum()" class="text-[11px] text-red-400 hover:text-red-300 font-medium transition flex items-center space-x-1">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Vider l'album</span>
+                </button>
+            </div>
+            <div id="album-grid" class="grid grid-cols-2 gap-3">
+                <!-- Stored album items -->
+            </div>
+            <div id="album-empty" class="hidden flex flex-col items-center justify-center py-16 space-y-3 text-center">
+                <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 text-lg">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-xs font-medium text-slate-300">Votre album est vide</p>
+                    <p class="text-[10px] text-slate-500 max-w-[220px]">Générez ou retouchez des images pour les retrouver ici en permanence.</p>
+                </div>
+            </div>
+        </div>
+
     </main>
 
+    <div id="preview-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex flex-col justify-between p-4">
+        <div class="flex items-center justify-between py-2">
+            <span id="modal-date" class="text-[11px] text-slate-400">Aperçu HD</span>
+            <button onclick="closePreview()" class="w-10 h-10 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+            <img id="modal-img" src="" alt="Aperçu Plein Écran" class="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl">
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-3">
+            <button onclick="downloadModalImage()" class="py-2.5 px-2 rounded-xl bg-blue-600 text-white text-xs font-medium flex items-center justify-center space-x-1 shadow-md">
+                <i class="fa-solid fa-download"></i>
+                <span>Enregistrer</span>
+            </button>
+            <button onclick="sendModalToEdit()" class="py-2.5 px-2 rounded-xl bg-indigo-600 text-white text-xs font-medium flex items-center justify-center space-x-1 shadow-md">
+                <i class="fa-solid fa-paintbrush"></i>
+                <span>Retoucher</span>
+            </button>
+            <button id="modal-delete-btn" onclick="deleteFromModal()" class="py-2.5 px-2 rounded-xl bg-red-600/20 border border-red-500/30 text-red-400 text-xs font-medium flex items-center justify-center space-x-1">
+                <i class="fa-solid fa-trash"></i>
+                <span>Suppr.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ALBUM PICKER MODAL -->
+    <div id="picker-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col justify-between p-4">
+        <div class="flex items-center justify-between py-2">
+            <span class="text-xs font-bold text-white">Choisir une image de l'album</span>
+            <button onclick="closeAlbumPicker()" class="w-9 h-9 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div id="picker-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-3 py-2">
+            <!-- Dynamic picker items -->
+        </div>
+    </div>
+
     <script>
-        let state = {
-            selectedSourceImage: null,
-            propositionsCount: 4,
-            isGenerating: false,
-            gallery: JSON.parse(localStorage.getItem('aperture_gallery') || '[]')
-        };
-
         const promptInput = document.getElementById('prompt-input');
-        const clearPromptBtn = document.getElementById('clear-prompt-btn');
-        const generateBtn = document.getElementById('generate-btn');
-        const viewerScreen = document.getElementById('viewer-screen');
-        const fileInput = document.getElementById('file-input');
-        const importFileBtn = document.getElementById('import-file-btn');
-        const sourceContainer = document.getElementById('source-container');
-        const sourcePreviewThumb = document.getElementById('source-preview-thumb');
-        const clearSourceBtn = document.getElementById('clear-source-btn');
-        const galleryCountBadge = document.getElementById('gallery-count');
-        const statusToast = document.getElementById('status-toast');
-        const toastMessage = document.getElementById('toast-message');
+        const charCount = document.getElementById('char-count');
+        
+        let persistentAlbum = JSON.parse(localStorage.getItem('mon_studio_persistent_album') || '[]');
+        let currentModalItem = null;
+        let selectedBase64Image = null;
+        let selectedMimeType = 'image/png';
+        let lastRetouchedUrl = null;
 
-        updateGalleryCount();
-
-        document.querySelectorAll('.prop-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.prop-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                state.propositionsCount = parseInt(e.target.getAttribute('data-count'));
-            });
+        promptInput.addEventListener('input', () => {
+            charCount.textContent = `${promptInput.value.length}/500`;
         });
 
-        clearPromptBtn.addEventListener('click', () => {
+        function clearPrompt() {
             promptInput.value = '';
+            charCount.textContent = '0/500';
             promptInput.focus();
-        });
-
-        importFileBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    setSourceImage(event.target.result, file.name);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        clearSourceBtn.addEventListener('click', () => {
-            state.selectedSourceImage = null;
-            sourceContainer.style.display = 'none';
-            fileInput.value = '';
-            showToast("Mode retouche désactivé.", "info");
-        });
-
-        function setSourceImage(dataUrl, name = "Image source") {
-            state.selectedSourceImage = dataUrl;
-            sourcePreviewThumb.src = dataUrl;
-            document.getElementById('source-info-text').textContent = name;
-            sourceContainer.style.display = 'flex';
-            showToast("Photo source chargée.", "success");
         }
 
-        generateBtn.addEventListener('click', async () => {
-            const promptText = promptInput.value.trim();
-            if (!promptText) {
-                showToast("Veuillez saisir un prompt.", "error");
+        function switchTab(tab) {
+            const genView = document.getElementById('view-generate');
+            const editView = document.getElementById('view-edit');
+            const albumView = document.getElementById('view-album');
+            
+            const genBtn = document.getElementById('tab-gen-btn');
+            const editBtn = document.getElementById('tab-edit-btn');
+            const albumBtn = document.getElementById('tab-album-btn');
+
+            // Reset all buttons
+            genBtn.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-dark-card border border-dark-border hover:bg-slate-800 transition text-slate-300 shadow-sm";
+            editBtn.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-dark-card border border-dark-border hover:bg-slate-800 transition text-slate-300 shadow-sm";
+            albumBtn.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-dark-card border border-dark-border hover:bg-slate-800 transition text-slate-300 shadow-sm relative";
+
+            genView.classList.add('hidden');
+            editView.classList.add('hidden');
+            albumView.classList.add('hidden');
+
+            if (tab === 'generate') {
+                genView.classList.remove('hidden');
+                genBtn.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white transition shadow-sm";
+            } else if (tab === 'edit') {
+                editView.classList.remove('hidden');
+                editBtn.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white transition shadow-sm";
+            } else {
+                albumView.classList.remove('hidden');
+                albumBtn.className = "w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white transition shadow-sm relative";
+                renderAlbum();
+            }
+        }
+
+        const loadingMessages = [
+            "Lancement de la génération des 4 clichés...",
+            "Calcul de la lumière naturelle et des textures...",
+            "Application du rendu photographique haute définition...",
+            "Finalisation des fichiers 16:9..."
+        ];
+        let msgInterval;
+
+        function startLoading() {
+            document.getElementById('loading-container').classList.remove('hidden');
+            document.getElementById('results-container').classList.add('hidden');
+            const btn = document.getElementById('generate-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            let idx = 0;
+            const msgEl = document.getElementById('loading-msg');
+            msgInterval = setInterval(() => {
+                idx = (idx + 1) % loadingMessages.length;
+                msgEl.textContent = loadingMessages[idx];
+            }, 2500);
+        }
+
+        function stopLoading() {
+            clearInterval(msgInterval);
+            document.getElementById('loading-container').classList.add('hidden');
+            const btn = document.getElementById('generate-btn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        async function callGeminiImageAPI(promptText) {
+            const enhancedPrompt = `${promptText}, photorealistic, hyper-realistic, 8k resolution, professional photography, natural lighting, highly detailed`;
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    role: 'user',
+                    parts: [{ text: enhancedPrompt }]
+                }],
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: { aspectRatio: "16:9" }
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+            if (!part) {
+                throw new Error("Aucune image valide reçue.");
+            }
+            return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        }
+
+        async function generateMultipleImages() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showToast("Veuillez saisir une description.");
                 promptInput.focus();
                 return;
             }
 
-            setGenerating(true);
+            startLoading();
 
             try {
-                const results = [];
-                for (let i = 0; i < state.propositionsCount; i++) {
-                    showToast(`Génération de la proposition ${i + 1}/${state.propositionsCount}...`, "info");
-                    
-                    // Simulation locale fluide intégrée (sans clé API ni serveur)
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    
-                    const demoImage = `https://picsum.photos/seed/${Date.now() + i}/1280/720`;
-                    results.push(demoImage);
+                const promises = [
+                    callGeminiImageAPI(prompt),
+                    callGeminiImageAPI(prompt),
+                    callGeminiImageAPI(prompt),
+                    callGeminiImageAPI(prompt)
+                ];
+
+                const imageUrls = await Promise.all(promises);
+                stopLoading();
+
+                const timestamp = new Date().toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                imageUrls.forEach((url, idx) => {
+                    const albumItem = {
+                        id: `${Date.now()}-${idx}`,
+                        url: url,
+                        prompt: prompt,
+                        date: timestamp
+                    };
+                    persistentAlbum.unshift(albumItem);
+                });
+
+                localStorage.setItem('mon_studio_persistent_album', JSON.stringify(persistentAlbum));
+                updateAlbumBadge();
+
+                renderResults(imageUrls, prompt);
+                showToast("4 images générées et enregistrées dans l'album !");
+
+            } catch (err) {
+                stopLoading();
+                console.error(err);
+                showToast("Erreur lors de la génération. Veuillez réessayer.");
+            }
+        }
+
+        function renderResults(urls, prompt) {
+            const grid = document.getElementById('images-grid');
+            grid.innerHTML = '';
+
+            urls.forEach((url, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-dark-card border border-dark-border rounded-2xl overflow-hidden shadow-lg flex flex-col";
+                card.innerHTML = `
+                    <div class="relative w-full aspect-video bg-slate-900 cursor-pointer overflow-hidden group" onclick="openPreviewFromUrl('${url}', '${prompt.replace(/'/g, "\\'")}')">
+                        <img src="${url}" alt="Variation ${index + 1}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-lg bg-black/60 backdrop-blur-md text-[10px] text-white font-medium">
+                            Cliché ${index + 1}
+                        </div>
+                    </div>
+                    <div class="p-3 flex items-center justify-between">
+                        <span class="text-[11px] text-slate-400 italic truncate max-w-[180px]">« ${prompt} »</span>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="prepareEditFromUrl('${url}')" class="px-2.5 py-1.5 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-xs font-medium hover:bg-indigo-600/30 transition flex items-center space-x-1" title="Retoucher">
+                                <i class="fa-solid fa-paintbrush"></i>
+                            </button>
+                            <button onclick="downloadSingle('${url}', 'mon-studio-${index + 1}.png')" class="px-2.5 py-1.5 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 text-xs font-medium hover:bg-blue-600/30 transition flex items-center space-x-1">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('results-container').classList.remove('hidden');
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- EDITING LOGIC ---
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            selectedMimeType = file.type || 'image/png';
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUrl = e.target.result;
+                setImageForEditing(dataUrl, selectedMimeType);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setImageForEditing(dataUrl, mimeType) {
+            selectedBase64Image = dataUrl;
+            selectedMimeType = mimeType;
+
+            const previewImg = document.getElementById('edit-preview-img');
+            const placeholder = document.getElementById('dropzone-placeholder');
+
+            previewImg.src = dataUrl;
+            previewImg.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+
+            checkRetouchReady();
+        }
+
+        function checkRetouchReady() {
+            const btn = document.getElementById('retouch-btn');
+            if (selectedBase64Image) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function openAlbumPicker() {
+            if (persistentAlbum.length === 0) {
+                showToast("Votre album est vide. Générez d'abord une image !");
+                return;
+            }
+
+            const pickerGrid = document.getElementById('picker-grid');
+            pickerGrid.innerHTML = '';
+
+            persistentAlbum.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "relative aspect-video rounded-xl overflow-hidden cursor-pointer border border-dark-border hover:border-indigo-500 transition group";
+                card.innerHTML = `
+                    <img src="${item.url}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                    <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <span class="bg-indigo-600 text-white text-[10px] font-semibold px-2 py-1 rounded-lg">Sélectionner</span>
+                    </div>
+                `;
+                card.onclick = () => {
+                    setImageForEditing(item.url, 'image/png');
+                    closeAlbumPicker();
+                    showToast("Image sélectionnée pour la retouche !");
+                };
+                pickerGrid.appendChild(card);
+            });
+
+            document.getElementById('picker-modal').classList.remove('hidden');
+        }
+
+        function closeAlbumPicker() {
+            document.getElementById('picker-modal').classList.add('hidden');
+        }
+
+        function prepareEditFromUrl(url) {
+            setImageForEditing(url, 'image/png');
+            switchTab('edit');
+            showToast("Image chargée dans l'outil de retouche.");
+        }
+
+        function sendModalToEdit() {
+            if (currentModalItem) {
+                setImageForEditing(currentModalItem.url, 'image/png');
+                closePreview();
+                switchTab('edit');
+                showToast("Image chargée pour la retouche.");
+            }
+        }
+
+        async function retouchImage() {
+            if (!selectedBase64Image) {
+                showToast("Veuillez sélectionner une image source.");
+                return;
+            }
+
+            const editPrompt = document.getElementById('edit-prompt-input').value.trim();
+            if (!editPrompt) {
+                showToast("Veuillez décrire la modification souhaitée.");
+                document.getElementById('edit-prompt-input').focus();
+                return;
+            }
+
+            document.getElementById('edit-loading').classList.remove('hidden');
+            document.getElementById('edit-result-container').classList.add('hidden');
+            const btn = document.getElementById('retouch-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const base64Data = selectedBase64Image.split(',')[1];
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [
+                            { text: `Retouche cette image selon ces instructions : ${editPrompt}. Conserve la haute qualité et le réalisme.` },
+                            {
+                                inlineData: {
+                                    mimeType: selectedMimeType,
+                                    data: base64Data
+                                }
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        responseModalities: ['IMAGE'],
+                        imageConfig: { aspectRatio: "16:9" }
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur API: ${response.status}`);
                 }
 
-                displayResults(results);
-                saveToGallery(results);
-                showToast("Génération réussie !", "success");
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                if (!part) {
+                    throw new Error("Aucune image retouchée reçue.");
+                }
 
-            } catch (error) {
-                console.error(error);
-                showToast("Erreur lors de la génération.", "error");
-            } finally {
-                setGenerating(false);
-            }
-        });
+                lastRetouchedUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                
+                document.getElementById('edit-loading').classList.add('hidden');
+                document.getElementById('edit-result-img').src = lastRetouchedUrl;
+                document.getElementById('edit-result-container').classList.remove('hidden');
+                document.getElementById('edit-result-container').scrollIntoView({ behavior: 'smooth' });
 
-        function setGenerating(status) {
-            state.isGenerating = status;
-            generateBtn.disabled = status;
-            if (status) {
-                viewerScreen.innerHTML = `
-                    <div class="loading-overlay">
-                        <div class="spinner"></div>
-                        <div class="loading-text">Développement Studio en cours...</div>
-                    </div>
-                `;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                showToast("Retouche IA réussie !");
+
+            } catch (err) {
+                document.getElementById('edit-loading').classList.add('hidden');
+                const btn = document.getElementById('retouch-btn');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                console.error(err);
+                showToast("Erreur lors de la retouche. Veuillez réessayer.");
             }
         }
 
-        function displayResults(images) {
-            viewerScreen.innerHTML = '';
-            if (images.length === 1) {
-                const container = document.createElement('div');
-                container.className = 'result-item';
-                container.style.width = '100%';
-                container.style.height = '100%';
-                container.innerHTML = `
-                    <img src="${images[0]}" alt="Résultat">
-                    <div class="result-actions">
-                        <button class="img-action-btn" onclick="sendToRetouch('${images[0]}')" title="Retoucher">✏️</button>
-                        <button class="img-action-btn" onclick="downloadImage('${images[0]}')" title="Télécharger">⬇️</button>
-                    </div>
-                `;
-                viewerScreen.appendChild(container);
-            } else {
-                const grid = document.createElement('div');
-                grid.className = 'results-grid';
-                grid.style.width = '100%';
-                grid.style.height = '100%';
-                grid.style.padding = '8px';
+        function saveRetouchedToAlbum() {
+            if (!lastRetouchedUrl) return;
 
-                images.forEach((imgSrc) => {
-                    const item = document.createElement('div');
-                    item.className = 'result-item';
-                    item.innerHTML = `
-                        <img src="${imgSrc}" alt="Proposition">
-                        <div class="result-actions">
-                            <button class="img-action-btn" onclick="sendToRetouch('${imgSrc}')" title="Retoucher">✏️</button>
-                            <button class="img-action-btn" onclick="downloadImage('${imgSrc}')" title="Télécharger">⬇️</button>
+            const timestamp = new Date().toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const albumItem = {
+                id: `${Date.now()}-retouch`,
+                url: lastRetouchedUrl,
+                prompt: `Retouche: ${document.getElementById('edit-prompt-input').value.trim()}`,
+                date: timestamp
+            };
+
+            persistentAlbum.unshift(albumItem);
+            localStorage.setItem('mon_studio_persistent_album', JSON.stringify(persistentAlbum));
+            updateAlbumBadge();
+            showToast("Image retouchée enregistrée dans l'Album !");
+            switchTab('album');
+        }
+
+        // --- ALBUM & PREVIEW ---
+        function renderAlbum() {
+            const grid = document.getElementById('album-grid');
+            const emptyEl = document.getElementById('album-empty');
+            const countEl = document.getElementById('album-count');
+            
+            grid.innerHTML = '';
+            countEl.textContent = persistentAlbum.length;
+
+            if (persistentAlbum.length === 0) {
+                emptyEl.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            persistentAlbum.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = "bg-dark-card border border-dark-border rounded-xl overflow-hidden shadow-md flex flex-col group relative";
+                card.innerHTML = `
+                    <div class="relative w-full aspect-video bg-slate-900 cursor-pointer overflow-hidden" onclick="openPreviewById('${item.id}')">
+                        <img src="${item.url}" alt="Album image" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <i class="fa-solid fa-expand text-white text-base"></i>
                         </div>
-                    `;
-                    grid.appendChild(item);
-                });
-                viewerScreen.appendChild(grid);
+                    </div>
+                    <div class="p-2.5 flex items-center justify-between bg-dark-card">
+                        <span class="text-[10px] text-slate-400 truncate max-w-[100px]">${item.date}</span>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="prepareEditFromUrl('${item.url}')" class="text-slate-400 hover:text-indigo-400 transition p-1" title="Retoucher">
+                                <i class="fa-solid fa-paintbrush text-xs"></i>
+                            </button>
+                            <button onclick="deleteAlbumItem('${item.id}')" class="text-slate-400 hover:text-red-400 transition p-1" title="Supprimer">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            updateAlbumBadge();
+        }
+
+        function updateAlbumBadge() {
+            const badge = document.getElementById('album-badge');
+            const count = persistentAlbum.length;
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
             }
         }
 
-        window.sendToRetouch = function(imgSrc) {
-            setSourceImage(imgSrc, "Photo générée");
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        window.downloadImage = function(imgSrc) {
+        function downloadSingle(url, filename) {
             const a = document.createElement('a');
-            a.href = imgSrc;
-            a.download = `aperture-studio-${Date.now()}.jpg`;
+            a.href = url;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            showToast("Image téléchargée.", "success");
+            showToast("Téléchargement réussi !");
         }
 
-        function saveToGallery(images) {
-            images.forEach(img => { state.gallery.unshift(img); });
-            if (state.gallery.length > 20) state.gallery = state.gallery.slice(0, 20);
-            localStorage.setItem('aperture_gallery', JSON.stringify(state.gallery));
-            updateGalleryCount();
-        }
-
-        function updateGalleryCount() {
-            galleryCountBadge.textContent = state.gallery.length;
-        }
-
-        document.getElementById('open-gallery-btn').addEventListener('click', () => {
-            if (state.gallery.length === 0) {
-                showToast("La galerie est vide.", "info");
-                return;
+        function downloadModalImage() {
+            if (currentModalItem) {
+                downloadSingle(currentModalItem.url, `mon-studio-hd-${Date.now()}.png`);
             }
-            displayResults(state.gallery);
-            showToast("Affichage de la galerie.", "info");
-        });
-
-        function showToast(message, type = "info") {
-            toastMessage.textContent = message;
-            statusToast.className = `toast ${type}`;
-            statusToast.style.display = 'flex';
-            setTimeout(() => { statusToast.style.display = 'none'; }, 4000);
         }
+
+        function openPreviewFromUrl(url, prompt) {
+            currentModalItem = { url: url, prompt: prompt, date: "A l'instant" };
+            document.getElementById('modal-img').src = url;
+            document.getElementById('modal-date').textContent = `« ${prompt} »`;
+            document.getElementById('modal-delete-btn').classList.add('hidden');
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function openPreviewById(id) {
+            const item = persistentAlbum.find(el => el.id === id);
+            if (!item) return;
+            currentModalItem = item;
+            document.getElementById('modal-img').src = item.url;
+            document.getElementById('modal-date').textContent = item.date;
+            document.getElementById('modal-delete-btn').classList.remove('hidden');
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function closePreview() {
+            document.getElementById('preview-modal').classList.add('hidden');
+            currentModalItem = null;
+        }
+
+        function deleteAlbumItem(id) {
+            persistentAlbum = persistentAlbum.filter(el => el.id !== id);
+            localStorage.setItem('mon_studio_persistent_album', JSON.stringify(persistentAlbum));
+            renderAlbum();
+            showToast("Image supprimée de l'album.");
+        }
+
+        function deleteFromModal() {
+            if (currentModalItem && currentModalItem.id) {
+                deleteAlbumItem(currentModalItem.id);
+                closePreview();
+            }
+        }
+
+        function clearAlbum() {
+            if (persistentAlbum.length === 0) return;
+            if (confirm("Voulez-vous vraiment vider tout l'album ?")) {
+                persistentAlbum = [];
+                localStorage.removeItem('mon_studio_persistent_album');
+                renderAlbum();
+                showToast("Album vidé avec succès.");
+            }
+        }
+
+        function showToast(message) {
+            const existing = document.getElementById('toast-notification');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'toast-notification';
+            toast.className = "fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700 text-white text-xs font-medium py-2.5 px-4 rounded-xl shadow-xl flex items-center space-x-2 transition-all duration-300";
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-blue-400"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        updateAlbumBadge();
     </script>
 </body>
 </html>
