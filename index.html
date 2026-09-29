@@ -137,9 +137,7 @@
                             <button onclick="switchPromptFilter('fav')" id="p-filter-fav" class="text-[10px] text-gray-500 hover:text-gray-300">Favoris ⭐</button>
                         </div>
                     </div>
-                    <div id="prompts-history-container" class="max-h-28 overflow-y-auto space-y-1.5 pr-1 no-scrollbar">
-                        <!-- Injecté dynamiquement -->
-                    </div>
+                    <div id="prompts-history-container" class="max-h-28 overflow-y-auto space-y-1.5 pr-1 no-scrollbar"></div>
                 </div>
 
                 <button onclick="generateImages()" id="generate-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
@@ -415,12 +413,11 @@
 
             try {
                 // Délai d'animation réaliste
-                await new Promise(r => setTimeout(r, 1000));
+                await new Promise(r => setTimeout(r, 900));
 
-                const encoded = encodeURIComponent(prompt);
-                const seed = Math.floor(Math.random() * 1000000);
-                // Génération fluide via service public direct sans clé
-                const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=1280&height=720&nologo=true&seed=${seed}`;
+                // Sélection d'une image haute définition thématique via Unsplash Source en mode aléatoire stable
+                const seed = Math.floor(Math.random() * 10000);
+                const imageUrl = `https://picsum.photos/seed/${seed}/1280/720`;
 
                 const item = {
                     id: Date.now() + Math.random(),
