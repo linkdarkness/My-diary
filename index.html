@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mon Studio</title>
-    <!-- Tailwind CSS pour un design moderne et responsive mobile -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome pour les icônes -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
@@ -31,7 +31,6 @@
             font-family: system-ui, -apple-system, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        /* Masquer la scrollbar tout en gardant le scroll fluide */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -52,7 +51,7 @@
             <h1 class="text-lg font-bold tracking-tight text-white">Mon Studio</h1>
         </div>
 
-        <!-- NAVIGATION PAR ICÔNES UNIQUEMENT -->
+        <!-- NAVIGATION PAR ICÔNES -->
         <nav class="flex items-center space-x-1 bg-dark-900 p-1 rounded-xl border border-dark-700">
             <button onclick="switchTab('generator')" id="nav-generator" class="w-10 h-10 rounded-lg flex items-center justify-center text-indigo-400 bg-dark-700 transition-all">
                 <i class="fa-solid fa-paintbrush text-base"></i>
@@ -221,7 +220,7 @@
             if (tabId === 'album') renderAlbum();
         }
 
-        async function generateImages() {
+        function generateImages() {
             const prompt = document.getElementById('prompt-input').value.trim();
             if (!prompt) {
                 alert("Veuillez saisir une description.");
@@ -235,18 +234,16 @@
             const resultsGrid = document.getElementById('results-grid');
             resultsGrid.innerHTML = '';
 
-            try {
-                // Génération de 4 images en parallèle via Pollinations.ai (gratuit, illimité, sans quota)
-                const promises = [];
-                for (let i = 0; i < 4; i++) {
-                    const seed = Math.floor(Math.random() * 1000000);
-                    // Format 16/9 forcé (1280x720)
-                    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + ", photorealistic, cinematic lighting, 8k resolution")}?width=1280&height=720&seed=${seed}&nologo=true`;
-                    promises.push(loadImageAsDataUrl(imageUrl));
-                }
+            // Génération directe des 4 URLs d'images 16:9
+            const imageUrls = [];
+            for (let i = 0; i < 4; i++) {
+                const seed = Math.floor(Math.random() * 1000000);
+                const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + ", photorealistic, cinematic lighting, 8k resolution")}?width=1280&height=720&seed=${seed}&nologo=true`;
+                imageUrls.push(url);
+            }
 
-                const imageUrls = await Promise.all(promises);
-
+            // Affichage immédiat pour éviter les blocages de chargement réseau
+            setTimeout(() => {
                 imageUrls.forEach(url => {
                     const item = {
                         id: Date.now() + Math.random(),
@@ -256,12 +253,11 @@
                         favorite: false
                     };
                     album.unshift(item);
-                    
-                    // Affichage dans les résultats récents
+
                     const card = document.createElement('div');
                     card.className = "relative rounded-xl overflow-hidden bg-dark-800 border border-dark-700 shadow-md aspect-video group";
                     card.innerHTML = `
-                        <img src="${url}" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
+                        <img src="${url}" loading="lazy" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
                         <div class="absolute bottom-2 right-2 flex space-x-1 bg-black/60 backdrop-blur-md p-1 rounded-lg">
                             <button onclick="toggleFavorite('${item.id}')" class="w-8 h-8 rounded-md flex items-center justify-center text-white hover:text-amber-400">
                                 <i class="${item.favorite ? 'fa-solid text-amber-400' : 'fa-regular'} fa-star"></i>
@@ -278,33 +274,10 @@
                 });
 
                 saveAlbum();
-                document.getElementById('results-container').classList.remove('hidden');
-            } catch (err) {
-                alert("Erreur lors de la génération. Veuillez réessayer.");
-            } finally {
                 document.getElementById('generate-btn').disabled = false;
                 document.getElementById('loading-container').classList.add('hidden');
-            }
-        }
-
-        // Utilitaire pour convertir l'image distante en base64 pour persistance locale
-        function loadImageAsDataUrl(url) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = 'Anonymous';
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    resolve(canvas.toDataURL('image/jpeg', 0.85));
-                };
-                img.onerror = function() {
-                    resolve(url); // Fallback sur l'URL directe si CORS bloque
-                };
-                img.src = url;
-            });
+                document.getElementById('results-container').classList.remove('hidden');
+            }, 800);
         }
 
         function replicateVariant(encodedPrompt) {
@@ -339,7 +312,7 @@
                 const card = document.createElement('div');
                 card.className = "relative rounded-xl overflow-hidden bg-dark-800 border border-dark-700 shadow-md aspect-video group";
                 card.innerHTML = `
-                    <img src="${item.url}" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
+                    <img src="${item.url}" loading="lazy" class="w-full h-full object-cover cursor-pointer" onclick="openModalById('${item.id}')">
                     <div class="absolute top-2 right-2">
                         <button onclick="toggleFavorite('${item.id}'); event.stopPropagation();" class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
                             <i class="${item.favorite ? 'fa-solid text-amber-400' : 'fa-regular'} fa-star text-xs"></i>
@@ -435,6 +408,7 @@
         function downloadImage(url) {
             const a = document.createElement('a');
             a.href = url;
+            a.target = '_blank';
             a.download = `mon-studio-${Date.now()}.jpg`;
             document.body.appendChild(a);
             a.click();
@@ -465,7 +439,6 @@
                 alert("Veuillez décrire les modifications souhaitées.");
                 return;
             }
-            // Redirection vers le générateur avec le prompt combiné
             document.getElementById('prompt-input').value = `Modification réaliste de l'image précédente: ${prompt}`;
             switchTab('generator');
             generateImages();
