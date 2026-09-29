@@ -1,1361 +1,156 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chroniques du Solitaire - Mobile RPG</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#05070b',
-                        cardBg: '#0f172a',
-                        cardBorder: '#1e293b',
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #05070b;
-            color: #f8fafc;
-            touch-action: manipulation;
-        }
-        .cinzel-font {
-            font-family: 'Cinzel', serif;
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 2px;
-        }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
-        }
-        .boss-glow {
-            animation: pulseGlow 2s infinite;
-        }
-        @keyframes mythicGlow {
-            0%, 100% { box-shadow: 0 0 8px rgba(236, 72, 153, 0.5); }
-            50% { box-shadow: 0 0 18px rgba(236, 72, 153, 0.9); }
-        }
-        .mythic-glow {
-            animation: mythicGlow 2s infinite;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon AI Girlfriend</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4effa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      width: 360px;
+      height: 550px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0,1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chat-header {
+      background: #e91e63;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .bot {
+      background-color: #f1f1f1;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .user {
+      background-color: #e91e63;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #eee;
+    }
+    .chat-input input {
+      flex: 1;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 20px;
+      outline: none;
+    }
+    .chat-input button {
+      background: #e91e63;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-left: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col select-none overflow-x-hidden pb-20">
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">❤️ Maya</div>
+  <div class="chat-messages" id="messages">
+    <div class="message bot">Coucou ! Comment s'est passée ta journée ? 💕</div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="userInput" placeholder="Écris un message..." onkeypress="handleKeyPress(event)">
+    <button onclick="sendMessage()">➔</button>
+  </div>
+</div>
+
+<script>
+  // Remplace par ta clé API (attention : ne pas publier cette clé en ligne)
+  const API_KEY = "TA_CLE_API_ICI";
+
+  // Prompt système définissant le rôle et la personnalité
+  const systemPrompt = "Tu es Maya, une petite amie attentionnée, douce et chaleureuse. Tu parles de manière naturelle, affectueuse et engageante, en utilisant parfois quelques émojis. Tu réponds toujours en français.";
+
+  let conversationHistory = [
+    { role: "system", content: systemPrompt },
+    { role: "assistant", content: "Coucou ! Comment s'est passée ta journée ? 💕" }
+  ];
+
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    appendMessage(text, 'user');
+    input.value = '';
+    conversationHistory.push({ role: "user", content: text });
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: conversationHistory
+        })
+      });
+
+      const data = await response.json();
+      const botReply = data.choices[0].message.content;
+
+      conversationHistory.push({ role: "assistant", content: botReply });
+      appendMessage(botReply, 'bot');
+    } catch (error) {
+      appendMessage("Désolée, j'ai eu un petit souci de connexion...", 'bot');
+      console.error(error);
+    }
+  }
+
+  function appendMessage(text, sender) {
+    const messagesDiv = document.getElementById('messages');
+    const msg = document.createElement('div');
+    msg.classList.add('message', sender);
+    msg.textContent = text;
+    messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function handleKeyPress(e) {
+    if (e.key === 'Enter') sendMessage();
+  }
+</script>
 
-    <!-- ÉCRAN DE SÉLECTION DE CLASSE -->
-    <div id="ecran-selection-classe" class="fixed inset-0 bg-[#05070b] z-50 flex flex-col p-4 overflow-y-auto">
-        <div class="max-w-md mx-auto w-full my-auto flex flex-col gap-4 py-6">
-            <div class="text-center">
-                <div class="w-14 h-14 rounded-2xl bg-amber-600/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3 shadow-lg">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <h1 class="cinzel-font text-xl font-bold text-amber-400">Chroniques du Solitaire</h1>
-                <p class="text-xs text-slate-400 mt-1">Choisissez votre classe pour commencer votre aventure</p>
-            </div>
-
-            <div class="mb-2">
-                <label class="block text-[11px] font-bold text-slate-300 mb-1">Nom du Héros</label>
-                <input type="text" id="input-creation-nom" value="Valen" class="w-full bg-slate-900 border border-slate-700 text-white text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-amber-500" />
-            </div>
-
-            <div class="grid grid-cols-1 gap-2.5" id="grille-classes-choix">
-                <!-- Rempli dynamiquement par JS -->
-            </div>
-
-            <button type="button" id="btn-valider-classe" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-bold text-sm shadow-xl mt-2 flex items-center justify-center gap-2 cursor-pointer">
-                <i class="fa-solid fa-play"></i> Commencer l'Aventure
-            </button>
-        </div>
-    </div>
-
-    <!-- HEADER -->
-    <header class="bg-cardBg border-b border-cardBorder px-3 py-2.5 sticky top-0 z-40 shadow-lg">
-        <div class="flex justify-between items-center gap-2">
-            <div class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-900/50 shrink-0">
-                    <i class="fa-solid fa-user-shield text-base" id="header-classe-icone"></i>
-                </div>
-                <div class="overflow-hidden">
-                    <h1 class="cinzel-font text-sm font-bold tracking-wider text-amber-400 truncate" id="header-titre-nom">Valen</h1>
-                    <p class="text-[10px] text-slate-400"><span id="header-classe-nom">Guerrier</span> • Étage <span id="header-etage">1</span></p>
-                </div>
-            </div>
-
-            <!-- Ressources -->
-            <div class="flex items-center gap-2.5 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-cardBorder text-xs">
-                <div class="flex items-center gap-1 text-amber-400 font-bold" title="Or">
-                    <i class="fa-solid fa-coins text-[11px]"></i>
-                    <span id="header-or">0</span>
-                </div>
-                <div class="flex items-center gap-1 text-purple-400 font-bold" title="Essence d'Âme">
-                    <i class="fa-solid fa-ghost text-[11px]"></i>
-                    <span id="header-ames">0</span>
-                </div>
-            </div>
-
-            <!-- Contrôles -->
-            <div class="flex items-center gap-1.5">
-                <button onclick="basculerPause()" id="pause-btn" class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow" aria-label="Pause">
-                    <i class="fa-solid fa-play" id="pause-icon"></i>
-                </button>
-                <button onclick="sauvegarderJeu()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center text-xs" aria-label="Sauvegarder">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-1 w-full max-w-md mx-auto p-3 flex flex-col gap-4">
-
-        <!-- ONGLET 1 : DONJON & COMBAT -->
-        <div id="tab-donjon" class="tab-content flex flex-col gap-3">
-            
-            <!-- Carte Biome & Progression -->
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-700/50 font-semibold" id="biome-nom">Crypte</span>
-                        <h2 class="cinzel-font text-base font-bold mt-1 text-white">
-                            Étage <span id="donjon-etage-num">1</span>
-                        </h2>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[10px] text-slate-400 block">Progression</span>
-                        <span class="text-xs font-bold text-amber-400" id="rencontre-compte">1 / 10</span>
-                    </div>
-                </div>
-
-                <!-- Barre de progression -->
-                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-cardBorder mb-3">
-                    <div id="etage-barre-progression" class="bg-gradient-to-r from-amber-600 to-yellow-500 h-full transition-all duration-300" style="width: 10%;"></div>
-                </div>
-
-                <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
-                    <button onclick="basculerAvancementAuto()" id="btn-auto-prog" class="px-3 py-1.5 rounded-lg font-semibold bg-amber-600 text-white shadow text-[11px] flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt"></i> Auto: ACTIF
-                    </button>
-                    <button onclick="avancerEtageManuel()" class="px-3 py-1.5 rounded-lg font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] flex items-center gap-1.5">
-                        <i class="fa-solid fa-forward-step"></i> Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Arène Active -->
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-xl flex flex-col justify-between min-h-[320px]" id="arene-box">
-                
-                <!-- Ennemi -->
-                <div id="ennemi-conteneur" class="flex flex-col items-center text-center w-full my-auto">
-                    <div id="ennemi-avatar-wrap" class="w-16 h-16 rounded-2xl bg-slate-900 border-2 border-red-900/60 flex items-center justify-center text-red-500 text-2xl mb-2 shadow-lg relative">
-                        <i class="fa-solid fa-skull" id="ennemi-icone"></i>
-                        <div class="absolute -top-2 -right-2 bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold" id="ennemi-niveau">Niv 1</div>
-                    </div>
-                    <h3 class="cinzel-font text-sm font-bold text-red-300" id="ennemi-nom">Squelette Errant</h3>
-                    <p class="text-[10px] text-slate-400 mb-2" id="ennemi-type-label">Monstre Standard</p>
-
-                    <!-- PV Ennemi -->
-                    <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800 relative mb-1">
-                        <div id="ennemi-pv-barre" class="bg-red-600 h-full transition-all duration-200" style="width: 100%;"></div>
-                        <div class="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white drop-shadow" id="ennemi-pv-texte">60 / 60</div>
-                    </div>
-                </div>
-
-                <!-- Événement Spécial -->
-                <div id="rencontre-speciale-box" class="hidden flex flex-col items-center text-center p-4 w-full my-auto">
-                    <div id="speciale-icone-wrap" class="w-16 h-16 rounded-2xl bg-amber-950/60 border-2 border-amber-500/60 flex items-center justify-center text-amber-400 text-2xl mb-3 shadow-lg animate-bounce">
-                        <i class="fa-solid fa-chest"></i>
-                    </div>
-                    <h3 class="cinzel-font text-base font-bold text-amber-300" id="speciale-titre">Coffre Mystérieux</h3>
-                    <p class="text-[11px] text-slate-300 my-1" id="speciale-desc">Un vieux coffre en bois.</p>
-                    <button onclick="resoudreRencontreSpeciale()" class="mt-2 px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-1.5">
-                        <i class="fa-solid fa-hand-sparkles"></i> Ouvrir
-                    </button>
-                </div>
-
-                <div class="my-3 border-t border-slate-800"></div>
-
-                <!-- Héros -->
-                <div class="w-full bg-slate-900/90 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <div id="hero-avatar-box" class="w-10 h-10 rounded-lg bg-amber-950/80 border border-amber-500/50 flex items-center justify-center text-amber-400 text-base shadow">
-                                <i class="fa-solid fa-user-shield" id="hero-avatar-icone"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-xs" id="hero-nom-affiche">Valen</h4>
-                                <span class="text-[9px] bg-amber-600/30 text-amber-300 px-1.5 py-0.5 rounded font-semibold" id="hero-niveau-affiche">Niv 1</span>
-                            </div>
-                        </div>
-                        <div class="text-right text-[10px] text-slate-400">
-                            Atq: <span class="text-white font-bold" id="hero-mini-atq">18</span> | Déf: <span class="text-white font-bold" id="hero-mini-def">10</span>
-                        </div>
-                    </div>
-
-                    <!-- Barres PV & Mana -->
-                    <div class="flex flex-col gap-1">
-                        <div class="flex justify-between text-[10px] text-slate-300">
-                            <span>PV</span>
-                            <span id="hero-pv-texte">120 / 120</span>
-                        </div>
-                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                            <div id="hero-pv-barre" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%;"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] text-slate-300 mt-0.5">
-                            <span>MANA</span>
-                            <span id="hero-mana-texte">50 / 50</span>
-                        </div>
-                        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
-                            <div id="hero-mana-barre" class="bg-blue-500 h-full transition-all duration-200" style="width: 100%;"></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Journal de Combat -->
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3 shadow-lg flex flex-col h-36">
-                <div class="flex justify-between items-center pb-1.5 border-b border-slate-800 mb-1.5 text-xs">
-                    <span class="font-bold text-slate-200 flex items-center gap-1.5">
-                        <i class="fa-solid fa-scroll text-amber-400"></i> Journal
-                    </span>
-                    <button onclick="effacerJournal()" class="text-[10px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-800">Effacer</button>
-                </div>
-                <div id="journal-combat" class="flex-1 overflow-y-auto flex flex-col gap-1 font-mono text-[11px] pr-1"></div>
-            </div>
-
-        </div>
-
-        <!-- ONGLET 2 : HÉROS & ÉQUIPEMENT -->
-        <div id="tab-heros" class="tab-content hidden flex flex-col gap-4">
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-xl flex flex-col gap-3">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="cinzel-font text-sm font-bold text-white">Équipement du Héros</h2>
-                        <span class="text-[10px] text-amber-400 font-semibold" id="label-set-bonus-actif">Set de classe : 0 / 7 pièces</span>
-                    </div>
-                    <button onclick="ouvrirChangementClasse()" class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg text-[10px] font-bold border border-slate-700">Changer de Classe</button>
-                </div>
-
-                <!-- Silhouette / Paper Doll Layout avec Icônes d'Emplacement -->
-                <div class="relative bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-center min-h-[300px]">
-                    
-                    <!-- Ligne 1 : Casque & Amulette -->
-                    <div class="w-full flex justify-between items-center px-6 mb-2">
-                        <div id="slot-casque" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('casque')">
-                            <i class="fa-solid fa-helmet-safety text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Casque</span>
-                        </div>
-                        <div id="slot-amulette" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('amulette')">
-                            <i class="fa-solid fa-gem text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Amulette</span>
-                        </div>
-                    </div>
-
-                    <!-- Ligne 2 : Arme, Silhouette centrale, Armure -->
-                    <div class="w-full flex justify-between items-center px-2 my-1">
-                        <div id="slot-arme" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('arme')">
-                            <i class="fa-solid fa-wand-magic-sparkles text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Arme</span>
-                        </div>
-
-                        <!-- Silhouette centrale -->
-                        <div class="flex flex-col items-center justify-center text-slate-700 my-auto py-2">
-                            <i class="fa-solid fa-user-ninja text-5xl opacity-40" id="silhouette-avatar-icone"></i>
-                            <span class="text-[10px] text-slate-500 font-bold mt-1 cinzel-font" id="silhouette-nom-classe">VALEN</span>
-                        </div>
-
-                        <div id="slot-armure" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('armure')">
-                            <i class="fa-solid fa-shirt text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Armure</span>
-                        </div>
-                    </div>
-
-                    <!-- Ligne 3 : Gants, Bottes, Anneau -->
-                    <div class="w-full flex justify-between items-center px-6 mt-2">
-                        <div id="slot-gants" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('gants')">
-                            <i class="fa-solid fa-mitten text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Gants</span>
-                        </div>
-                        <div id="slot-bottes" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('bottes')">
-                            <i class="fa-solid fa-shoe-prints text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Bottes</span>
-                        </div>
-                        <div id="slot-anneau" class="equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative" onclick="gererClicSlot('anneau')">
-                            <i class="fa-solid fa-ring text-slate-600 text-base mb-0.5"></i>
-                            <span class="text-[9px] text-slate-400 font-semibold truncate w-full">Anneau</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Fiche -->
-                <div class="grid grid-cols-3 gap-2 text-center text-[11px] bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                    <div><span class="text-slate-500 block text-[9px]">PV MAX</span><span class="font-bold text-white" id="stat-pv">120</span></div>
-                    <div><span class="text-slate-500 block text-[9px]">ATTAQUE</span><span class="font-bold text-white" id="stat-atq">18</span></div>
-                    <div><span class="text-slate-500 block text-[9px]">DÉFENSE</span><span class="font-bold text-white" id="stat-def">10</span></div>
-                    <div><span class="text-slate-500 block text-[9px]">MANA</span><span class="font-bold text-white" id="stat-mana">50</span></div>
-                    <div><span class="text-slate-500 block text-[9px]">VITESSE</span><span class="font-bold text-white" id="stat-vit">12</span></div>
-                    <div><span class="text-slate-500 block text-[9px]">CRITIQUE</span><span class="font-bold text-white" id="stat-crit">5%</span></div>
-                </div>
-            </div>
-
-            <!-- Réserve d'Inventaire -->
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-xl">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="cinzel-font text-xs font-bold text-white flex items-center gap-1.5">
-                        <i class="fa-solid fa-box-archive text-amber-400"></i> Réserve
-                    </h3>
-                    <span class="text-[10px] text-slate-400" id="inventaire-compte-label">0 / 24</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2 min-h-[140px] bg-slate-900/60 p-2.5 rounded-xl border border-slate-800" id="inventaire-grille"></div>
-            </div>
-        </div>
-
-        <!-- ONGLET 3 : COMPÉTENCES -->
-        <div id="tab-competences" class="tab-content hidden flex flex-col gap-4">
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-xl">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="cinzel-font text-sm font-bold text-white">Arbre de Compétences</h2>
-                    <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-[11px] font-bold text-amber-400">
-                        Points : <span id="points-competences-val">0</span>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-3" id="competences-grille"></div>
-            </div>
-        </div>
-
-        <!-- ONGLET 4 : VILLAGE & SANCTUAIRE -->
-        <div id="tab-village" class="tab-content hidden flex flex-col gap-4">
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-xl">
-                <h2 class="cinzel-font text-sm font-bold text-white mb-1">Sanctuaire & Village</h2>
-                <p class="text-[10px] text-slate-400 mb-3">Améliorez les infrastructures pour des bonus permanents.</p>
-                <div class="flex flex-col gap-3" id="village-batiments-grille"></div>
-            </div>
-        </div>
-
-        <!-- ONGLET 5 : ASCENSION DIVINE -->
-        <div id="tab-ascension" class="tab-content hidden flex flex-col gap-4">
-            <div class="bg-cardBg border border-cardBorder rounded-2xl p-3.5 shadow-xl relative overflow-hidden">
-                <h2 class="cinzel-font text-sm font-bold text-purple-300 mb-1">Ascension Divine</h2>
-                <p class="text-[10px] text-slate-400 mb-3">Transcendez votre héros pour obtenir de l'<span class="text-purple-400 font-bold">Essence d'Âme</span>.</p>
-
-                <div class="bg-slate-900/90 p-3 rounded-xl border border-purple-900/50 flex justify-between items-center mb-4">
-                    <div>
-                        <span class="text-[10px] text-slate-400 block">Récoltable</span>
-                        <span class="text-xl font-bold text-purple-400 cinzel-font" id="ames-en-attente-val">0</span>
-                    </div>
-                    <button onclick="realiserAscension()" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shadow transition text-xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-skull"></i> S'élever
-                    </button>
-                </div>
-
-                <h3 class="cinzel-font text-xs font-bold text-white mb-2">Faveurs Divines</h3>
-                <div class="flex flex-col gap-3" id="ascension-faveurs-grille"></div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- MODALE DE COMPARAISON D'ÉQUIPEMENT -->
-    <div id="modale-comparaison" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 w-full max-w-sm shadow-2xl flex flex-col gap-3">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="cinzel-font text-sm font-bold text-amber-400" id="modale-titre">Comparaison d'Équipement</h3>
-                <button onclick="fermerModaleComparaison()" class="text-slate-400 hover:text-white px-2 py-1 text-sm font-bold">✕</button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 text-center text-xs my-1">
-                <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 block mb-1">Actuellement Équipé</span>
-                    <div id="modale-actuel-nom" class="font-bold text-slate-300 text-[11px] mb-2">Aucun</div>
-                    <div id="modale-actuel-stats" class="flex flex-col gap-1 text-[11px]"></div>
-                </div>
-                <div class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40">
-                    <span class="text-[10px] text-amber-400 block mb-1">Nouvel Objet</span>
-                    <div id="modale-nouveau-nom" class="font-bold text-amber-300 text-[11px] mb-2">Objet</div>
-                    <div id="modale-nouveau-stats" class="flex flex-col gap-1 text-[11px]"></div>
-                </div>
-            </div>
-
-            <div class="flex gap-2 mt-2">
-                <button onclick="fermerModaleComparaison()" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">Annuler</button>
-                <button id="modale-btn-equiper" onclick="confirmerEquiper()" class="flex-1 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow">Équiper</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation du Bas Mobile -->
-    <nav class="bg-cardBg border-t border-cardBorder fixed bottom-0 left-0 right-0 z-40 px-2 py-2 shadow-2xl">
-        <div class="max-w-md mx-auto grid grid-cols-5 gap-1">
-            <button onclick="changerOnglet('donjon')" id="tab-btn-donjon" class="tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition bg-amber-600 text-white shadow">
-                <i class="fa-solid fa-dungeon text-sm mb-0.5"></i>
-                <span>Donjon</span>
-            </button>
-            <button onclick="changerOnglet('heros')" id="tab-btn-heros" class="tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition text-slate-400 hover:bg-slate-800">
-                <i class="fa-solid fa-user-shield text-sm mb-0.5"></i>
-                <span>Héros</span>
-            </button>
-            <button onclick="changerOnglet('competences')" id="tab-btn-competences" class="tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition text-slate-400 hover:bg-slate-800">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm mb-0.5"></i>
-                <span>Sorts</span>
-            </button>
-            <button onclick="changerOnglet('village')" id="tab-btn-village" class="tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition text-slate-400 hover:bg-slate-800">
-                <i class="fa-solid fa-house-chimney text-sm mb-0.5"></i>
-                <span>Village</span>
-            </button>
-            <button onclick="changerOnglet('ascension')" id="tab-btn-ascension" class="tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition text-slate-400 hover:bg-slate-800">
-                <i class="fa-solid fa-angles-up text-sm mb-0.5"></i>
-                <span>Prestige</span>
-            </button>
-        </div>
-    </nav>
-
-    <script>
-        const CLASSES_DATA = {
-            voleur: {
-                nom: "Voleur",
-                icone: "fa-user-ninja",
-                desc: "Agile et mortel, spécialisé dans les coups critiques et l'esquive.",
-                stats: { pv: 100, atq: 20, def: 8, vit: 18, crit: 15 },
-                setNom: "Set de l'Ombre Silencieuse",
-                setBonus: "+20% Coups Critiques et +15% Vitesse."
-            },
-            rodeur: {
-                nom: "Rôdeur",
-                icone: "fa-hiking",
-                desc: "Traqueur des bois endurant, équilibré entre attaque et survie.",
-                stats: { pv: 130, atq: 17, def: 11, vit: 14, crit: 8 },
-                setNom: "Set du Traqueur Sauvage",
-                setBonus: "+15% PV Max et +10% Attaque."
-            },
-            archer: {
-                nom: "Archer",
-                icone: "fa-bullseye",
-                desc: "Maître du tir à distance, inflige des dégâts constants et précis.",
-                stats: { pv: 110, atq: 22, def: 7, vit: 16, crit: 12 },
-                setNom: "Set de l'Œil de Faucon",
-                setBonus: "+25% Dégâts d'Attaque à distance."
-            },
-            guerrier: {
-                nom: "Guerrier",
-                icone: "fa-shield-halved",
-                desc: "Combattant en armure lourde, rempart infranchissable du groupe.",
-                stats: { pv: 150, atq: 16, def: 15, vit: 10, crit: 5 },
-                setNom: "Set de la Garde Royale",
-                setBonus: "+30% Défense et +15% PV Max."
-            },
-            barbare: {
-                nom: "Barbare",
-                icone: "fa-axe-battle",
-                desc: "Force brute destructrice qui écrase ses ennemis avec rage.",
-                stats: { pv: 160, atq: 24, def: 9, vit: 11, crit: 10 },
-                setNom: "Set du Berserker en Fureur",
-                setBonus: "+35% Attaque et +10% Critique."
-            },
-            moine: {
-                nom: "Moine",
-                icone: "fa-hand-fist",
-                desc: "Ascète discipliné combinant vitesse fulgurante et résilience spirituelle.",
-                stats: { pv: 125, atq: 17, def: 12, vit: 17, crit: 7 },
-                setNom: "Set de l'Esprit Éveillé",
-                setBonus: "+20% Vitesse et Régénération de Mana accrue."
-            },
-            magicien: {
-                nom: "Magicien",
-                icone: "fa-hat-wizard",
-                desc: "Erudit des arcanes déchaînant des sorts destructeurs surpuissants.",
-                stats: { pv: 90, atq: 26, def: 6, vit: 13, crit: 10 },
-                setNom: "Set des Arcanes Célestes",
-                setBonus: "+30% Mana Max et +25% Puissance des Sorts."
-            },
-            necromancien: {
-                nom: "Nécromancien",
-                icone: "fa-skull-crossbones",
-                desc: "Manege les énergies obscures pour drainer la vie de ses adversaires.",
-                stats: { pv: 100, atq: 23, def: 7, vit: 12, crit: 8 },
-                setNom: "Set du Seigneur des Tombes",
-                setBonus: "Vol de vie de 10% sur chaque attaque."
-            },
-            druide: {
-                nom: "Druide",
-                icone: "fa-leaf",
-                desc: "Gardien de la nature en harmonie avec les forces de régénération.",
-                stats: { pv: 140, atq: 16, def: 12, vit: 12, crit: 6 },
-                setNom: "Set du Gardien Sylvestre",
-                setBonus: "+20% PV Max et Régénération passive de PV."
-            }
-        };
-
-        let etatJeu = {
-            classeChoisie: null,
-            or: 150,
-            ames: 0,
-            etage: 1,
-            etageMax: 1,
-            indiceRencontre: 1,
-            avancementAuto: true,
-            estEnPause: false,
-            hero: {
-                nom: "Valen",
-                niveau: 1,
-                xp: 0,
-                xpRequis: 100,
-                pointsCompetences: 0,
-                pvMax: 120,
-                pv: 120,
-                manaMax: 50,
-                mana: 50,
-                atq: 18,
-                def: 10,
-                vit: 12,
-                crit: 5,
-                equipement: { arme: null, armure: null, casque: null, gants: null, bottes: null, anneau: null, amulette: null }
-            },
-            inventaire: [],
-            competences: { frappePuissante: 0, guerisonDivine: 0, fureurBerzerk: 0, auraSacre: 0 },
-            village: { forge: 0, sanctuaire: 0, marche: 0, academie: 0 },
-            faveurs: { attaqueBoucle: 0, santeBoucle: 0, orBoucle: 0, ameBoucle: 0 }
-        };
-
-        const BIOMES = [
-            { etageMax: 5, nom: "Crypte", desc: "Catacombes humides." },
-            { etageMax: 15, nom: "Cavernes", desc: "Tunnels sombres et venimeux." },
-            { etageMax: 30, nom: "Forge Infernale", desc: "Chambres ardentes." },
-            { etageMax: 50, nom: "Flèche Céleste", desc: "Tour colossale." },
-            { etageMax: 999, nom: "L'Abysse", desc: "Frontière ultime." }
-        ];
-
-        const RARETES = {
-            commun: { nom: "Commun", couleur: "text-slate-300", bordure: "border-slate-600", fond: "bg-slate-800/50", mult: 1.0 },
-            inhabituel: { nom: "Inhabituel", couleur: "text-emerald-400", bordure: "border-emerald-500/60", fond: "bg-emerald-950/40", mult: 1.3 },
-            rare: { nom: "Rare", couleur: "text-blue-400", bordure: "border-blue-500/60", fond: "bg-blue-950/40", mult: 1.7 },
-            epique: { nom: "Épique", couleur: "text-purple-400", bordure: "border-purple-500/60", fond: "bg-purple-950/40", mult: 2.3 },
-            legendaire: { nom: "Légendaire", couleur: "text-amber-400", bordure: "border-amber-500/60", fond: "bg-amber-950/40", mult: 3.2 },
-            mythique: { nom: "Mythique", couleur: "text-pink-400", bordure: "border-pink-500/80", fond: "bg-pink-950/50", mult: 4.5 }
-        };
-
-        const ICONES_EMPLACEMENT = {
-            casque: 'fa-helmet-safety',
-            amulette: 'fa-gem',
-            arme: 'fa-wand-magic-sparkles',
-            armure: 'fa-shirt',
-            gants: 'fa-mitten',
-            bottes: 'fa-shoe-prints',
-            anneau: 'fa-ring'
-        };
-
-        const NOMS_EMPLACEMENT = {
-            casque: 'Casque',
-            amulette: 'Amulette',
-            arme: 'Arme',
-            armure: 'Armure',
-            gants: 'Gants',
-            bottes: 'Bottes',
-            anneau: 'Anneau'
-        };
-
-        const COMPETENCES_DATA = {
-            frappePuissante: { nom: "Frappe Dévastatrice", desc: "Inflige 180% d'attaque.", maxNiveau: 5, icone: "fa-hammer" },
-            guerisonDivine: { nom: "Guérison Sacrée", desc: "Restaure 40% PV max.", maxNiveau: 5, icone: "fa-hand-holding-medical" },
-            fureurBerzerk: { nom: "Fureur Guerrière", desc: "+15% Attaque passive par rang.", maxNiveau: 5, icone: "fa-fire-flame-curved" },
-            auraSacre: { nom: "Aura de Résilience", desc: "+12% Défense passive par rang.", maxNiveau: 5, icone: "fa-shield-heart" }
-        };
-
-        let ennemiActuel = null;
-        let donneeRencontreSpeciale = null;
-        let chronoCombat = 0;
-        let idItemEnCoursSelection = null;
-        let classeSelectionneeTmp = 'guerrier';
-
-        window.addEventListener('DOMContentLoaded', () => {
-            chargerJeu();
-            peuplerEcranSelectionClasse();
-
-            const btnValider = document.getElementById('btn-valider-classe');
-            if (btnValider) {
-                btnValider.addEventListener('click', validerSelectionClasse);
-            }
-
-            if (!etatJeu.classeChoisie) {
-                document.getElementById('ecran-selection-classe').classList.remove('hidden');
-            } else {
-                document.getElementById('ecran-selection-classe').classList.add('hidden');
-                document.getElementById('input-creation-nom').value = etatJeu.hero.nom;
-            }
-
-            rendreTout();
-            setInterval(boucleJeu, 200);
-            setInterval(sauvegarderJeu, 30000);
-        });
-
-        function peuplerEcranSelectionClasse() {
-            const grille = document.getElementById('grille-classes-choix');
-            grille.innerHTML = '';
-
-            Object.keys(CLASSES_DATA).forEach(cle => {
-                const c = CLASSES_DATA[cle];
-                const estSel = (classeSelectionneeTmp === cle);
-                const div = document.createElement('div');
-                div.className = `p-3 rounded-2xl border cursor-pointer transition flex items-center gap-3 ${estSel ? 'bg-amber-950/60 border-amber-500 shadow-lg' : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'}`;
-                div.onclick = () => { classeSelectionneeTmp = cle; peuplerEcranSelectionClasse(); };
-                div.innerHTML = `
-                    <div class="w-11 h-11 rounded-xl bg-slate-950 border border-amber-500/40 flex items-center justify-center text-amber-400 text-lg shrink-0">
-                        <i class="fa-solid ${c.icone}"></i>
-                    </div>
-                    <div class="flex-1 overflow-hidden">
-                        <h3 class="cinzel-font text-xs font-bold text-white">${c.nom}</h3>
-                        <p class="text-[10px] text-slate-400 truncate">${c.desc}</p>
-                        <span class="text-[9px] text-amber-400 font-semibold block mt-0.5">Set : ${c.setNom}</span>
-                    </div>
-                    <div class="w-5 h-5 rounded-full border-2 ${estSel ? 'border-amber-500 bg-amber-500' : 'border-slate-700'} flex items-center justify-center text-[10px] text-slate-950 font-bold">
-                        ${estSel ? '✓' : ''}
-                    </div>
-                `;
-                grille.appendChild(div);
-            });
-        }
-
-        function validerSelectionClasse() {
-            const nomSaisi = document.getElementById('input-creation-nom').value.trim() || "Valen";
-            etatJeu.classeChoisie = classeSelectionneeTmp;
-            etatJeu.hero.nom = nomSaisi;
-
-            const cData = CLASSES_DATA[etatJeu.classeChoisie];
-            etatJeu.hero.pvMax = cData.stats.pv;
-            etatJeu.hero.pv = cData.stats.pv;
-            etatJeu.hero.atq = cData.stats.atq;
-            etatJeu.hero.def = cData.stats.def;
-            etatJeu.hero.vit = cData.stats.vit;
-            etatJeu.hero.crit = cData.stats.crit;
-            etatJeu.hero.manaMax = 50;
-            etatJeu.hero.mana = 50;
-            etatJeu.hero.equipement = { arme: null, armure: null, casque: null, gants: null, bottes: null, anneau: null, amulette: null };
-
-            document.getElementById('ecran-selection-classe').classList.add('hidden');
-            ajouterJournal(`🎉 Bienvenue ${nomSaisi} le ${cData.nom} !`, "text-amber-400 font-bold");
-            recalculerStats();
-            rendreTout();
-            sauvegarderJeu();
-        }
-
-        function ouvrirChangementClasse() {
-            classeSelectionneeTmp = etatJeu.classeChoisie || 'guerrier';
-            peuplerEcranSelectionClasse();
-            document.getElementById('ecran-selection-classe').classList.remove('hidden');
-        }
-
-        function sauvegarderJeu() {
-            localStorage.setItem('idle_roguelike_classes_fr', JSON.stringify(etatJeu));
-        }
-
-        function chargerJeu() {
-            const s = localStorage.getItem('idle_roguelike_classes_fr');
-            if (s) {
-                try {
-                    etatJeu = Object.assign({}, etatJeu, JSON.parse(s));
-                    if (!etatJeu.hero.equipement) {
-                        etatJeu.hero.equipement = { arme: null, armure: null, casque: null, gants: null, bottes: null, anneau: null, amulette: null };
-                    }
-                } catch(e) { console.error(e); }
-            }
-            if (!ennemiActuel) faireAppaitreEnnemi();
-        }
-
-        function changerOnglet(id) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition text-slate-400 hover:bg-slate-800";
-            });
-
-            document.getElementById('tab-' + id).classList.remove('hidden');
-            const actif = document.getElementById('tab-btn-' + id);
-            actif.className = "tab-btn py-2 rounded-xl flex flex-col items-center justify-center text-[10px] font-medium transition bg-amber-600 text-white shadow";
-        }
-
-        function basculerPause() {
-            etatJeu.estEnPause = !etatJeu.estEnPause;
-            const btn = document.getElementById('pause-btn');
-            btn.className = etatJeu.estEnPause ? "w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center text-xs shadow" : "w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow";
-            document.getElementById('pause-icon').className = etatJeu.estEnPause ? "fa-solid fa-play" : "fa-solid fa-pause";
-        }
-
-        function basculerAvancementAuto() {
-            etatJeu.avancementAuto = !etatJeu.avancementAuto;
-            const btn = document.getElementById('btn-auto-prog');
-            btn.className = etatJeu.avancementAuto ? "px-3 py-1.5 rounded-lg font-semibold bg-amber-600 text-white shadow text-[11px] flex items-center gap-1.5" : "px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 text-[11px] flex items-center gap-1.5";
-            btn.innerHTML = etatJeu.avancementAuto ? '<i class="fa-solid fa-bolt"></i> Auto: ACTIF' : '<i class="fa-solid fa-bolt-slash"></i> Auto: INACTIF';
-        }
-
-        function avancerEtageManuel() {
-            etatJeu.etage++;
-            etatJeu.indiceRencontre = 1;
-            if (etatJeu.etage > etatJeu.etageMax) etatJeu.etageMax = etatJeu.etage;
-            faireAppaitreEnnemi();
-            ajouterJournal(`⏩ Descente manuelle : Étage ${etatJeu.etage}`, "text-blue-400 font-bold");
-        }
-
-        function faireAppaitreEnnemi() {
-            const estBoss = (etatJeu.indiceRencontre >= 10);
-            const etage = etatJeu.etage;
-
-            if (estBoss) {
-                const bNoms = ["Malakor", "Arachne", "Ignis", "Xylar", "Dragon Ancien"];
-                const bNom = bNoms[Math.min(Math.floor(etage / 10), bNoms.length - 1)];
-                ennemiActuel = {
-                    nom: bNom,
-                    estBoss: true,
-                    niveau: etage,
-                    pvMax: Math.floor(220 * Math.pow(1.35, etage)),
-                    pv: Math.floor(220 * Math.pow(1.35, etage)),
-                    atq: Math.floor(20 * Math.pow(1.25, etage)),
-                    def: Math.floor(9 * Math.pow(1.2, etage)),
-                    icone: "fa-dragon",
-                    type: "Boss"
-                };
-                ajouterJournal(`⚠️ BOSS : ${bNom} apparaît !`, "text-red-400 font-bold");
-            } else if (etatJeu.indiceRencontre === 4 || etatJeu.indiceRencontre === 8) {
-                ennemiActuel = null;
-                donneeRencontreSpeciale = Math.random() > 0.5 ? 'coffre' : 'sanctuaire';
-                return;
-            } else {
-                donneeRencontreSpeciale = null;
-                const mTypes = [
-                    { nom: "Squelette", icone: "fa-skull" },
-                    { nom: "Gobelin", icone: "fa-ghost" },
-                    { nom: "Chauve-souris", icone: "fa-crow" },
-                    { nom: "Vase", icone: "fa-droplet" }
-                ];
-                const mob = mTypes[Math.floor(Math.random() * mTypes.length)];
-                const pv = Math.floor(40 * Math.pow(1.28, etage));
-                ennemiActuel = {
-                    nom: mob.nom,
-                    estBoss: false,
-                    niveau: etage,
-                    pvMax: pv,
-                    pv: pv,
-                    atq: Math.floor(7 * Math.pow(1.2, etage)),
-                    def: Math.floor(2 * Math.pow(1.15, etage)),
-                    icone: mob.icone,
-                    type: "Standard"
-                };
-            }
-        }
-
-        function boucleJeu() {
-            if (etatJeu.estEnPause || !etatJeu.classeChoisie) return;
-
-            const boxEnnemi = document.getElementById('ennemi-conteneur');
-            const boxSpeciale = document.getElementById('rencontre-speciale-box');
-
-            if (donneeRencontreSpeciale) {
-                boxEnnemi.classList.add('hidden');
-                boxSpeciale.classList.remove('hidden');
-                if (donneeRencontreSpeciale === 'coffre') {
-                    document.getElementById('speciale-titre').innerText = "Coffre Mystérieux";
-                    document.getElementById('speciale-desc').innerText = "Un coffre aux trésors verrouillé.";
-                    document.getElementById('speciale-icone-wrap').innerHTML = '<i class="fa-solid fa-chest"></i>';
-                } else {
-                    document.getElementById('speciale-titre').innerText = "Autel Sacré";
-                    document.getElementById('speciale-desc').innerText = "Un autel purifiant.";
-                    document.getElementById('speciale-icone-wrap').innerHTML = '<i class="fa-solid fa-place-of-worship"></i>';
-                }
-                rendreTout();
-                return;
-            } else {
-                boxEnnemi.classList.remove('hidden');
-                boxSpeciale.classList.add('hidden');
-            }
-
-            if (!ennemiActuel) {
-                faireAppaitreEnnemi();
-                return;
-            }
-
-            if (etatJeu.hero.mana < etatJeu.hero.manaMax) {
-                etatJeu.hero.mana = Math.min(etatJeu.hero.manaMax, etatJeu.hero.mana + 1);
-            }
-
-            chronoCombat++;
-            if (chronoCombat >= 5) {
-                chronoCombat = 0;
-                executerTourCombat();
-            }
-
-            rendreTout();
-        }
-
-        function executerTourCombat() {
-            if (!ennemiActuel) return;
-            const hero = etatJeu.hero;
-
-            if (hero.pv <= 0) {
-                ajouterJournal(`💀 ${hero.nom} vaincu ! Repli vers l'étage 1.`, "text-red-500 font-bold");
-                etatJeu.etage = Math.max(1, etatJeu.etage - 2);
-                etatJeu.indiceRencontre = 1;
-                hero.pv = hero.pvMax;
-                hero.mana = hero.manaMax;
-                ennemiActuel = null;
-                return;
-            }
-
-            let actionFaite = false;
-            const lSoin = etatJeu.competences.guerisonDivine;
-            const lFrappe = etatJeu.competences.frappePuissante;
-
-            if (lSoin > 0 && hero.pv < hero.pvMax * 0.5 && hero.mana >= 25) {
-                hero.mana -= 25;
-                const soin = Math.floor(hero.pvMax * (0.3 + (lSoin * 0.1)));
-                hero.pv = Math.min(hero.pvMax, hero.pv + soin);
-                ajouterJournal(`✨ Guérison (+${soin} PV)`, "text-emerald-400 font-bold");
-                actionFaite = true;
-            } else if (lFrappe > 0 && hero.mana >= 15 && Math.random() < 0.4) {
-                hero.mana -= 15;
-                const atqTot = hero.atq * (1 + (etatJeu.faveurs.attaqueBoucle * 0.1) + (etatJeu.competences.fureurBerzerk * 0.15));
-                const deg = Math.max(1, Math.floor((atqTot * (1.5 + (lFrappe * 0.2))) - (ennemiActuel.def * 0.4)));
-                ennemiActuel.pv -= deg;
-                
-                if (compterSetEquipe() >= 4 && etatJeu.classeChoisie === 'necromancien') {
-                    const vol = Math.floor(deg * 0.1);
-                    hero.pv = Math.min(hero.pvMax, hero.pv + vol);
-                }
-
-                ajouterJournal(`🔥 Frappe critique (${deg})`, "text-amber-400 font-bold");
-                actionFaite = true;
-            }
-
-            if (!actionFaite) {
-                const atqTot = hero.atq * (1 + (etatJeu.faveurs.attaqueBoucle * 0.1) + (etatJeu.competences.fureurBerzerk * 0.15));
-                const degBrut = Math.max(1, Math.floor(atqTot - (ennemiActuel.def * 0.5)));
-                const crit = Math.random() * 100 < hero.crit;
-                const degFinal = crit ? Math.floor(degBrut * 1.75) : degBrut;
-                ennemiActuel.pv -= degFinal;
-
-                if (compterSetEquipe() >= 4 && etatJeu.classeChoisie === 'necromancien') {
-                    const vol = Math.floor(degFinal * 0.1);
-                    hero.pv = Math.min(hero.pvMax, hero.pv + vol);
-                }
-
-                ajouterJournal(`⚔️ Attaque (${degFinal})`, "text-slate-300");
-            }
-
-            if (ennemiActuel.pv <= 0) {
-                gererVictoire();
-                return;
-            }
-
-            const defTot = hero.def * (1 + (etatJeu.competences.auraSacre * 0.12));
-            const degMob = Math.max(1, ennemiActuel.atq - Math.floor(defTot * 0.6));
-            hero.pv = Math.max(0, hero.pv - degMob);
-            ajouterJournal(`💥 Reçu ${degMob} dégâts`, "text-red-400");
-        }
-
-        function gererVictoire() {
-            const boss = ennemiActuel.estBoss;
-            const or = Math.floor((12 + (etatJeu.etage * 6)) * (1 + (etatJeu.faveurs.orBoucle * 0.15)));
-            etatJeu.or += or;
-            etatJeu.stats = etatJeu.stats || { tues: 0 };
-            etatJeu.stats.tues = (etatJeu.stats.tues || 0) + 1;
-
-            ajouterJournal(`🎉 Victoire ! +${or} Or`, "text-emerald-400 font-bold");
-
-            const xp = 35 + (etatJeu.etage * 10);
-            const hero = etatJeu.hero;
-            hero.xp += xp;
-
-            if (hero.xp >= hero.xpRequis) {
-                hero.xp -= hero.xpRequis;
-                hero.niveau++;
-                hero.pointsCompetences++;
-                hero.pvMax += 20;
-                hero.pv = hero.pvMax;
-                hero.manaMax += 8;
-                hero.mana = hero.manaMax;
-                hero.atq += 5;
-                hero.def += 3;
-                hero.xpRequis = Math.floor(hero.xpRequis * 1.3);
-                ajouterJournal(`⭐ Niveau ${hero.niveau} atteint !`, "text-amber-400 font-bold");
-            }
-
-            if (Math.random() < 0.4 || boss) {
-                lacherEquipement(boss ? 'epique' : null);
-            }
-
-            if (boss) {
-                etatJeu.ames += 4 * etatJeu.etage;
-            }
-
-            etatJeu.indiceRencontre++;
-            if (etatJeu.indiceRencontre > 10) {
-                etatJeu.indiceRencontre = 1;
-                etatJeu.etage++;
-                if (etatJeu.etage > etatJeu.etageMax) etatJeu.etageMax = etatJeu.etage;
-            }
-            ennemiActuel = null;
-        }
-
-        function resoudreRencontreSpeciale() {
-            if (donneeRencontreSpeciale === 'coffre') {
-                const or = 50 * etatJeu.etage;
-                etatJeu.or += or;
-                ajouterJournal(`✨ Coffre ouvert : +${or} Or !`, "text-amber-400 font-bold");
-                lacherEquipement('rare');
-            } else {
-                ajouterJournal(`✨ Autel purifié : PV et Mana restaurés.`, "text-purple-400 font-bold");
-                etatJeu.hero.pv = etatJeu.hero.pvMax;
-                etatJeu.hero.mana = etatJeu.hero.manaMax;
-            }
-            donneeRencontreSpeciale = null;
-            etatJeu.indiceRencontre++;
-            if (etatJeu.indiceRencontre > 10) {
-                etatJeu.indiceRencontre = 1;
-                etatJeu.etage++;
-            }
-        }
-
-        function lacherEquipement(forceR = null) {
-            if (etatJeu.inventaire.length >= 24) return;
-            const emps = ['arme', 'armure', 'casque', 'gants', 'bottes', 'anneau', 'amulette'];
-            const emp = emps[Math.floor(Math.random() * emps.length)];
-            const clesR = ['commun', 'inhabituel', 'rare', 'epique', 'legendaire', 'mythique'];
-            let poids = [50, 25, 15, 7, 2, 1];
-            if (forceR === 'epique') poids = [0, 0, 10, 60, 25, 5];
-
-            let r = Math.random() * 100, cum = 0, choix = 'commun';
-            for (let i = 0; i < clesR.length; i++) {
-                cum += poids[i];
-                if (r <= cum) { choix = clesR[i]; break; }
-            }
-
-            const rData = RARETES[choix];
-            const mult = rData.mult * (1 + (etatJeu.village.forge * 0.1)) * etatJeu.etage;
-            const cData = CLASSES_DATA[etatJeu.classeChoisie];
-
-            let estSetClass = (choix === 'legendaire' && Math.random() < 0.4) || (Math.random() < 0.08);
-            if (estSetClass) choix = 'legendaire';
-
-            const objet = {
-                id: Date.now() + Math.random(),
-                emplacement: emp,
-                rarete: choix,
-                estSet: estSetClass,
-                nom: estSetClass ? `[${cData.nom}] ${NOMS_EMPLACEMENT[emp]}` : `${NOMS_EMPLACEMENT[emp]} ${rData.nom}`,
-                stats: {
-                    atq: emp === 'arme' ? Math.floor(10 * mult) : (Math.random() > 0.7 ? Math.floor(3 * mult) : 0),
-                    def: (emp === 'armure' || emp === 'casque' || emp === 'gants' || emp === 'bottes') ? Math.floor(6 * mult) : (Math.random() > 0.7 ? Math.floor(3 * mult) : 0),
-                    pv: (emp === 'anneau' || emp === 'amulette') ? Math.floor(16 * mult) : (Math.random() > 0.7 ? Math.floor(8 * mult) : 0)
-                }
-            };
-            etatJeu.inventaire.push(objet);
-            ajouterJournal(`🎁 Butin : [${rData.nom}] ${objet.nom}`, rData.couleur);
-        }
-
-        function compterSetEquipe() {
-            let cpt = 0;
-            Object.values(etatJeu.hero.equipement).forEach(eq => {
-                if (eq && eq.estSet) cpt++;
-            });
-            return cpt;
-        }
-
-        function rendreTout() {
-            const cData = CLASSES_DATA[etatJeu.classeChoisie || 'guerrier'];
-            document.getElementById('header-classe-nom').innerText = cData.nom;
-            document.getElementById('header-classe-icone').className = `fa-solid ${cData.icone} text-base`;
-            document.getElementById('header-titre-nom').innerText = etatJeu.hero.nom;
-            document.getElementById('silhouette-nom-classe').innerText = cData.nom.toUpperCase();
-            document.getElementById('silhouette-avatar-icone').className = `fa-solid ${cData.icone} text-5xl opacity-40`;
-
-            document.getElementById('header-or').innerText = etatJeu.or;
-            document.getElementById('header-ames').innerText = etatJeu.ames;
-            document.getElementById('header-etage').innerText = etatJeu.etage;
-            document.getElementById('donjon-etage-num').innerText = etatJeu.etage;
-            document.getElementById('rencontre-compte').innerText = `${etatJeu.indiceRencontre} / 10`;
-            document.getElementById('etage-barre-progression').style.width = `${(etatJeu.indiceRencontre / 10) * 100}%`;
-
-            const b = BIOMES.find(x => etatJeu.etage <= x.etageMax) || BIOMES[BIOMES.length - 1];
-            document.getElementById('biome-nom').innerText = b.nom;
-
-            if (ennemiActuel) {
-                document.getElementById('ennemi-nom').innerText = ennemiActuel.nom;
-                document.getElementById('ennemi-niveau').innerText = `Niv ${ennemiActuel.niveau}`;
-                document.getElementById('ennemi-type-label').innerText = ennemiActuel.estBoss ? "⚠️ BOSS" : "Standard";
-                document.getElementById('ennemi-icone').className = `fa-solid ${ennemiActuel.icone}`;
-                const pct = Math.max(0, (ennemiActuel.pv / ennemiActuel.pvMax) * 100);
-                document.getElementById('ennemi-pv-barre').style.width = `${pct}%`;
-                document.getElementById('ennemi-pv-texte').innerText = `${ennemiActuel.pv} / ${ennemiActuel.pvMax}`;
-                if (ennemiActuel.estBoss) document.getElementById('ennemi-avatar-wrap').classList.add('boss-glow');
-                else document.getElementById('ennemi-avatar-wrap').classList.remove('boss-glow');
-            }
-
-            const hero = etatJeu.hero;
-            document.getElementById('hero-nom-affiche').innerText = hero.nom;
-            document.getElementById('hero-niveau-affiche').innerText = `Niv ${hero.niveau}`;
-            document.getElementById('hero-avatar-icone').className = `fa-solid ${cData.icone}`;
-            document.getElementById('hero-pv-texte').innerText = `${hero.pv} / ${hero.pvMax}`;
-            document.getElementById('hero-pv-barre').style.width = `${Math.max(0, (hero.pv / hero.pvMax) * 100)}%`;
-            document.getElementById('hero-mana-texte').innerText = `${hero.mana} / ${hero.manaMax}`;
-            document.getElementById('hero-mana-barre').style.width = `${Math.max(0, (hero.mana / hero.manaMax) * 100)}%`;
-            document.getElementById('hero-mini-atq').innerText = hero.atq;
-            document.getElementById('hero-mini-def').innerText = hero.def;
-
-            document.getElementById('stat-pv').innerText = hero.pvMax;
-            document.getElementById('stat-mana').innerText = hero.manaMax;
-            document.getElementById('stat-atq').innerText = hero.atq;
-            document.getElementById('stat-def').innerText = hero.def;
-            document.getElementById('stat-vit').innerText = hero.vit;
-            document.getElementById('stat-crit').innerText = `${hero.crit}%`;
-
-            const nbSet = compterSetEquipe();
-            document.getElementById('label-set-bonus-actif').innerText = `Set de classe (${nbSet}/7) : ${cData.setNom}`;
-
-            rendreEquipementPaperDoll();
-            rendreInventaire();
-            rendreCompetences();
-            rendreVillage();
-            rendreAscension();
-        }
-
-        function rendreEquipementPaperDoll() {
-            const emplacements = ['casque', 'amulette', 'arme', 'armure', 'gants', 'bottes', 'anneau'];
-
-            emplacements.forEach(emp => {
-                const slotEl = document.getElementById(`slot-${emp}`);
-                const eq = etatJeu.hero.equipement[emp];
-                const iconeEmpl = ICONES_EMPLACEMENT[emp];
-
-                if (!eq) {
-                    slotEl.className = "equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-center p-1 relative hover:border-amber-500 transition";
-                    slotEl.innerHTML = `
-                        <i class="fa-solid ${iconeEmpl} text-slate-600 text-base mb-0.5"></i>
-                        <span class="text-[9px] text-slate-400 font-semibold capitalize truncate w-full">${NOMS_EMPLACEMENT[emp]}</span>
-                    `;
-                } else {
-                    const r = RARETES[eq.rarete];
-                    const isMythic = eq.rarete === 'mythique';
-                    const isSet = eq.estSet;
-                    slotEl.className = `equipment-slot flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-slate-950 border-2 ${isSet ? 'border-amber-400 shadow-amber-500/30' : r.bordure} ${r.fond} cursor-pointer text-center p-1 relative shadow-md ${isMythic ? 'mythic-glow' : ''}`;
-                    slotEl.innerHTML = `
-                        <i class="fa-solid ${iconeEmpl} ${isSet ? 'text-amber-400' : r.couleur} text-xs mb-0.5"></i>
-                        <span class="${isSet ? 'text-amber-300' : r.couleur} font-bold text-[8px] truncate w-full">${eq.nom}</span>
-                        <span class="text-[7px] text-slate-300">+${eq.stats.atq || eq.stats.def || eq.stats.pv}</span>
-                        <span onclick="event.stopPropagation(); retirerEquipement('${emp}')" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px]" title="Retirer">×</span>
-                    `;
-                }
-            });
-        }
-
-        function gererClicSlot(emp) {
-            const eq = etatJeu.hero.equipement[emp];
-            if (eq) {
-                retirerEquipement(emp);
-            } else {
-                ajouterJournal(`ℹ️ Aucun objet équipé sur cet emplacement.`, "text-slate-400");
-            }
-        }
-
-        function rendreInventaire() {
-            const cont = document.getElementById('inventaire-grille');
-            cont.innerHTML = '';
-            document.getElementById('inventaire-compte-label').innerText = `${etatJeu.inventaire.length} / 24`;
-
-            for (let i = 0; i < 24; i++) {
-                const item = etatJeu.inventaire[i];
-                const div = document.createElement('div');
-                if (!item) {
-                    div.className = "bg-slate-950/40 border border-slate-800/50 rounded-xl h-16 flex items-center justify-center text-slate-800 text-xs";
-                    div.innerHTML = `<i class="fa-solid fa-lock"></i>`;
-                } else {
-                    const r = RARETES[item.rarete];
-                    const isMythic = item.rarete === 'mythique';
-                    const isSet = item.estSet;
-                    const iconeEmpl = ICONES_EMPLACEMENT[item.emplacement];
-                    div.className = `bg-slate-950 border-2 ${isSet ? 'border-amber-400' : r.bordure} ${r.fond} rounded-xl p-1.5 flex flex-col justify-between text-[10px] cursor-pointer h-16 hover:scale-[1.02] transition ${isMythic ? 'mythic-glow' : ''}`;
-                    div.innerHTML = `
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid ${iconeEmpl} ${isSet ? 'text-amber-400' : r.couleur} text-[10px]"></i>
-                            <span class="${isSet ? 'text-amber-300' : r.couleur} font-bold truncate">${item.nom}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-[9px]">
-                            <span class="text-slate-400">+${item.stats.atq || item.stats.def || item.stats.pv}</span>
-                            <button onclick="ouvrirModaleComparaison(${item.id})" class="text-amber-400 font-bold hover:underline">Équiper</button>
-                        </div>
-                    `;
-                }
-                cont.appendChild(div);
-            }
-        }
-
-        function ouvrirModaleComparaison(id) {
-            const item = etatJeu.inventaire.find(x => x.id === id);
-            if (!item) return;
-            idItemEnCoursSelection = id;
-
-            const actuel = etatJeu.hero.equipement[item.emplacement];
-            document.getElementById('modale-titre').innerText = `Comparer : ${item.nom}`;
-
-            const nomActuelEl = document.getElementById('modale-actuel-nom');
-            const statsActuelEl = document.getElementById('modale-actuel-stats');
-            if (!actuel) {
-                nomActuelEl.innerText = "Vide";
-                statsActuelEl.innerHTML = `<span class="text-slate-500">Aucun équipement</span>`;
-            } else {
-                nomActuelEl.innerText = actuel.nom;
-                let htmlAct = "";
-                if (actuel.stats.atq) htmlAct += `<div>Attaque: +${actuel.stats.atq}</div>`;
-                if (actuel.stats.def) htmlAct += `<div>Défense: +${actuel.stats.def}</div>`;
-                if (actuel.stats.pv) htmlAct += `<div>PV Max: +${actuel.stats.pv}</div>`;
-                statsActuelEl.innerHTML = htmlAct || "<div>Aucun bonus</div>";
-            }
-
-            document.getElementById('modale-nouveau-nom').innerText = item.nom;
-            const statsNouveauEl = document.getElementById('modale-nouveau-stats');
-            let htmlNouv = "";
-
-            ['atq', 'def', 'pv'].forEach(st => {
-                const valN = item.stats[st] || 0;
-                const valA = actuel ? (actuel.stats[st] || 0) : 0;
-                const diff = valN - valA;
-                const lib = st === 'atq' ? 'Attaque' : st === 'def' ? 'Défense' : 'PV Max';
-
-                if (valN > 0 || valA > 0) {
-                    let diffHtml = "";
-                    if (diff > 0) diffHtml = ` <span class="text-emerald-400 font-bold">(+${diff})</span>`;
-                    else if (diff < 0) diffHtml = ` <span class="text-red-400 font-bold">(${diff})</span>`;
-                    else diffHtml = ` <span class="text-slate-400">(0)</span>`;
-
-                    htmlNouv += `<div>${lib}: +${valN}${diffHtml}</div>`;
-                }
-            });
-            statsNouveauEl.innerHTML = htmlNouv || "<div>Aucun bonus</div>";
-            document.getElementById('modale-comparaison').classList.remove('hidden');
-        }
-
-        function fermerModaleComparaison() {
-            document.getElementById('modale-comparaison').classList.add('hidden');
-            idItemEnCoursSelection = null;
-        }
-
-        function confirmerEquiper() {
-            if (!idItemEnCoursSelection) return;
-            equiperObjet(idItemEnCoursSelection);
-            fermerModaleComparaison();
-        }
-
-        function equiperObjet(id) {
-            const idx = etatJeu.inventaire.findIndex(x => x.id === id);
-            if (idx === -1) return;
-            const item = etatJeu.inventaire[idx];
-            const hero = etatJeu.hero;
-            const ancien = hero.equipement[item.emplacement];
-
-            hero.equipement[item.emplacement] = item;
-            etatJeu.inventaire.splice(idx, 1);
-            if (ancien) etatJeu.inventaire.push(ancien);
-            recalculerStats();
-            rendreTout();
-        }
-
-        function retirerEquipement(emp) {
-            const hero = etatJeu.hero;
-            if (!hero.equipement[emp] || etatJeu.inventaire.length >= 24) return;
-            const item = hero.equipement[emp];
-            hero.equipement[emp] = null;
-            etatJeu.inventaire.push(item);
-            recalculerStats();
-            rendreTout();
-        }
-
-        function recalculerStats() {
-            const cData = CLASSES_DATA[etatJeu.classeChoisie || 'guerrier'];
-            const hero = etatJeu.hero;
-            let pv = cData.stats.pv + ((hero.niveau - 1) * 20) + (etatJeu.village.sanctuaire * 15);
-            let mana = 50 + ((hero.niveau - 1) * 8);
-            let atq = cData.stats.atq + ((hero.niveau - 1) * 5);
-            let def = cData.stats.def + ((hero.niveau - 1) * 3);
-            let vit = cData.stats.vit;
-            let crit = cData.stats.crit;
-
-            Object.values(hero.equipement).forEach(eq => {
-                if (eq && eq.stats) {
-                    atq += (eq.stats.atq || 0);
-                    def += (eq.stats.def || 0);
-                    pv += (eq.stats.pv || 0);
-                }
-            });
-
-            const nbSet = compterSetEquipe();
-            if (nbSet >= 4) {
-                if (etatJeu.classeChoisie === 'voleur') { crit += 20; vit += 5; }
-                if (etatJeu.classeChoisie === 'rodeur') { pv = Math.floor(pv * 1.15); atq = Math.floor(atq * 1.1); }
-                if (etatJeu.classeChoisie === 'archer') { atq = Math.floor(atq * 1.25); }
-                if (etatJeu.classeChoisie === 'guerrier') { def = Math.floor(def * 1.3); pv = Math.floor(pv * 1.15); }
-                if (etatJeu.classeChoisie === 'barbare') { atq = Math.floor(atq * 1.35); crit += 10; }
-                if (etatJeu.classeChoisie === 'moine') { vit += 8; }
-                if (etatJeu.classeChoisie === 'magicien') { mana = Math.floor(mana * 1.3); }
-                if (etatJeu.classeChoisie === 'druide') { pv = Math.floor(pv * 1.2); }
-            }
-
-            hero.pvMax = pv;
-            hero.manaMax = mana;
-            hero.atq = atq;
-            hero.def = def;
-            hero.vit = vit;
-            hero.crit = crit;
-
-            if (hero.pv > hero.pvMax) hero.pv = hero.pvMax;
-            if (hero.mana > hero.manaMax) hero.mana = hero.manaMax;
-        }
-
-        function rendreCompetences() {
-            const cont = document.getElementById('competences-grille');
-            cont.innerHTML = '';
-            document.getElementById('points-competences-val').innerText = etatJeu.hero.pointsCompetences;
-
-            Object.keys(COMPETENCES_DATA).forEach(k => {
-                const c = COMPETENCES_DATA[k];
-                const niv = etatJeu.competences[k];
-                const max = niv >= c.maxNiveau;
-                const div = document.createElement('div');
-                div.className = "bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center gap-2";
-                div.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-white text-xs">${c.nom} <span class="text-amber-400">Niv ${niv}/${c.maxNiveau}</span></h4>
-                        <p class="text-[10px] text-slate-400 mt-0.5">${c.desc}</p>
-                    </div>
-                    <button onclick="ameliorerComp('${k}')" ${max || etatJeu.hero.pointsCompetences <= 0 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg bg-amber-600 disabled:bg-slate-800 disabled:text-slate-600 text-white text-[10px] font-bold shrink-0">Améliorer</button>
-                `;
-                cont.appendChild(div);
-            });
-        }
-
-        function rendreVillage() {
-            const cont = document.getElementById('village-batiments-grille');
-            cont.innerHTML = '';
-            const bats = [
-                { cle: 'forge', nom: "Forge Royale", desc: "Augmente la puissance du butin.", cout: 150, niv: etatJeu.village.forge },
-                { cle: 'sanctuaire', nom: "Sanctuaire", desc: "Augmente les PV max.", cout: 200, niv: etatJeu.village.sanctuaire },
-                { cle: 'marche', nom: "Marché Noir", desc: "Génère des revenus d'or.", cout: 250, niv: etatJeu.village.marche }
-            ];
-
-            bats.forEach(b => {
-                const cout = Math.floor(b.cout * Math.pow(1.4, b.niv));
-                const div = document.createElement('div');
-                div.className = "bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center gap-2";
-                div.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-white text-xs">${b.nom} <span class="text-amber-400">Niv ${b.niv}</span></h4>
-                        <p class="text-[10px] text-slate-400">${b.desc}</p>
-                        <span class="text-[10px] text-amber-400 font-semibold"><i class="fa-solid fa-coins"></i> ${cout} Or</span>
-                    </div>
-                    <button onclick="ameliorerBat('${b.cle}')" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-[10px] font-bold shrink-0">Améliorer</button>
-                `;
-                cont.appendChild(div);
-            });
-        }
-
-        function rendreAscension() {
-            const cont = document.getElementById('ascension-faveurs-grille');
-            cont.innerHTML = '';
-            document.getElementById('ames-en-attente-val').innerText = Math.floor(etatJeu.etage * 4 + (etatJeu.hero.niveau * 2));
-
-            const favs = [
-                { cle: 'attaqueBoucle', nom: "Grâce Attaque", desc: "+10% Attaque par rang", cout: 10, niv: etatJeu.faveurs.attaqueBoucle },
-                { cle: 'santeBoucle', nom: "Bénédiction PV", desc: "+10% PV Max par rang", cout: 10, niv: etatJeu.faveurs.santeBoucle },
-                { cle: 'orBoucle', nom: "Aura Midas", desc: "+15% Or par rang", cout: 15, niv: etatJeu.faveurs.orBoucle }
-            ];
-
-            favs.forEach(f => {
-                const cout = f.cout * (f.niv + 1);
-                const div = document.createElement('div');
-                div.className = "bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center gap-2";
-                div.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-white text-xs">${f.nom} <span class="text-purple-400">Rang ${f.niv}</span></h4>
-                        <p class="text-[10px] text-slate-400">${f.desc}</p>
-                        <span class="text-[10px] text-purple-400 font-semibold"><i class="fa-solid fa-ghost"></i> ${cout} Âmes</span>
-                    </div>
-                    <button onclick="acheterFaveur('${f.cle}', ${cout})" class="px-3 py-1.5 rounded-lg bg-purple-600 text-white text-[10px] font-bold shrink-0">Débloquer</button>
-                `;
-                cont.appendChild(div);
-            });
-        }
-
-        function ameliorerComp(k) {
-            if (etatJeu.hero.pointsCompetences <= 0) return;
-            etatJeu.hero.pointsCompetences--;
-            etatJeu.competences[k]++;
-            recalculerStats();
-            rendreTout();
-        }
-
-        function ameliorerBat(k) {
-            const couts = { forge: 150, sanctuaire: 200, marche: 250 };
-            const cout = Math.floor(couts[k] * Math.pow(1.4, etatJeu.village[k]));
-            if (etatJeu.or < cout) return;
-            etatJeu.or -= cout;
-            etatJeu.village[k]++;
-            recalculerStats();
-            rendreTout();
-        }
-
-        function realiserAscension() {
-            const ames = Math.floor(etatJeu.etage * 4 + (etatJeu.hero.niveau * 2));
-            etatJeu.ames += ames;
-            etatJeu.etage = 1;
-            etatJeu.indiceRencontre = 1;
-            etatJeu.or = 150;
-            const hero = etatJeu.hero;
-            hero.niveau = 1;
-            hero.xp = 0;
-            hero.xpRequis = 100;
-            hero.pointsCompetences = 0;
-            hero.equipement = { arme: null, armure: null, casque: null, gants: null, bottes: null, anneau: null, amulette: null };
-            recalculerStats();
-            hero.pv = hero.pvMax;
-            hero.mana = hero.manaMax;
-            ajouterJournal(`🌀 Ascension divine ! +${ames} Âmes`, "text-purple-400 font-bold");
-            rendreTout();
-        }
-
-        function acheterFaveur(k, cout) {
-            if (etatJeu.ames < cout) return;
-            etatJeu.ames -= cout;
-            etatJeu.faveurs[k]++;
-            recalculerStats();
-            rendreTout();
-        }
-
-        function ajouterJournal(msg, color = "text-slate-300") {
-            const box = document.getElementById('journal-combat');
-            const div = document.createElement('div');
-            div.className = color;
-            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
-            box.prepend(div);
-            if (box.children.length > 50) box.removeChild(box.lastChild);
-        }
-
-        function effacerJournal() {
-            document.getElementById('journal-combat').innerHTML = '';
-        }
-    </script>
 </body>
 </html>
