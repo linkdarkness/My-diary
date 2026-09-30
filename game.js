@@ -1,18 +1,22 @@
 let player;
 let ground;
-let cursors;
 let scoreText;
 let distance = 0;
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 450,
+    // On s'adapte à la taille de l'écran du smartphone
+    width: window.innerWidth,
+    height: window.innerHeight,
     parent: 'game-container',
+    scale: {
+        mode: Phaser.Scale.FIT, // Ajuste proprement le jeu à l'écran sans le déformer
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 1000 }, // Une bonne gravité pour un saut réactif
+            gravity: { y: 1200 }, // Gravité un peu plus forte pour un meilleur feeling tactile
             debug: false
         }
     },
@@ -26,53 +30,46 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-    // Pas d'images externes pour l'instant, on utilise des formes générées par code
+    // Rien pour l'instant
 }
 
 function create() {
-    // 1. Ciel (Fond d'écran)
-    this.add.rectangle(400, 225, 800, 450, 0x1a1a2e);
+    // 1. Fond d'écran adapté à la taille dynamique
+    this.add.rectangle(config.width / 2, config.height / 2, config.width, config.height, 0x1a1a2e);
 
-    // 2. Création du Sol (statique, ne bouge pas)
-    ground = this.physics.add.staticRectangle(400, 420, 800, 60);
-    // On dessine visuellement le sol
-    let groundGraphics = this.add.rectangle(400, 420, 800, 60, 0x16213e);
+    // 2. Le Sol (basé sur la hauteur de l'écran)
+    const groundHeight = 80;
+    ground = this.physics.add.staticRectangle(config.width / 2, config.height - (groundHeight / 2), config.width, groundHeight);
     
-    // 3. Création du Personnage (un carré rouge vif)
-    // Il commence à la position x: 150, y: 300
-    player = this.physics.add.image(150, 300, null).setDisplaySize(40, 40);
-    player.setTint(0xe94560); // Couleur rouge/rose
-    player.setCollideWorldBounds(true); // Empêche le joueur de sortir de l'écran par le haut
+    // Visuel du sol
+    this.add.rectangle(config.width / 2, config.height - (groundHeight / 2), config.width, groundHeight, 0x16213e);
 
-    // Collision entre le joueur et le sol
+    // 3. Le Personnage
+    player = this.physics.add.image(150, config.height - 200, null).setDisplaySize(50, 50);
+    player.setTint(0xe94560);
+    player.setCollideWorldBounds(true);
+
+    // Collision sol/joueur
     this.physics.add.collider(player, ground);
 
-    // 4. Activer les touches du clavier (Espace ou Flèche du haut)
-    cursors = this.input.keyboard.createCursorKeys();
-    // Permettre aussi de sauter en cliquant/touchant l'écran
+    // 4. Contrôle tactile unique : Appuyer n'importe où sur l'écran fait sauter
     this.input.on('pointerdown', () => {
         jump();
     });
 
-    // 5. Affichage du score / de la distance parcourue en haut à gauche
-    scoreText = this.add.text(20, 20, 'Distance : 0m', { fontSize: '20px', fill: '#ffffff' });
+    // 5. Score / Distance
+    scoreText = this.add.text(30, 30, 'Distance : 0m', { fontSize: '24px', fill: '#ffffff' });
 }
 
 function update(time, delta) {
-    // Le joueur saute si on appuie sur Espace ou Flèche du Haut ET qu'il touche le sol
-    if ((cursors.space.isDown || cursors.up.isDown)) {
-        jump();
-    }
-
-    // Incrémenter la distance parcourue avec le temps
+    // Incrémenter la distance
     distance += delta * 0.01;
     scoreText.setText('Distance : ' + Math.floor(distance) + 'm');
 }
 
-// Fonction de saut mutualisée (clavier ou clic)
 function jump() {
-    // body.touching.down vérifie si le personnage est bien posé sur le sol
+    // Si le joueur touche le sol, il saute
     if (player.body.touching.down) {
-        player.setVelocityY(-550); // Impulsion vers le haut
+        player.setVelocityY(-650);
     }
 }
