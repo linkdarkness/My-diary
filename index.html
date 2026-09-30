@@ -2,19 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- Empêche le zoom sur mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mon Jeu Web Idle Runner</title>
+    <title>Mon Jeu Idle Runner</title>
     <style>
-        /* Bloque le scroll et les barres de défilement sur tout le site */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #222;
-            touch-action: none; /* Désactive les comportements tactiles par défaut du navigateur */
+            background-color: #111;
+            touch-action: none;
         }
         #game-container {
             width: 100%;
@@ -24,14 +22,11 @@
             align-items: center;
         }
     </style>
-    <!-- Chargement de Phaser 3 depuis un CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <!-- Utilisation d'une version de Phaser très stable -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
 </head>
 <body>
-
     <div id="game-container"></div>
-
-    <!-- Notre script de jeu -->
     <script src="game.js"></script>
 </body>
 </html>
