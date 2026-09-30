@@ -39,7 +39,6 @@
             z-index: 20;
             cursor: pointer;
         }
-        /* Fenêtre de la boutique (cachée par défaut) */
         #shop-modal {
             display: none;
             position: absolute;
@@ -90,6 +89,23 @@
             font-size: 16px;
             font-weight: bold;
         }
+        /* Message d'information de gain hors-ligne */
+        #offline-popup {
+            display: none;
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0f3460;
+            border: 2px solid #f9ed69;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 40;
+            font-size: 16px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
         canvas {
             display: block;
             background: #16213e;
@@ -106,6 +122,13 @@
     </div>
 
     <button id="shop-btn" onclick="toggleShop()">🏪 Boutique</button>
+
+    <!-- Pop-up de gain hors-ligne -->
+    <div id="offline-popup">
+        <h3>Bienvenue !</h3>
+        <p>Pendant votre absence, vous avez gagné <span id="offline-gold">0</span> 🪙 !</p>
+        <button onclick="closeOfflinePopup()" style="background:#e94560; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">Super !</button>
+    </div>
 
     <!-- Fenêtre de la boutique -->
     <div id="shop-modal">
@@ -143,7 +166,6 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Données du jeu et du joueur
         let player = {
             x: 100,
             y: canvas.height - 150,
@@ -165,11 +187,55 @@
         let spawnTimer = 0;
         let isShopOpen = false;
 
-        // Système d'améliorations (Upgrades)
         let upgrades = {
             jump: { level: 1, cost: 10, costMultiplier: 1.8 },
             coin: { level: 1, cost: 15, costMultiplier: 2.0 }
         };
+
+        // --- SYSTÈME DE SAUVEGARDE ET CHARGEMENT ---
+        function saveGame() {
+            const saveData = {
+                gold: gold,
+                upgrades: upgrades,
+                lastTime: Date.now() // Enregistre l'heure actuelle
+            };
+            localStorage.setItem('idle_runner_save', JSON.stringify(saveData));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('idle_runner_save');
+            if (saved) {
+                const data = JSON.parse(saved);
+                gold = data.gold || 0;
+                if (data.upgrades) {
+                    upgrades = data.upgrades;
+                    // Recalculer la force du saut selon le niveau chargé
+                    player.jumpForce = -16 - (upgrades.jump.level - 1) * 1.5;
+                }
+
+                // Calcul du temps hors-ligne (Idle progress)
+                if (data.lastTime) {
+                    const elapsedSeconds = Math.floor((Date.now() - data.lastTime) / 1000);
+                    if (elapsedSeconds > 10) { // S'il s'est écoulé plus de 10 secondes
+                        // Gain passif : un peu d'or par minute en fonction du niveau
+                        const earnedOffline = Math.floor((elapsedSeconds / 60) * upgrades.coin.level * 2);
+                        if (earnedOffline > 0) {
+                            gold += earnedOffline;
+                            document.getElementById('offline-gold').innerText = earnedOffline;
+                            document.getElementById('offline-popup').style.display = 'block';
+                        }
+                    }
+                }
+            }
+            updateShopUI();
+        }
+
+        function closeOfflinePopup() {
+            document.getElementById('offline-popup').style.display = 'none';
+        }
+
+        // Sauvegarder automatiquement toutes les 5 secondes
+        setInterval(saveGame, 5000);
 
         function toggleShop() {
             isShopOpen = !isShopOpen;
@@ -184,12 +250,12 @@
                 up.level++;
                 up.cost = Math.floor(up.cost * up.costMultiplier);
 
-                // Appliquer l'effet de l'amélioration
                 if (type === 'jump') {
-                    player.jumpForce = -16 - (up.level - 1) * 1.5; // Saute de plus en plus haut
+                    player.jumpForce = -16 - (up.level - 1) * 1.5;
                 }
 
                 updateShopUI();
+                saveGame(); // Sauvegarde immédiate après un achat
             }
         }
 
@@ -200,11 +266,9 @@
             document.getElementById('cost-coin').innerText = upgrades.coin.cost;
         }
 
-        // Contrôle tactile (uniquement si la boutique est fermée)
         window.addEventListener('pointerdown', (e) => {
             if (isShopOpen) return;
-            // Évite de sauter si on clique sur le bouton boutique
-            if (e.target.id === 'shop-btn' || e.target.closest('#shop-modal')) return;
+            if (e.target.id === 'shop-btn' || e.target.closest('#shop-modal') || e.target.closest('#offline-popup')) return;
 
             if (player.isGrounded) {
                 player.vy = player.jumpForce;
@@ -213,7 +277,7 @@
         });
 
         function spawnEntity() {
-            if (isShopOpen) return; // Pause le spawn si la boutique est ouverte
+            if (isShopOpen) return;
             spawnTimer++;
             if (spawnTimer > 90) {
                 spawnTimer = 0;
@@ -239,7 +303,7 @@
         }
 
         function update() {
-            if (isShopOpen) return; // Stoppe le jeu quand la boutique est ouverte
+            if (isShopOpen) return;
 
             player.vy += player.gravity;
             player.y += player.vy;
@@ -247,7 +311,7 @@
             let groundLevel = canvas.height - groundHeight - player.height;
             if (player.y >= groundLevel) {
                 player.y = groundLevel;
-                player.vy = 0;
+                player.vy = dx = 0;
                 player.isGrounded = true;
             }
 
@@ -256,7 +320,6 @@
 
             spawnEntity();
 
-            // Gestion des obstacles
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 obstacles[i].x -= gameSpeed;
 
@@ -267,9 +330,9 @@
                     player.y + player.height > obstacles[i].y
                 ) {
                     distance = 0;
-                    gold = 0; // Remet l'or à 0 en cas de mort (style arcade)
                     obstacles = [];
                     coins = [];
+                    // Note : On ne remet plus l'or à 0 quand on meurt, pour garder la progression !
                 }
 
                 if (obstacles[i].x + obstacles[i].width < 0) {
@@ -277,7 +340,6 @@
                 }
             }
 
-            // Gestion des pièces
             for (let i = coins.length - 1; i >= 0; i--) {
                 coins[i].x -= gameSpeed;
 
@@ -289,8 +351,8 @@
                     player.y + player.height > coins[i].y
                 ) {
                     coins[i].collected = true;
-                    // L'or gagné dépend du niveau de l'amélioration "coin"
                     gold += upgrades.coin.level;
+                    saveGame(); // Sauvegarde lors de la collecte d'or
                 }
 
                 if (coins[i].x + coins[i].width < 0 || coins[i].collected) {
@@ -327,11 +389,13 @@
         }
 
         function loop() {
-            update();
+            update();mourir: { /* géré dans update */ }
             draw();
             requestAnimationFrame(loop);
         }
 
+        // Charger la partie au démarrage du jeu
+        loadGame();
         loop();
     </script>
 </body>
