@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mon Runner Mobile</title>
+    <title>Mon Jeu Idle Runner</title>
     <style>
         html, body {
             margin: 0;
@@ -20,8 +20,9 @@
             top: 20px;
             left: 20px;
             color: white;
-            font-size: 24px;
+            font-size: 20px;
             z-index: 10;
+            line-height: 1.5;
         }
         canvas {
             display: block;
@@ -33,14 +34,16 @@
 </head>
 <body>
 
-    <div id="ui">Distance : <span id="score">0</span>m</div>
+    <div id="ui">
+        Distance : <span id="score">0</span>m<br>
+        Or : <span id="gold">0</span> 🪙
+    </div>
     <canvas id="gameCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Ajuster la taille du canvas à l'écran du smartphone
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -48,12 +51,12 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Propriétés du joueur
+        // Joueur
         let player = {
             x: 100,
             y: canvas.height - 150,
-            width: 50,
-            height: 50,
+            width: 40,
+            height: 40,
             vy: 0,
             gravity: 0.8,
             jumpForce: -16,
@@ -62,8 +65,14 @@
 
         let groundHeight = 80;
         let distance = 0;
+        let gold = 0;
+        let gameSpeed = 6;
 
-        // Contrôle tactile ou clic
+        let obstacles = [];
+        let coins = [];
+        let spawnTimer = 0;
+
+        // Contrôle tactile
         window.addEventListener('pointerdown', () => {
             if (player.isGrounded) {
                 player.vy = player.jumpForce;
@@ -71,13 +80,38 @@
             }
         });
 
-        // Boucle de jeu
+        function spawnEntity() {
+            spawnTimer++;
+            // Toutes les 90 images environ, on fait apparaître un objet
+            if (spawnTimer > 90) {
+                spawnTimer = 0;
+                let groundLevel = canvas.height - groundHeight;
+
+                // Aléatoirement : un obstacle (rouge foncé) ou une pièce (jaune)
+                if (Math.random() > 0.4) {
+                    obstacles.push({
+                        x: canvas.width,
+                        y: groundLevel - 40,
+                        width: 30,
+                        height: 40
+                    });
+                } else {
+                    coins.push({
+                        x: canvas.width,
+                        y: groundLevel - 90 - Math.random() * 60, // Hauteur variable
+                        width: 25,
+                        height: 25,
+                        collected: false
+                    });
+                }
+            }
+        }
+
         function update() {
-            // Physique du saut
+            // Physique du joueur
             player.vy += player.gravity;
             player.y += player.vy;
 
-            // Collision avec le sol
             let groundLevel = canvas.height - groundHeight - player.height;
             if (player.y >= groundLevel) {
                 player.y = groundLevel;
@@ -85,22 +119,89 @@
                 player.isGrounded = true;
             }
 
-            // Incrémenter la distance
+            // Gestion de la distance et vitesse
             distance += 0.1;
+            gameSpeed = 6 + Math.floor(distance / 100); // Accélère légèrement avec le temps
+
+            spawnEntity();
+
+            // Mettre à jour les obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= gameSpeed;
+
+                // Collision simple (Boîte englobante)
+                if (
+                    player.x < obstacles[i].x + obstacles[i].width &&
+                    player.x + player.width > obstacles[i].x &&
+                    player.y < obstacles[i].y + obstacles[i].height &&
+                    player.y + player.height > obstacles[i].y
+                ) {
+                    // Si on touche un obstacle, on réinitialise la distance et l'or
+                    distance = 0;
+                    gold = 0;
+                    obstacles = [];
+                    coins = [];
+                }
+
+                // Supprimer si hors écran
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // Mettre à jour les pièces
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].x -= gameSpeed;
+
+                // Collision avec les pièces
+                if (
+                    !coins[i].collected &&
+                    player.x < coins[i].x + coins[i].width &&
+                    player.x + player.width > coins[i].x &&
+                    player.y < coins[i].y + coins[i].height &&
+                    player.y + player.height > coins[i].y
+                ) {
+                    coins[i].collected = true;
+                    gold += 1;
+                }
+
+                // Supprimer si hors écran ou collectée
+                if (coins[i].x + coins[i].width < 0 || coins[i].collected) {
+                    coins.splice(i, 1);
+                }
+            }
+
+            // Mise à jour de l'interface HTML
             document.getElementById('score').innerText = Math.floor(distance);
+            document.getElementById('gold').innerText = gold;
         }
 
         function draw() {
-            // Effacer l'écran
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Dessiner le sol
             ctx.fillStyle = '#0f3460';
             ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
-            // Dessiner le joueur (carré rouge)
+            // Dessiner le joueur (carré rose/rouge)
             ctx.fillStyle = '#e94560';
             ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Dessiner les obstacles (rectangles oranges)
+            ctx.fillStyle = '#e94584';
+            for (let obs of obstacles) {
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            }
+
+            // Dessiner les pièces (cercles dorés)
+            ctx.fillStyle = '#f9ed69';
+            for (let coin of coins) {
+                if (!coin.collected) {
+                    ctx.beginPath();
+                    ctx.arc(coin.x + coin.width / 2, coin.y + coin.height / 2, coin.width / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
         }
 
         function loop() {
