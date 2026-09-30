@@ -22,11 +22,71 @@
             align-items: center;
         }
     </style>
-    <!-- Utilisation d'une version de Phaser très stable -->
+    <!-- Chargement de Phaser 3 -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
 </head>
 <body>
+
     <div id="game-container"></div>
-    <script src="game.js"></script>
+
+    <script>
+        let player;
+        let ground;
+        let scoreText;
+        let distance = 0;
+
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 450,
+            parent: 'game-container',
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 1000 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: function() {},
+                create: function() {
+                    // 1. Fond d'écran
+                    this.add.rectangle(400, 225, 800, 450, 0x1a1a2e);
+
+                    // 2. Le Sol
+                    ground = this.physics.add.staticRectangle(400, 420, 800, 60);
+                    this.add.rectangle(400, 420, 800, 60, 0x16213e);
+
+                    // 3. Le Personnage (carré rouge)
+                    player = this.physics.add.image(150, 300, null).setDisplaySize(40, 40);
+                    player.setTint(0xe94560);
+                    player.setCollideWorldBounds(true);
+
+                    // Collision sol / joueur
+                    this.physics.add.collider(player, ground);
+
+                    // 4. Contrôle tactile
+                    this.input.on('pointerdown', () => {
+                        if (player.body.touching.down) {
+                            player.setVelocityY(-550);
+                        }
+                    });
+
+                    // 5. Texte de distance
+                    scoreText = this.add.text(30, 30, 'Distance : 0m', { fontSize: '24px', fill: '#ffffff' });
+                },
+                update: function(time, delta) {
+                    distance += delta * 0.01;
+                    scoreText.setText('Distance : ' + Math.floor(distance) + 'm');
+                }
+            }
+        };
+
+        const game = new Phaser.Game(config);
+    </script>
 </body>
 </html>
