@@ -17,12 +17,78 @@
         }
         #ui {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             z-index: 10;
-            line-height: 1.5;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+        #shop-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            z-index: 20;
+            cursor: pointer;
+        }
+        /* Fenêtre de la boutique (cachée par défaut) */
+        #shop-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 350px;
+            background-color: #16213e;
+            border: 2px solid #e94560;
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            z-index: 30;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        #shop-modal h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 22px;
+            color: #f9ed69;
+        }
+        .upgrade-item {
+            background: #0f3460;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .upgrade-item button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        #close-shop {
+            width: 100%;
+            margin-top: 15px;
+            background-color: #533483;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
         }
         canvas {
             display: block;
@@ -38,6 +104,32 @@
         Distance : <span id="score">0</span>m<br>
         Or : <span id="gold">0</span> 🪙
     </div>
+
+    <button id="shop-btn" onclick="toggleShop()">🏪 Boutique</button>
+
+    <!-- Fenêtre de la boutique -->
+    <div id="shop-modal">
+        <h2>Boutique d'Améliorations</h2>
+        
+        <div class="upgrade-item">
+            <div>
+                <strong>Saut Puissant</strong><br>
+                <small>Niveau <span id="lvl-jump">1</span></small>
+            </div>
+            <button onclick="buyUpgrade('jump')"><span id="cost-jump">10</span> 🪙</button>
+        </div>
+
+        <div class="upgrade-item">
+            <div>
+                <strong>Valeur Pièce +1</strong><br>
+                <small>Niveau <span id="lvl-coin">1</span></small>
+            </div>
+            <button onclick="buyUpgrade('coin')"><span id="cost-coin">15</span> 🪙</button>
+        </div>
+
+        <button id="close-shop" onclick="toggleShop()">Reprendre le jeu</button>
+    </div>
+
     <canvas id="gameCanvas"></canvas>
 
     <script>
@@ -51,7 +143,7 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Joueur
+        // Données du jeu et du joueur
         let player = {
             x: 100,
             y: canvas.height - 150,
@@ -71,9 +163,49 @@
         let obstacles = [];
         let coins = [];
         let spawnTimer = 0;
+        let isShopOpen = false;
 
-        // Contrôle tactile
-        window.addEventListener('pointerdown', () => {
+        // Système d'améliorations (Upgrades)
+        let upgrades = {
+            jump: { level: 1, cost: 10, costMultiplier: 1.8 },
+            coin: { level: 1, cost: 15, costMultiplier: 2.0 }
+        };
+
+        function toggleShop() {
+            isShopOpen = !isShopOpen;
+            const modal = document.getElementById('shop-modal');
+            modal.style.display = isShopOpen ? 'block' : 'none';
+        }
+
+        function buyUpgrade(type) {
+            let up = upgrades[type];
+            if (gold >= up.cost) {
+                gold -= up.cost;
+                up.level++;
+                up.cost = Math.floor(up.cost * up.costMultiplier);
+
+                // Appliquer l'effet de l'amélioration
+                if (type === 'jump') {
+                    player.jumpForce = -16 - (up.level - 1) * 1.5; // Saute de plus en plus haut
+                }
+
+                updateShopUI();
+            }
+        }
+
+        function updateShopUI() {
+            document.getElementById('lvl-jump').innerText = upgrades.jump.level;
+            document.getElementById('cost-jump').innerText = upgrades.jump.cost;
+            document.getElementById('lvl-coin').innerText = upgrades.coin.level;
+            document.getElementById('cost-coin').innerText = upgrades.coin.cost;
+        }
+
+        // Contrôle tactile (uniquement si la boutique est fermée)
+        window.addEventListener('pointerdown', (e) => {
+            if (isShopOpen) return;
+            // Évite de sauter si on clique sur le bouton boutique
+            if (e.target.id === 'shop-btn' || e.target.closest('#shop-modal')) return;
+
             if (player.isGrounded) {
                 player.vy = player.jumpForce;
                 player.isGrounded = false;
@@ -81,13 +213,12 @@
         });
 
         function spawnEntity() {
+            if (isShopOpen) return; // Pause le spawn si la boutique est ouverte
             spawnTimer++;
-            // Toutes les 90 images environ, on fait apparaître un objet
             if (spawnTimer > 90) {
                 spawnTimer = 0;
                 let groundLevel = canvas.height - groundHeight;
 
-                // Aléatoirement : un obstacle (rouge foncé) ou une pièce (jaune)
                 if (Math.random() > 0.4) {
                     obstacles.push({
                         x: canvas.width,
@@ -98,7 +229,7 @@
                 } else {
                     coins.push({
                         x: canvas.width,
-                        y: groundLevel - 90 - Math.random() * 60, // Hauteur variable
+                        y: groundLevel - 90 - Math.random() * 60,
                         width: 25,
                         height: 25,
                         collected: false
@@ -108,7 +239,8 @@
         }
 
         function update() {
-            // Physique du joueur
+            if (isShopOpen) return; // Stoppe le jeu quand la boutique est ouverte
+
             player.vy += player.gravity;
             player.y += player.vy;
 
@@ -119,41 +251,36 @@
                 player.isGrounded = true;
             }
 
-            // Gestion de la distance et vitesse
             distance += 0.1;
-            gameSpeed = 6 + Math.floor(distance / 100); // Accélère légèrement avec le temps
+            gameSpeed = 6 + Math.floor(distance / 100);
 
             spawnEntity();
 
-            // Mettre à jour les obstacles
+            // Gestion des obstacles
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 obstacles[i].x -= gameSpeed;
 
-                // Collision simple (Boîte englobante)
                 if (
                     player.x < obstacles[i].x + obstacles[i].width &&
                     player.x + player.width > obstacles[i].x &&
                     player.y < obstacles[i].y + obstacles[i].height &&
                     player.y + player.height > obstacles[i].y
                 ) {
-                    // Si on touche un obstacle, on réinitialise la distance et l'or
                     distance = 0;
-                    gold = 0;
+                    gold = 0; // Remet l'or à 0 en cas de mort (style arcade)
                     obstacles = [];
                     coins = [];
                 }
 
-                // Supprimer si hors écran
                 if (obstacles[i].x + obstacles[i].width < 0) {
                     obstacles.splice(i, 1);
                 }
             }
 
-            // Mettre à jour les pièces
+            // Gestion des pièces
             for (let i = coins.length - 1; i >= 0; i--) {
                 coins[i].x -= gameSpeed;
 
-                // Collision avec les pièces
                 if (
                     !coins[i].collected &&
                     player.x < coins[i].x + coins[i].width &&
@@ -162,16 +289,15 @@
                     player.y + player.height > coins[i].y
                 ) {
                     coins[i].collected = true;
-                    gold += 1;
+                    // L'or gagné dépend du niveau de l'amélioration "coin"
+                    gold += upgrades.coin.level;
                 }
 
-                // Supprimer si hors écran ou collectée
                 if (coins[i].x + coins[i].width < 0 || coins[i].collected) {
                     coins.splice(i, 1);
                 }
             }
 
-            // Mise à jour de l'interface HTML
             document.getElementById('score').innerText = Math.floor(distance);
             document.getElementById('gold').innerText = gold;
         }
@@ -179,21 +305,17 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dessiner le sol
             ctx.fillStyle = '#0f3460';
             ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
-            // Dessiner le joueur (carré rose/rouge)
             ctx.fillStyle = '#e94560';
             ctx.fillRect(player.x, player.y, player.width, player.height);
 
-            // Dessiner les obstacles (rectangles oranges)
             ctx.fillStyle = '#e94584';
             for (let obs of obstacles) {
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
             }
 
-            // Dessiner les pièces (cercles dorés)
             ctx.fillStyle = '#f9ed69';
             for (let coin of coins) {
                 if (!coin.collected) {
