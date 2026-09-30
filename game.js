@@ -5,18 +5,17 @@ let distance = 0;
 
 const config = {
     type: Phaser.AUTO,
-    // On s'adapte à la taille de l'écran du smartphone
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
     scale: {
-        mode: Phaser.Scale.FIT, // Ajuste proprement le jeu à l'écran sans le déformer
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 1200 }, // Gravité un peu plus forte pour un meilleur feeling tactile
+            gravity: { y: 1200 },
             debug: false
         }
     },
@@ -34,10 +33,10 @@ function preload() {
 }
 
 function create() {
-    // 1. Fond d'écran adapté à la taille dynamique
+    // 1. Fond d'écran adapté
     this.add.rectangle(config.width / 2, config.height / 2, config.width, config.height, 0x1a1a2e);
 
-    // 2. Le Sol (basé sur la hauteur de l'écran)
+    // 2. Le Sol
     const groundHeight = 80;
     ground = this.physics.add.staticRectangle(config.width / 2, config.height - (groundHeight / 2), config.width, groundHeight);
     
@@ -52,7 +51,7 @@ function create() {
     // Collision sol/joueur
     this.physics.add.collider(player, ground);
 
-    // 4. Contrôle tactile unique : Appuyer n'importe où sur l'écran fait sauter
+    // 4. Contrôle tactile : Appuyer n'importe où fait sauter
     this.input.on('pointerdown', () => {
         jump();
     });
@@ -68,7 +67,6 @@ function update(time, delta) {
 }
 
 function jump() {
-    // Si le joueur touche le sol, il saute
     if (player.body.touching.down) {
         player.setVelocityY(-650);
     }
