@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mon Jeu Idle Runner</title>
+    <title>Mon Runner Mobile</title>
     <style>
         html, body {
             margin: 0;
@@ -11,82 +11,105 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #111;
+            background-color: #1a1a2e;
+            font-family: Arial, sans-serif;
             touch-action: none;
         }
-        #game-container {
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            z-index: 10;
+        }
+        canvas {
+            display: block;
+            background: #16213e;
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
     </style>
-    <!-- Chargement de Phaser 3 -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.js"></script>
 </head>
 <body>
 
-    <div id="game-container"></div>
+    <div id="ui">Distance : <span id="score">0</span>m</div>
+    <canvas id="gameCanvas"></canvas>
 
     <script>
-        let player;
-        let ground;
-        let scoreText;
-        let distance = 0;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-        const config = {
-            type: Phaser.AUTO,
-            width: 800,
-            height: 450,
-            parent: 'game-container',
-            scale: {
-                mode: Phaser.Scale.FIT,
-                autoCenter: Phaser.Scale.CENTER_BOTH
-            },
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    gravity: { y: 1000 },
-                    debug: false
-                }
-            },
-            scene: {
-                preload: function() {},
-                create: function() {
-                    // 1. Fond d'écran
-                    this.add.rectangle(400, 225, 800, 450, 0x1a1a2e);
+        // Ajuster la taille du canvas à l'écran du smartphone
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-                    // 2. Le Sol
-                    ground = this.physics.add.staticRectangle(400, 420, 800, 60);
-                    this.add.rectangle(400, 420, 800, 60, 0x16213e);
-
-                    // 3. Le Personnage (carré rouge)
-                    player = this.physics.add.image(150, 300, null).setDisplaySize(40, 40);
-                    player.setTint(0xe94560);
-                    player.setCollideWorldBounds(true);
-
-                    // Collision sol / joueur
-                    this.physics.add.collider(player, ground);
-
-                    // 4. Contrôle tactile
-                    this.input.on('pointerdown', () => {
-                        if (player.body.touching.down) {
-                            player.setVelocityY(-550);
-                        }
-                    });
-
-                    // 5. Texte de distance
-                    scoreText = this.add.text(30, 30, 'Distance : 0m', { fontSize: '24px', fill: '#ffffff' });
-                },
-                update: function(time, delta) {
-                    distance += delta * 0.01;
-                    scoreText.setText('Distance : ' + Math.floor(distance) + 'm');
-                }
-            }
+        // Propriétés du joueur
+        let player = {
+            x: 100,
+            y: canvas.height - 150,
+            width: 50,
+            height: 50,
+            vy: 0,
+            gravity: 0.8,
+            jumpForce: -16,
+            isGrounded: false
         };
 
-        const game = new Phaser.Game(config);
+        let groundHeight = 80;
+        let distance = 0;
+
+        // Contrôle tactile ou clic
+        window.addEventListener('pointerdown', () => {
+            if (player.isGrounded) {
+                player.vy = player.jumpForce;
+                player.isGrounded = false;
+            }
+        });
+
+        // Boucle de jeu
+        function update() {
+            // Physique du saut
+            player.vy += player.gravity;
+            player.y += player.vy;
+
+            // Collision avec le sol
+            let groundLevel = canvas.height - groundHeight - player.height;
+            if (player.y >= groundLevel) {
+                player.y = groundLevel;
+                player.vy = 0;
+                player.isGrounded = true;
+            }
+
+            // Incrémenter la distance
+            distance += 0.1;
+            document.getElementById('score').innerText = Math.floor(distance);
+        }
+
+        function draw() {
+            // Effacer l'écran
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dessiner le sol
+            ctx.fillStyle = '#0f3460';
+            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+            // Dessiner le joueur (carré rouge)
+            ctx.fillStyle = '#e94560';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
     </script>
 </body>
 </html>
