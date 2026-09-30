@@ -3,57 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur d'images Gemini</title>
+    <title>Mon Jeu Web Idle Runner</title>
     <style>
-        body { font-family: sans-serif; padding: 15px; text-align: center; background: #121212; color: #fff; margin: 0; }
-        .box { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 500px; margin: 40px auto; }
-        input { width: 90%; padding: 12px; font-size: 16px; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 8px; margin-bottom: 15px; }
-        button { background: #007bff; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 8px; width: 100%; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #0056b3; }
-        img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        #loader { display: none; margin: 15px; color: #aaa; font-style: italic; }
-        p { word-break: break-word; }
+        body {
+            margin: 0;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
     </style>
+    <!-- Chargement de Phaser 3 depuis un CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
 </head>
 <body>
-    <div class="box">
-        <h2>Générateur Gemini</h2>
-        <input type="text" id="prompt" placeholder="Décrivez votre image...">
-        <button onclick="generer()">Générer</button>
-        <div id="loader">Création en cours... Patientez...</div>
-        <div id="resultat"></div>
-    </div>
 
-    <script>
-        async function generer() {
-            const promptText = document.getElementById('prompt').value.trim();
-            const resDiv = document.getElementById('resultat');
-            const loader = document.getElementById('loader');
-            
-            if (!promptText) return alert('Écrivez un prompt !');
+    <div id="game-container"></div>
 
-            resDiv.innerHTML = '';
-            loader.style.display = 'block';
-
-            try {
-                // Remplacez l'URL ci-dessous par l'URL de votre Cloudflare Worker
-                const URL_BACKEND = 'https://winter-cake-1c9d.ogiorgini.workers.dev/';
-                
-                const rep = await fetch(`${URL_BACKEND}?prompt=${encodeURIComponent(promptText)}`);
-                
-                if (!rep.ok) {
-                    const errData = await rep.json().catch(() => ({ error: "Erreur serveur inconnue" }));
-                    throw new Error(errData.error || `Erreur HTTP ${rep.status}`);
-                }
-
-                const blob = await rep.blob();
-                resDiv.innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="${promptText}">`;
-            } catch (e) {
-                resDiv.innerHTML = `<p style="color:#ff6b6b;">Erreur : ${e.message}</p>`;
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-    </script>
+    <!-- Notre futur script de jeu -->
+    <script src="game.js"></script>
 </body>
 </html>
