@@ -34,7 +34,7 @@
 
             try {
                 // Remplacez par l'URL de votre backend Cloudflare (Étape 2)
-                const URL_BACKEND = 'METTRE_URL_CLOUDFLARE_ICI';
+                const URL_BACKEND = 'https://winter-cake-1c9d.ogiorgini.workers.dev/';
                 
                 const rep = await fetch(`${URL_BACKEND}?prompt=${encodeURIComponent(promptText)}`);
                 if(!rep.ok) throw new Error("Erreur de génération");
